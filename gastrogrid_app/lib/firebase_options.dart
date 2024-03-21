@@ -21,10 +21,7 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
@@ -52,6 +49,14 @@ class DefaultFirebaseOptions {
     messagingSenderId: '33269041187',
     projectId: 'gastrogridfirebase',
     authDomain: 'gastrogridfirebase.firebaseapp.com',
+    storageBucket: 'gastrogridfirebase.appspot.com',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyD4yzV_GUAKEjta7zq5-WC8a6NQW2jNnFA',
+    appId: '1:33269041187:android:050141f7174df32a7cc996',
+    messagingSenderId: '33269041187',
+    projectId: 'gastrogridfirebase',
     storageBucket: 'gastrogridfirebase.appspot.com',
   );
 
