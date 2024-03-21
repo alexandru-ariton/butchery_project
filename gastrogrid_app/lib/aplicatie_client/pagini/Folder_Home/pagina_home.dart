@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/bara_navigare.dart';
 
 
 class PaginaHome extends StatefulWidget {

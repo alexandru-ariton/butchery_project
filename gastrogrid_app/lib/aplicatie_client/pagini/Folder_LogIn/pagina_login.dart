@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_import
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Home/pagina_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/componente/my_button.dart';
 import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/componente/my_textfield.dart';
 import 'package:gastrogrid_app/aplicatie_client/pagini/bara_navigare.dart';
