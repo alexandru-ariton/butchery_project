@@ -1,44 +1,28 @@
-// ignore_for_file: unnecessary_import
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Home/pagina_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/componente/my_button.dart';
 import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/componente/my_textfield.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/bara_navigare.dart';
 
-class PaginaLogIn extends StatefulWidget {
 
-  final void Function()? onTap;
+class PaginaInregistrare extends StatefulWidget {
 
-  const PaginaLogIn({super.key, required this.onTap});
+    final void Function()? onTap;
+
+  const PaginaInregistrare({
+    super.key, 
+    this.onTap
+  });
 
   @override
-  State<PaginaLogIn> createState() => _PaginaLogInState();
+  State<PaginaInregistrare> createState() => _PaginaInregistrareState();
 }
 
-class _PaginaLogInState extends State<PaginaLogIn> {
-  //controller-ul pentru editarea text-ului
+
+
+class _PaginaInregistrareState extends State<PaginaInregistrare> {
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-
-  //functia de login
-  void login() {
-
-
-
-
-    //navigarea catre pagina de home a clientului
-  Navigator.push(
-     context,
-     MaterialPageRoute(
-      builder: (context) =>  BaraNavigare(),
-     ),
-  );
-
-  }
-
-
+  final TextEditingController confirmpasswordController = TextEditingController();
 
 
   @override
@@ -60,7 +44,7 @@ class _PaginaLogInState extends State<PaginaLogIn> {
 
             //titlul aplicatiei
             Text(
-              "Gastro Grid",
+              "Inregistrare",
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -87,21 +71,30 @@ class _PaginaLogInState extends State<PaginaLogIn> {
 
             const SizedBox(height: 10),
 
-            //buton logare
-            MyButton(
-              text: "Sign In", 
-              onTap: login,
+            //campul text pentru confirmare parola
+             MyTextField(
+              conntroller: confirmpasswordController, 
+              hintText: "Confirmare Parola", 
+              obscureText: true,
             ),
 
             const SizedBox(height: 10),
 
-            //optiunea de inregistrare
+            //buton logare
+            MyButton(
+              text: "Sign Up", 
+              onTap:() {},
+            ),
+
+            const SizedBox(height: 10),
+
+            //optiunea de logare
             GestureDetector(
               onTap: widget.onTap,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [ 
-                  Text("Inregistreaza-te", 
+                  Text("Logheaza-te", 
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.inversePrimary,
                     fontWeight: FontWeight.bold,

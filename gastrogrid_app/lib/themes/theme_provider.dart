@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/themes/dark_mode.dart';
-import 'package:gastrogrid_app/aplicatie_client/themes/light_mode.dart';
+import 'package:gastrogrid_app/themes/dark_mode.dart';
+import 'package:gastrogrid_app/themes/light_mode.dart';
 
 class ThemeProvider with ChangeNotifier{
   ThemeData _themeData = lightMode;

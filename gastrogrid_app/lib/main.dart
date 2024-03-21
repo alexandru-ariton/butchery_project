@@ -2,8 +2,8 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/pagina_login.dart';
-import 'package:gastrogrid_app/aplicatie_client/themes/theme_provider.dart';
+import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/authentificare/login_sau_inregistrare.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 Future<void> main() async {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: PaginaLogIn(),
+      home:const LoginSauInregistrare(),
       theme: Provider.of<ThemeProvider>(context).themeData,
     );
   }
