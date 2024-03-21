@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Home/componente_home/pagina_selectare_adresa.dart';
-import 'package:flat_3d_button/flat_3d_button.dart';
+
 
 class PaginaHome extends StatefulWidget {
   @override
