@@ -3,6 +3,8 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Home/pagina_home.dart';
+import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Orders/pagina_order.dart';
+import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/pagina_profil.dart';
 
 class BaraNavigare extends StatefulWidget {
   BaraNavigare({super.key});
@@ -28,6 +30,8 @@ class _BaraNavigareState extends State<BaraNavigare> {
 
   List<Widget> pageList = [
     PaginaHome(),
+    OrderPage(),
+    ProfilePage(),
     
   ];
 
@@ -60,11 +64,11 @@ class _BaraNavigareState extends State<BaraNavigare> {
         ),
         bottomNavigationBar:CustomNavigationBar(
 
-            backgroundColor: Color.fromARGB(255, 235, 71, 17),
+            backgroundColor: Theme.of(context).colorScheme.onPrimary,
             iconSize: 26.0,
             borderRadius: Radius.circular(5),
-            selectedColor: Colors.white,
-            unSelectedColor: const Color.fromARGB(255, 0, 0, 0),
+            selectedColor: Color.fromARGB(255, 142, 241, 103),
+            unSelectedColor: Color.fromARGB(255, 62, 134, 230),
             strokeColor: Colors.white,
             
             items:[
