@@ -1,9 +1,9 @@
 // ignore_for_file: use_key_in_widget_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Home/pagina_home.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Orders/pagina_order.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/pagina_profil.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/pagina_home.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Orders/pagina_order.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagina_profil.dart';
 
 class BaraNavigare extends StatefulWidget {
   @override

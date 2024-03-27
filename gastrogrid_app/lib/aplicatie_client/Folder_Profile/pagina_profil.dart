@@ -1,8 +1,8 @@
 // ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_const_constructors_in_immutables
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/pagini/pagina_adrese.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/pagini/pagina_editare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_editare.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {

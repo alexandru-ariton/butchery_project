@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/pagina_inregistrare.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/pagina_login.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/pagina_inregistrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/pagina_login.dart';
 
 class LoginSauInregistrare extends StatefulWidget {
   const LoginSauInregistrare({super.key});

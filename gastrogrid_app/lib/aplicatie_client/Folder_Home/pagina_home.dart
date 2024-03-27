@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Home/componente_home/butoane_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
 
 class HomePage extends StatelessWidget {
   @override

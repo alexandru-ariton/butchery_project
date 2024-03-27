@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/componente/my_button.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_LogIn/componente/my_textfield.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_button.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_textfield.dart';
 
 
 class PaginaInregistrare extends StatefulWidget {
