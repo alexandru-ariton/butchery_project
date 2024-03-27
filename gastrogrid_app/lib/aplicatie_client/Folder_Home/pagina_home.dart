@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_produs.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -20,25 +21,27 @@ class HomePage extends StatelessWidget {
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: EdgeInsets.all(16), // Ajustează padding după preferințe
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.end, // Alinează la baza spațiului flexibil
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap:() {},
-                    child: Row(
-                    children:[
-                      Icon(Icons.pin_drop_outlined),
-                      SizedBox(width: 8),
-                      Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
-                    ]
+              title: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end, // Alinează la baza spațiului flexibil
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap:() {},
+                      child: Row(
+                      children:[
+                        Icon(Icons.pin_drop_outlined),
+                        SizedBox(width: 8),
+                        Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
+                      ]
+                      
+                                      ),
+                    ),
                     
-                                    ),
-                  ),
-                  
-                  SizedBox(height: 8), // Spațiu între text și butoane
-                  DeliveryToggleButtons(), // Includem butoanele aici
-                ],
+                    SizedBox(height: 6), // Spațiu între text și butoane
+                    DeliveryToggleButtons(), // Includem butoanele aici
+                  ],
+                ),
               ),
               background: Container(
                 color: Theme.of(context).primaryColor, // Alege o culoare pentru fundal sau un gradient
@@ -75,20 +78,42 @@ class HomePage extends StatelessWidget {
             ),
             pinned: false,
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Card(
-                  child: ListTile(
-                    title: Text('Produs $index'),
-                    subtitle: Text('Descriere produs $index'),
-                    onTap: () {
-                      // Logica pentru deschiderea detaliilor produsului
-                    },
-                  ),
-                );
-              },
-              childCount: 10, // numărul de produse
+            // Înlocuiește SliverList cu SliverGrid
+          SliverPadding(
+            padding: EdgeInsets.all(10),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Numărul de coloane
+                crossAxisSpacing: 10, // Spațierea orizontală între elemente
+                mainAxisSpacing: 10, // Spațierea verticală între elemente
+                childAspectRatio: 4 / 3, // Aspect ratio pentru dimensiunea cardurilor
+              ),
+              delegate: SliverChildBuilderDelegate(
+  (BuildContext context, int index) {
+    // Mock product data
+    final product = Product(
+      title: 'Produs $index',
+      description: 'Descriere produs $index',
+      price: (index + 1) * 5.0, // Example price calculation
+      imageUrl: 'https://via.placeholder.com/150', // Placeholder image URL
+    );
+
+    return Card(
+      child: ListTile(
+        title: Text(product.title),
+        subtitle: Text(product.description),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ProductDetailPage(product: product),
+            ),
+          );
+        },
+      ),
+    );
+  },
+  childCount: 10, // numărul de produse
+),
             ),
           ),
         ],

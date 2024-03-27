@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, prefer_const_constructors, sized_box_for_whitespace
-
 import 'package:flutter/material.dart';
 
 class DeliveryToggleButtons extends StatefulWidget {
@@ -12,63 +10,101 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 40, // Înălțimea container-ului pentru butoane
-      child: Padding(
-        padding: const EdgeInsets.only(left: 110),
-        child: Row(
-          mainAxisSize:MainAxisSize.min, // Face ca Row să fie cât mai mic posibil
-          children: <Widget>[
-            AnimatedContainer(
-              height: 30,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              decoration: BoxDecoration(
-                color: isDeliverySelected ? Colors.blue : Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isDeliverySelected = true;
-                  });
-                },
-                child: Text(
-                  'Livrare',
-                  style: TextStyle(
-                    color: isDeliverySelected ? Colors.white : Colors.black,
-                     fontSize: 12
-                  ),
-                ),
-              ),
-            ),
-             // Spațiu între butoane
-            AnimatedContainer(
-              height: 30,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              decoration: BoxDecoration(
-                color: !isDeliverySelected ? Colors.blue : Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isDeliverySelected = false;
-                  });
-                },
-                child: Text(
-                  'Ridicare',
-                  style: TextStyle(
-                    color: !isDeliverySelected ? Colors.white : Colors.black,
-                    fontSize: 12
-                  ),
-                ),
-              ),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min, // Face ca Row să fie cât mai mic posibil
+            children: <Widget>[
+              _buildDeliveryButton(),
+              _buildPickupButton(),
+            ],
+          ),
+        ),
+        if (isDeliverySelected) ...[
+          SizedBox(height: 10),
+         
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [ 
+            
+            Icon(Icons.timelapse_outlined,size: 15,),
+            Text('60 min', style: TextStyle(fontSize: 12)),
+            SizedBox(width: 8),
+            Icon(Icons.delivery_dining_outlined,size: 15,),
+            Text('5 lei', style: TextStyle(fontSize: 12)),
+            ],
+                    ),
+          ),
+          
+        ] else ...[
+          SizedBox(height: 10),
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [ 
+            
+            Icon(Icons.timelapse_outlined,size: 15,),
+            Text('20 min', style: TextStyle(fontSize: 12)),
+         
+            ],
+                    ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDeliveryButton() {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: isDeliverySelected ? Colors.blue : Colors.grey[200],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            isDeliverySelected = true;
+          });
+        },
+        child: Text(
+          'Livrare',
+          style: TextStyle(
+            color: isDeliverySelected ? Colors.white : Colors.black,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPickupButton() {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: !isDeliverySelected ? Colors.blue : Colors.grey[200],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            isDeliverySelected = false;
+          });
+        },
+        child: Text(
+          'Ridicare',
+          style: TextStyle(
+            color: !isDeliverySelected ? Colors.white : Colors.black,
+            fontSize: 12,
+          ),
         ),
       ),
     );
