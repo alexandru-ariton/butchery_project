@@ -1,173 +1,140 @@
-// ignore_for_file: unused_import, prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_unnecessary_containers
-
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/screens/edit_screen.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/screens/payment_screen.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/screens/settings_screen.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/screens/support_screen.dart';
-import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/widgets/setting_item.dart';
-import 'package:get/get.dart';
-import 'package:ionicons/ionicons.dart';
-
+import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/pagini/pagina_adrese.dart';
+import 'package:gastrogrid_app/aplicatie_client/pagini/Folder_Profile/pagini/pagina_editare.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String _username = "Utilizator Nou";
+  String _phoneNumber = "0712345678";
+  String _email = "utilizatornou@example.com";
 
-  bool isDarkMode = false;
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileInfo();
+  }
 
-
+  Future<void> _loadProfileInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? "Utilizator Nou";
+      _phoneNumber = prefs.getString('phoneNumber') ?? "0712345678";
+      _email = prefs.getString('email') ?? "utilizatornou@example.com";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     backgroundColor: Theme.of(context).colorScheme.background,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-             
-             
-           
-              Padding(
-                padding: EdgeInsets.all( 8),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Test Test",
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 25),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push<void>(
-    context,
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) => const EditAccountScreen(),
-    ),
-  );
-                            },
-                            child: Container(
-                              child: Text(
-                                "+407563214",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                     
-                      
-                    ],
+      backgroundColor: Colors.grey[200], // Schimbă culoarea de fundal
+      body: SafeArea(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.blue[100], // Schimbă culoarea de fundal a avatarului
+              child: Icon(Icons.person, size: 50, color: Colors.blue[800]), // Schimbă culoarea iconiței
+            ),
+            SizedBox(height: 10),
+            Text(
+              _username,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800], // Schimbă culoarea textului
+              ),
+            ),
+            Text(
+              _phoneNumber,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[800], // Schimbă culoarea textului
+              ),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView(
+                children: [
+                  ProfileOption(
+                    icon: Icons.edit,
+                    text: 'Editează informații personale',
+                    onTap: () async {
+                      final updated = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditProfilePage(
+                                  username: _username,
+                                  phoneNumber: _phoneNumber,
+                                  email: _email,
+                                )),
+                      );
+                      if (updated != null && updated) {
+                        _loadProfileInfo();
+                      }
+                    },
                   ),
-                ),
+                  ProfileOption(
+                    icon: Icons.location_on,
+                    text: 'Adresele mele',
+                    onTap: () async {
+              // Aici folosim Navigator pentru a deschide pagina de adrese
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MultiAddressInputPage()),
+              );
+              // Reîncarcă informațiile din profil, dacă este necesar
+            },
+                  ),
+                  ProfileOption(
+                    icon: Icons.settings,
+                    text: 'Setări aplicație',
+                    onTap: () {
+                      // Navighează către pagina de setări
+                    },
+                  ),
+                  ProfileOption(
+                    icon: Icons.info,
+                    text: 'Informații aplicație',
+                    onTap: () {
+                      // Navighează către pagina de informații
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 30),
-         
-              
-              const SizedBox(height: 20),
-              SettingItem(
-                title: "Paymet",
-                icon: Icons.payment_outlined,
-                bgColor: Colors.blue.shade100,
-                iconColor: Colors.blue,
-                onPressed: () {
-                  Navigator.push<void>(
-    context,
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) =>  PaymentPage(),
-    ),
-  );
-                },
-              ),
-               const SizedBox(height: 20),
-              SettingItem(
-                title: "Profile",
-                icon: Icons.person,
-                bgColor: Colors.blue.shade100,
-                iconColor: Colors.blue,
-                onPressed: () {
-                       Navigator.push<void>(
-    context,
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) => const EditAccountScreen(),
-    ),
-  );
-                },
-              ),
-               const SizedBox(height: 20),
-              SettingItem(
-                title: "Settings",
-                icon: Icons.settings,
-                bgColor: Colors.blue.shade100,
-                iconColor: Colors.blue,
-               onPressed: () {
-                Navigator.push<void>(
-    context,
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) =>  SettingsPage(),
-    ),
-  );
-               },
-              ),
-             
-              const SizedBox(height: 20),
-              SettingItem(
-                title: "About",
-                icon: Icons.info,
-                bgColor: Color.fromARGB(255, 237, 180, 10),
-                iconColor: Color.fromARGB(255, 107, 82, 18),
-                onPressed: () {
-                  Navigator.push<void>(
-    context,
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) => const EditAccountScreen(),
-    ),
-  );
-                },
-              ),
-               const SizedBox(height: 20),
-              SettingItem(
-                title: "Support",
-                icon: Icons.help,
-                bgColor: Colors.blue.shade100,
-                iconColor: Colors.blue,
-                onPressed: () {
-                 Navigator.push<void>(
-    context,
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) =>  SupportPage(),
-    ),
-  );
-                },
-              ),
-               
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class ProfileOption extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final VoidCallback onTap;
+
+  ProfileOption({
+    required this.icon,
+    required this.text,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue[800]),
+        title: Text(text),
+        trailing: Icon(Icons.chevron_right, color: Colors.blue[800]),
+        onTap: onTap,
       ),
     );
   }
