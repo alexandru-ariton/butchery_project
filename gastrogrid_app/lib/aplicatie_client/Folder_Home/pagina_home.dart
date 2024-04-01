@@ -4,8 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_produs.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_selectare_adresa.dart';
+
 
 class HomePage extends StatelessWidget {
+
+  void _selectAddress(BuildContext context) async {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return AddressSelector();
+    },
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,17 +39,16 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end, // Alinează la baza spațiului flexibil
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap:() {},
-                      child: Row(
-                      children:[
-                        Icon(Icons.pin_drop_outlined),
-                        SizedBox(width: 8),
-                        Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
-                      ]
-                      
-                                      ),
-                    ),
+                      GestureDetector(
+      onTap: () => _selectAddress(context),
+      child: Row(
+        children: [
+          Icon(Icons.pin_drop_outlined),
+          SizedBox(width: 8),
+          Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
+        ],
+      ),
+    ),
                     
                     SizedBox(height: 6), // Spațiu între text și butoane
                     DeliveryToggleButtons(), // Includem butoanele aici
