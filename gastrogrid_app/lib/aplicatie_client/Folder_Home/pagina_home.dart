@@ -9,12 +9,11 @@ import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagi
 
 class HomePage extends StatelessWidget {
 
-  void _selectAddress(BuildContext context) async {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return AddressSelector();
-    },
+void _selectAddress(BuildContext context) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => AddressSelector(),
+    ),
   );
 }
 

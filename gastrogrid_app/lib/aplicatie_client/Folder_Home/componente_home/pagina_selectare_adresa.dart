@@ -1,9 +1,12 @@
-// ignore_for_file: unnecessary_new
+// ignore_for_file: unused_import
 
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'package:location/location.dart' as loc;
+import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddressSelector extends StatefulWidget {
   @override
@@ -16,95 +19,116 @@ class _AddressSelectorState extends State<AddressSelector> {
   TextEditingController searchController = TextEditingController();
   GoogleMapController? mapController;
   LatLng? selectedLocation;
+ 
 
   @override
   void initState() {
     super.initState();
+    // Initialize googlePlace with your API key
     googlePlace = GooglePlace("AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ");
   }
 
-  void autoCompleteSearch(String value) async {
+ void autoCompleteSearch(String value) async {
+  // Check if the input is not empty
+  if (value.isNotEmpty) {
     var result = await googlePlace.autocomplete.get(value);
     if (result != null && result.predictions != null && mounted) {
       setState(() {
         predictions = result.predictions!;
       });
     }
+  } else {
+    // Clear predictions if the search input is cleared
+    setState(() {
+      predictions = [];
+    });
   }
+}
+
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
 
-  void selectPrediction(AutocompletePrediction prediction) async {
-    var detail = await googlePlace.details.get(prediction.placeId!);
-    if (detail != null && detail.result != null && mounted) {
-      final location = detail.result!.geometry!.location!;
-      final position = LatLng(location.lat!, location.lng!);
-      mapController?.animateCamera(CameraUpdate.newLatLng(position));
-      setState(() {
-        selectedLocation = position;
-        predictions.clear();
-        searchController.text = detail.result!.formattedAddress!;
-      });
-    }
+ void selectPrediction(AutocompletePrediction prediction) async {
+  var detail = await googlePlace.details.get(prediction.placeId!);
+  if (detail != null && detail.result != null && mounted) {
+    final location = detail.result!.geometry!.location!;
+    final position = LatLng(location.lat!, location.lng!);
+    mapController?.animateCamera(CameraUpdate.newLatLng(position));
+    setState(() {
+      selectedLocation = position;
+      predictions.clear();
+      searchController.text = detail.result!.formattedAddress!;
+    });
+    // Save the address
+    saveAddress(detail.result!.formattedAddress!);
   }
+}
 
   void determineLocationAutomatically() async {
-    loc.Location location = new loc.Location();
-    bool _serviceEnabled;
-    loc.PermissionStatus _permissionGranted;
-    loc.LocationData _locationData;
+  var locationService = loc.Location();
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
+  bool serviceEnabled;
+  loc.PermissionStatus permissionGranted;
+  loc.LocationData locationData;
+
+  serviceEnabled = await locationService.serviceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await locationService.requestService();
+    if (!serviceEnabled) {
+      return;
     }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == loc.PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != loc.PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-    setState(() {
-      selectedLocation = LatLng(_locationData.latitude!, _locationData.longitude!);
-    });
-
-    mapController?.animateCamera(CameraUpdate.newLatLng(selectedLocation!));
   }
+
+  permissionGranted = await locationService.hasPermission();
+  if (permissionGranted == loc.PermissionStatus.denied) {
+    permissionGranted = await locationService.requestPermission();
+    if (permissionGranted != loc.PermissionStatus.granted) {
+      return;
+    }
+  }
+
+  locationData = await locationService.getLocation();
+  LatLng currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+
+  mapController?.animateCamera(CameraUpdate.newLatLngZoom(currentLocation, 14.0));
+  
+  setState(() {
+    selectedLocation = currentLocation;
+    // Assuming you want to clear the search bar when using automatic location
+    searchController.clear();
+    predictions.clear();
+  });
+
+}
+
 
   void addAddressManually() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Adaugă Adresa Manual'),
-          content: TextField(
-            onSubmitted: (value) {
-              Navigator.of(context).pop();
-              // Do something with the user input
-            },
-            decoration: InputDecoration(
-              hintText: 'Introdu adresa',
-            ),
-          ),
-        );
-      },
-    );
+    // TODO: Add your logic to add the address manually
   }
+
+
+
+
+
+void saveAddress(String address) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // Fetch the existing list of saved addresses or initialize an empty list
+  List<String> savedAddresses = prefs.getStringList('savedAddresses') ?? [];
+  // Add the new address to the list
+  savedAddresses.add(address);
+  // Save the updated list back to shared_preferences
+  await prefs.setStringList('savedAddresses', savedAddresses);
+}
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Adaugă adresă'),
+        title: Text('Select Address'),
       ),
       body: Column(
         children: [
@@ -114,9 +138,11 @@ class _AddressSelectorState extends State<AddressSelector> {
               controller: searchController,
               onChanged: autoCompleteSearch,
               decoration: InputDecoration(
-                hintText: 'Caută stradă, localitate, județ',
+                hintText: 'Search by street, city, or state',
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
             ),
           ),
@@ -134,41 +160,35 @@ class _AddressSelectorState extends State<AddressSelector> {
               },
             ),
           ),
-          Expanded(
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: selectedLocation ?? LatLng(45.4215, -75.6972),
-                zoom: 14.0,
+          if (selectedLocation != null) ...[
+            Expanded(
+              child: GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: selectedLocation!,
+                  zoom: 14.0,
+                ),
+                markers: {
+                  Marker(
+                    markerId: MarkerId("selectedLocation"),
+                    position: selectedLocation!,
+                  ),
+                },
+                onTap: (position) {
+                  setState(() {
+                    selectedLocation = position;
+                  });
+                },
               ),
-              markers: selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: MarkerId("selected-location"),
-                        position: selectedLocation!,
-                      ),
-                    }
-                  : {},
-              onTap: (position) {
-                setState(() {
-                  selectedLocation = position;
-                });
-                mapController?.animateCamera(CameraUpdate.newLatLng(position));
-              },
             ),
-          ),
-          ElevatedButton(
-            onPressed: determineLocationAutomatically,
-            child: Text('Determină locația automat'),
-          ),
-          ElevatedButton(
-            onPressed: addAddressManually,
-            child: Text('Adaugă adresă manual'),
-          ),
+            ElevatedButton(
+             
+              onPressed: () { saveAddress; },
+              child: Text('Save Address'),
+            ),
+          ],
         ],
       ),
     );
   }
 }
-
-void main() => runApp(MaterialApp(home: AddressSelector()));

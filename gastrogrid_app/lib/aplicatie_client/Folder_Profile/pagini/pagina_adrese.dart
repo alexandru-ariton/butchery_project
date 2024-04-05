@@ -1,65 +1,66 @@
-// ignore_for_file: unused_field, prefer_const_constructors, use_key_in_widget_constructors, library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class MultiAddressInputPage extends StatefulWidget {
+class SavedAddressesPage extends StatefulWidget {
   @override
-  _MultiAddressInputPageState createState() => _MultiAddressInputPageState();
+  _SavedAddressesPageState createState() => _SavedAddressesPageState();
 }
 
-class _MultiAddressInputPageState extends State<MultiAddressInputPage> {
-  final Set<Marker> _markers = {};
-  late GoogleMapController _mapController;
-  final LatLng _initialPosition = LatLng(45.4215, -75.6972); // Înlocuiește cu o locație inițială
+class _SavedAddressesPageState extends State<SavedAddressesPage> {
+  List<String> savedAddresses = [];
 
-  void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
+  @override
+  void initState() {
+    super.initState();
+    loadSavedAddresses();
   }
 
-  void _onAddMarkerButtonPressed(LatLng position) {
+  void loadSavedAddresses() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _markers.add(
-        Marker(
-          markerId: MarkerId(position.toString()),
-          position: position,
-          infoWindow: InfoWindow(
-            title: 'Adresa selectată',
-            snippet: 'Adaugă descrierea aici',
-          ),
-          icon: BitmapDescriptor.defaultMarker,
-        ),
-      );
+      savedAddresses = prefs.getStringList('savedAddresses') ?? [];
     });
+  }
+
+  Widget _buildAddressCard(String address) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 4,
+      shadowColor: Colors.grey.withOpacity(0.5),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        title: Text(
+          address,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.edit, color: Theme.of(context).primaryColor),
+          onPressed: () {
+            // Implement edit address logic
+          },
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Adaugă Adrese'),
+        title: Text('Adresele mele'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
-      body: Stack(
-        children: [
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _initialPosition,
-              zoom: 12.0,
-            ),
-            markers: _markers,
-            onTap: _onAddMarkerButtonPressed,
-          ),
-          // Adaugă aici widget-uri pentru căutarea adreselor și pentru a lista adresele adăugate
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Logica pentru a salva adresele sau pentru a merge mai departe
+      body: ListView.builder(
+        itemCount: savedAddresses.length,
+        itemBuilder: (context, index) {
+          return _buildAddressCard(savedAddresses[index]);
         },
-        child: Icon(Icons.check),
       ),
     );
   }
-
 }

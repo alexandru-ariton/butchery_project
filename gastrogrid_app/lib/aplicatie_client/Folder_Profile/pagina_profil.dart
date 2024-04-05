@@ -88,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
               // Aici folosim Navigator pentru a deschide pagina de adrese
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MultiAddressInputPage()),
+                MaterialPageRoute(builder: (context) => SavedAddressesPage()),
               );
               // Reîncarcă informațiile din profil, dacă este necesar
             },
