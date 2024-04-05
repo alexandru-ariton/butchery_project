@@ -21,10 +21,11 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   @override
   Widget build(BuildContext context) {
      final cart = Provider.of<CartModel>(context);
-  final deliveryInfo = Provider.of<DeliveryInfo>(context);
+    final deliveryInfo = Provider.of<DeliveryInfo>(context);
 
-  double total = cart.total;
-  double deliveryFee = deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0;
+    // Setăm costul de livrare la 0 dacă nu există produse în coș
+    double deliveryFee = cart.items.isEmpty ? 0.0 : (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0);
+    double total = cart.total + deliveryFee;
   
     return Scaffold(
       appBar: AppBar(
@@ -46,7 +47,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
+            child: cart.items.isEmpty
+                ? Center(child: Text("Nu exista produse in cos")) // Afișăm mesajul când coșul este gol
+                : ListView.builder(
               itemCount: cart.items.length,
               itemBuilder: (context, index) {
                 var item = cart.items[index];
@@ -98,14 +101,14 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Livrare:'),
-                      Text('${deliveryInfo.isDelivery ? "$deliveryFee lei" : "Ridicare"}'),
+                      Text(cart.items.isEmpty ? "0 lei" : '${deliveryInfo.isDelivery ? "$deliveryFee lei" : "Ridicare"}'),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Total: '),
-                      Text('${total + deliveryFee} lei'),
+                     Text(cart.items.isEmpty ? "0 lei" : '$total lei'),
                     ],
                   ),
                 ],
