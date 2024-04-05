@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cart.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/pagina_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/authentificare/login_sau_inregistrare.dart';
 import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';

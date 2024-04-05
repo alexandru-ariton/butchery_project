@@ -46,7 +46,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: deliveryInfo.isDelivery ? 
-            [Icon(Icons.timelapse_outlined, size: 12), Text('60 min'), Icon(Icons.delivery_dining_outlined, size: 15), Text('${deliveryInfo.deliveryFee} lei',style:TextStyle(fontSize: 12))] : 
+            [Icon(Icons.timelapse_outlined, size: 12), Text('60 min',style:TextStyle(fontSize: 12)),SizedBox(width: 8,), Icon(Icons.delivery_dining_outlined, size: 15), Text('${deliveryInfo.deliveryFee} lei',style:TextStyle(fontSize: 12))] : 
             [Icon(Icons.timelapse_outlined, size: 12), Text('20 min',style:TextStyle(fontSize: 12),)],
           ),
         ),
