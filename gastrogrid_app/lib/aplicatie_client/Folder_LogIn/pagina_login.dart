@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_import
+// ignore_for_file: unnecessary_import, unused_import
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_admin/pagina_admin.dart';
