@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_null_comparison
-
 import 'package:flutter/material.dart';
 
 class CartItem {
@@ -9,7 +7,7 @@ class CartItem {
 
   CartItem({required this.title, required this.price, this.quantity = 1});
 
-    void incrementQuantity() {
+  void incrementQuantity() {
     quantity++;
   }
 
@@ -25,30 +23,50 @@ class CartModel extends ChangeNotifier {
 
   List<CartItem> get items => _items;
 
-void addProduct(CartItem item) {
-    // Attempt to find the item in the cart
-    var existingItemIndex = _items.indexWhere((element) => element.title == item.title);
-    if (existingItemIndex != -1) {
-      // If item exists, increment its quantity
-      _items[existingItemIndex].incrementQuantity();
-    } else {
-      // If item doesn't exist, add it to the cart
-      _items.add(item);
+  CartItem? findItemByTitle(String title) {
+    try {
+      return _items.firstWhere((element) => element.title == title);
+    } catch (e) {
+      // If no item is found, return null
+      return null;
     }
-    notifyListeners();
   }
+
+ void addProduct(CartItem newItem) {
+  // Check if the item is already in the cart.
+  var existingItemIndex = _items.indexWhere((item) => item.title == newItem.title);
+  if (existingItemIndex != -1) {
+    // If the item exists, increase its quantity by the new item's quantity.
+    _items[existingItemIndex].quantity += newItem.quantity;
+  } else {
+    // If the item is new, add it to the cart with the provided quantity.
+    _items.add(newItem);
+  }
+  notifyListeners();
+}
+
 
   void removeProduct(CartItem item) {
-    var existingItemIndex = _items.indexWhere((element) => element.title == item.title);
-    if (existingItemIndex != -1 && _items[existingItemIndex].quantity > 1) {
+    var existingItem = findItemByTitle(item.title);
+    if (existingItem != null && existingItem.quantity > 1) {
       // If item exists and quantity is more than one, decrement it
-      _items[existingItemIndex].decrementQuantity();
-    } else {
-      // Remove the item from the cart if quantity is 1 or it somehow wasn't found
-      _items.removeAt(existingItemIndex);
+      existingItem.decrementQuantity();
+    } else if (existingItem != null) {
+      // Remove the item if quantity is 1
+      _items.remove(existingItem);
     }
     notifyListeners();
   }
 
- double get total => _items.fold(0, (sum, item) => sum + (item.price * item.quantity));
+  void updateProductQuantity(CartItem item, int newQuantity) {
+    var existingItemIndex = _items.indexWhere((element) => element.title == item.title);
+    if (existingItemIndex != -1) {
+      _items[existingItemIndex].quantity = newQuantity;
+      notifyListeners();
+    }
+  }
+
+   int get totalItemsQuantity => _items.fold(0, (total, current) => total + current.quantity);
+
+  double get total => _items.fold(0, (sum, item) => sum + (item.price * item.quantity));
 }

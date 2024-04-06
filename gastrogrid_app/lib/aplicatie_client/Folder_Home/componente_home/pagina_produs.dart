@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cart.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cos_cumparaturi.dart';
+import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
 import 'package:provider/provider.dart';
 
 class Product {
@@ -21,7 +21,6 @@ class Product {
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
-
   ProductDetailPage({required this.product});
 
   @override
@@ -31,101 +30,120 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
 
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Expanded(
-            child: Stack(
-              alignment: Alignment.bottomLeft,
-              children: [
-                Image.network(
-                  widget.product.imageUrl,
-                  fit: BoxFit.cover,
-                  height: double.infinity,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Image.network(
+              widget.product.imageUrl,
+              fit: BoxFit.cover,
+              height: 300,
+              width: double.infinity,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                widget.product.title,
+                style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                widget.product.description,
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                '\$${widget.product.price.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.headline6?.copyWith(color: Theme.of(context).colorScheme.secondary),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _buildQuantityButton(Icons.remove, () {
+                    setState(() {
+                      if (quantity > 1) quantity--;
+                    });
+                  }),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      quantity.toString(),
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    widget.product.title,
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                  _buildQuantityButton(Icons.add, () {
+                    setState(() {
+                      quantity++;
+                    });
+                  }),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary, backgroundColor: Theme.of(context).colorScheme.primary,
+                  minimumSize: Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
-              ],
+                onPressed: addToCart,
+                child: Text('Add to Cart'),
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.product.description, style: TextStyle(fontSize: 16)),
-                SizedBox(height: 8),
-                Text('\$${widget.product.price.toStringAsFixed(2)}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _buildQuantityButton(Icons.remove, () {
-                      if (quantity > 1) setState(() => quantity--);
-                    }),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(quantity.toString(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    ),
-                    _buildQuantityButton(Icons.add, () => setState(() => quantity++)),
-                  ],
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      var cartItem = CartItem(
-                        title: widget.product.title,
-                        price: widget.product.price,
-                        quantity: quantity,
-                      );
-                      Provider.of<CartModel>(context, listen: false).addProduct(cartItem);
-
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ShoppingCartPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Theme.of(context).colorScheme.secondary),
-                    child: Text('Add to Cart', style: TextStyle(fontSize: 18)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+   void addToCart() {
+    var cartItem = CartItem(
+      title: widget.product.title,
+      price: widget.product.price,
+      quantity: quantity, // Use the current quantity value
+    );
+    // Use the current quantity to add or update the cart item
+    Provider.of<CartModel>(context, listen: false).addProduct(cartItem);
+
+    // Navigate to the ShoppingCartPage without resetting the quantity
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BaraNavigare(),
+      ),
+    );
+
+    // Reset the quantity to 1 for the next product detail visit
+    setState(() {
+      quantity = 1;
+    });
   }
 
   Widget _buildQuantityButton(IconData icon, VoidCallback onPressed) {
     return CircleAvatar(
       backgroundColor: Colors.grey[200],
-      child: IconButton(icon: Icon(icon, color: Colors.black), onPressed: onPressed),
+      child: IconButton(
+        icon: Icon(icon, color: Theme.of(context).colorScheme.onBackground),
+        onPressed: onPressed,
+      ),
     );
   }
 }
