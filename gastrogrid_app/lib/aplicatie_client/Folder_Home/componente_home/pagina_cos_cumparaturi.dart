@@ -41,88 +41,104 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     double deliveryFee = cart.items.isEmpty ? 0.0 : (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0);
     double total = cart.total + deliveryFee;
   
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Center(child: Text('Coș cumpărături')),
-       
-      ),
-      body: Column(
-        children: [
+     return Scaffold(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            automaticallyImplyLeading: false,
            
-          Expanded(
-            child: cart.items.isEmpty
-                ? Center(child: Text("Nu există produse în coș", style: TextStyle(fontSize: 18)))
-                : ListView.builder(
-                    itemCount: cart.items.length,
-                    itemBuilder: (context, index) {
-                      return _buildCartItem(cart.items[index]);
-                    },
-                  ),
-          ),
-          if (deliveryInfo.isDelivery)// Check if delivery is selected
-            Container(
-              // If an address is selected, display it
-              padding: EdgeInsets.all(16),
-              color: Colors.grey[200],
-              width: double.infinity,
-              child: deliveryInfo.selectedAddress != null
-                  ? Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Adresa de livrare: ${deliveryInfo.selectedAddress}',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () async {
-                            final selectedAddress = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => SavedAddressesPage(),
-                              ),
-                            );
-                            if (selectedAddress != null) {
-                              setState(() {
-                                _selectedAddress = selectedAddress;
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    )
-                  : ElevatedButton(
-                      child: Text("Selectează o adresă de livrare"),
-                      onPressed: () async {
-                        final selectedAddress = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => SavedAddressesPage(),
-                          ),
-                        );
-                        if (selectedAddress != null) {
-                          setState(() {
-                            deliveryInfo.setSelectedAddress(selectedAddress as String);
-                          });
-                        }
-                      },
-                    ),
+            floating: false,
+            pinned: false,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text('Coș cumpărături', style: TextStyle(color: const Color.fromARGB(255, 7, 7, 7))),
+              
             ),
-          
-          _buildTotalSection(cart, deliveryFee, total),
+          ),
+
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _buildCartItem(cart.items[index]),
+              childCount: cart.items.length,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: _buildDeliveryInfoSection(deliveryInfo),
+          ),
+          SliverToBoxAdapter(
+            child: _buildTotalSection(cart,deliveryFee,total),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCartItem(CartItem item) {
-    return ListTile(
-       // Înlocuiește cu o imagine reală
-      title: Text(item.title, style: TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text('${item.price} x ${item.quantity}'),
-      trailing: _buildQuantityControls(item),
+  Widget _buildDeliveryInfoSection(DeliveryInfo deliveryInfo) {
+    return Container(
+      padding: EdgeInsets.all(8.0),
+      color: Colors.white,
+      child: deliveryInfo.isDelivery
+          ? ListTile(
+              title: Text('Selectați adresa de livrare'),
+              subtitle: Text(deliveryInfo.selectedAddress ?? 'Nu a fost selectată nicio adresă'),
+              trailing: Icon(Icons.keyboard_arrow_right),
+              onTap: _selectDeliveryAddress,
+            )
+          : ListTile(
+              title: Text('Ridicare personală activată'),
+              subtitle: Text('Produsele vor fi ridicate de la magazin'),
+            ),
     );
   }
+
+ Widget _buildCartItem(CartItem item) {
+  return Card(
+    elevation: 2.0,
+    margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    child: Padding(
+      padding: EdgeInsets.all(8),
+      child: Row(
+        children: <Widget>[
+          // Use a placeholder image for now, replace with item.image later
+         
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    item.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    'Price: \$${item.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    'Quantity: ${item.quantity}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _buildQuantityControls(item),
+        ],
+      ),
+    ),
+  );
+}
+
 
   Widget _buildQuantityControls(CartItem item) {
     return Row(
@@ -154,7 +170,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
 
   Widget _buildTotalSection(CartModel cart, double deliveryFee, double total) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -177,7 +193,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             _buildSummaryLine('Total:', '${total.toStringAsFixed(2)} lei', isTotal: true),
             SizedBox(height: 12),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(50)),
+              style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(30)),
               onPressed: () {
                 // Logică pentru finalizarea comenzii
               },

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_editare_adrese.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,7 +51,11 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
           trailing: IconButton(
             icon: Icon(Icons.edit, color: Theme.of(context).primaryColor),
             onPressed: () {
-              // Implement edit address logic
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditAddressPage(address: address)),
+              );
+
             },
           ),
         ),
