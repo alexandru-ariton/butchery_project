@@ -7,6 +7,7 @@ environment:
   sdk: '>=3.3.1 <4.0.0'
 
 dependencies:
+  cloud_firestore: ^4.17.0
   custom_navigation_bar: ^0.8.2
   firebase_auth: ^4.17.9
   firebase_core: ^2.27.1

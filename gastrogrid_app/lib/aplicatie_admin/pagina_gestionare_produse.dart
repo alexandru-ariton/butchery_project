@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Product {
   final String id;
@@ -183,28 +185,28 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _priceController = TextEditingController(text: widget.product?.price.toString() ?? '');
   }
 
-  void _saveForm() {
-    if (_formKey.currentState!.validate()) {
-      if (widget.product != null) {
-        // Edit mode
-        setState(() {
-          widget.product!.title = _titleController.text;
-          widget.product!.price = double.parse(_priceController.text);
-        });
-      } else {
-        // Add mode
-        final newProduct = Product(
-          id: DateTime.now().toString(),
-          title: _titleController.text,
-          price: double.parse(_priceController.text),
-        );
-        setState(() {
-          products.add(newProduct);
-        });
-      }
-      Navigator.pop(context);
+ void _saveForm() async {
+  if (_formKey.currentState!.validate()) {
+    final collection = FirebaseFirestore.instance.collection('products');
+    
+    if (widget.product != null) {
+      // Edit mode
+      await collection.doc(widget.product!.id).update({
+        'title': _titleController.text,
+        'price': double.parse(_priceController.text),
+      });
+    } else {
+      // Add mode
+      await collection.add({
+        'title': _titleController.text,
+        'price': double.parse(_priceController.text),
+      });
     }
+    
+    Navigator.pop(context);
   }
+}
+
 
   @override
   void dispose() {
