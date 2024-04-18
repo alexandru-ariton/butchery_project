@@ -114,7 +114,7 @@ void _selectAddress(BuildContext context) {
                         return Card(
                           child: ListTile(
                             title: Text(product.title),
-                            subtitle: Text(product.description),
+                            subtitle: Text(product.price.toString() + " lei"),
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(

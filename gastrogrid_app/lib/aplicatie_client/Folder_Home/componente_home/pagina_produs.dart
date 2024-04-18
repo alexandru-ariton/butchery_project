@@ -33,11 +33,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Image.network(
-              widget.product.imageUrl,
-              fit: BoxFit.cover,
-              height: 300,
-              width: double.infinity,
-            ),
+  widget.product.imageUrl,
+  fit: BoxFit.cover,
+  height: 300,
+  width: double.infinity,
+  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.error, color: Colors.red, size: 60),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Failed to load image', style: TextStyle(fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+  },
+),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(

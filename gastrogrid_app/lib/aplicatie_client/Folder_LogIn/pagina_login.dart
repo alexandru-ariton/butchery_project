@@ -33,7 +33,7 @@ class _PaginaLogInState extends State<PaginaLogIn> {
   Navigator.push(
      context,
      MaterialPageRoute(
-      builder: (context) => AdminPage(),
+      builder: (context) => BaraNavigare(),
      ),
   );
 

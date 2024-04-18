@@ -95,7 +95,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
               title: doc['title'],
               price: doc['price'],
               description: doc['description'] ?? '',
-              imageUrl: doc['imageUrl'] ?? 'https://via.placeholder.com/150',
+              imageUrl: doc['imageUrl'] ?? 'https://via.placeholder.com/350',
             );
           }).toList() ?? [];
 
@@ -140,9 +140,20 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
         children: [
           Positioned.fill(
             child: Image.network(
-              'https://via.placeholder.com/150',
-              fit: BoxFit.cover,
-            ),
+  "https://via.placeholder.com/350",
+  fit: BoxFit.cover,
+  height: 300,
+  width: double.infinity,
+  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+    // Log the error or handle it in a way suitable for your app
+    print('Failed to load the image: $exception');
+
+    // Returning a placeholder widget or an error icon
+    return Center(
+      child: Icon(Icons.error, color: Colors.red),
+    );
+  },
+),
           ),
           Positioned(
             bottom: 0,
@@ -239,21 +250,31 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _imageUrl = widget.product?.imageUrl ?? '';
   }
 
-  Future<void> _selectAndUploadImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('product_images')
-          .child(DateTime.now().toString() + '.png');
-      await ref.putFile(File(pickedFile.path));
-      final url = await ref.getDownloadURL();
-      setState(() {
-        _imageUrl = url;
-      });
-    }
+ // Method to select and upload image
+Future<void> _selectAndUploadImage() async {
+  final ImagePicker picker = ImagePicker();
+  final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null) {
+    final File file = File(pickedFile.path);
+    // Define the path in Firebase Storage
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('product_images/${DateTime.now().toIso8601String()}.png');
+
+    // Upload file
+    await ref.putFile(file);
+    // Retrieve download URL
+    final url = await ref.getDownloadURL();
+
+    // Update state with new image URL
+    setState(() {
+      _imageUrl = url;
+    });
+  } else {
+    print('No image selected.');
   }
+}
 
   void _saveForm() async {
     if (_formKey.currentState!.validate()) {
