@@ -1,20 +1,36 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 class Product {
-  final String id;
+  String id;
   String title;
   double price;
+  String description;
+  String imageUrl;
 
-  Product({required this.id, required this.title, required this.price});
+  Product({
+    required this.id,
+    required this.title,
+    required this.price,
+    this.description = '',
+    this.imageUrl = '',
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'price': price,
+      'description': description,
+      'imageUrl': imageUrl,
+    };
+  }
 }
 
-List<Product> products = [
-  Product(id: 'p1', title: 'Red Shirt', price: 29.99),
-  Product(id: 'p2', title: 'Blue Carpet', price: 59.99),
-  // Add more products here
-];
+
 
 class ManageProductsPage extends StatefulWidget {
   @override
@@ -23,10 +39,20 @@ class ManageProductsPage extends StatefulWidget {
 
 class _ManageProductsPageState extends State<ManageProductsPage> {
    // Function to delete a product
-  void _deleteProduct(String id) {
-    setState(() {
-      products.removeWhere((prod) => prod.id == id);
-    });
+       void _deleteProduct(String id) async {
+    try {
+      await FirebaseFirestore.instance.collection('products').doc(id).delete();
+      // Optionally show a snackbar or some UI feedback that the product has been deleted
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Product deleted successfully')),
+      );
+    } catch (e) {
+      // If there's an error, handle it here. For example, show a snackbar with the error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting product: $e')),
+      );
+    }
+    // You may want to refresh the product list after deletion
   }
 
   // Navigate to product form and pass product details for editing
@@ -48,37 +74,61 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
       ),
     ).then((_) => setState(() {})); // Refresh the list after adding
   }
+  final CollectionReference _productsRef = FirebaseFirestore.instance.collection('products');
+
   @override
   Widget build(BuildContext context) {
-    int crossAxisCount = MediaQuery.of(context).size.width ~/ 200;
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-        
-          SliverPadding(
-            padding: EdgeInsets.all(16),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                childAspectRatio: 1 / 1.2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  if (index < products.length) {
-                    return _buildProductItem(products[index]);
-                  } else {
-                    return _buildAddNewProductButton();
-                  }
-                },
-                childCount: products.length + 1, // Add one for the "add new" button
-              ),
-            ),
+      body: StreamBuilder(
+        stream: _productsRef.snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text("Something went wrong"));
+          }
+
+          List<Product> products = snapshot.data?.docs.map((doc) {
+            return Product(
+              id: doc.id,
+              title: doc['title'],
+              price: doc['price'],
+              description: doc['description'] ?? '',
+              imageUrl: doc['imageUrl'] ?? 'https://via.placeholder.com/150',
+            );
+          }).toList() ?? [];
+
+          int crossAxisCount = MediaQuery.of(context).size.width ~/ 200;
+          return CustomScrollView(
+    slivers: [
+      SliverPadding(
+        padding: EdgeInsets.all(16),
+        sliver: SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: 1 / 1.2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
           ),
-        ],
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              // Pass 'products[index]' instead of 'context' to '_buildProductItem'
+              return _buildProductItem(products[index]);
+            },
+            childCount: products.length,
+          ),
+        ),
       ),
-      
+    ],
+  );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addNewProduct,
+        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
     );
   }
 
@@ -177,41 +227,60 @@ class _ProductFormPageState extends State<ProductFormPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _priceController;
+  late TextEditingController _descriptionController;
+  String _imageUrl = '';
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.product?.title ?? '');
     _priceController = TextEditingController(text: widget.product?.price.toString() ?? '');
+    _descriptionController = TextEditingController(text: widget.product?.description ?? '');
+    _imageUrl = widget.product?.imageUrl ?? '';
   }
 
- void _saveForm() async {
-  if (_formKey.currentState!.validate()) {
-    final collection = FirebaseFirestore.instance.collection('products');
-    
-    if (widget.product != null) {
-      // Edit mode
-      await collection.doc(widget.product!.id).update({
-        'title': _titleController.text,
-        'price': double.parse(_priceController.text),
-      });
-    } else {
-      // Add mode
-      await collection.add({
-        'title': _titleController.text,
-        'price': double.parse(_priceController.text),
+  Future<void> _selectAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('product_images')
+          .child(DateTime.now().toString() + '.png');
+      await ref.putFile(File(pickedFile.path));
+      final url = await ref.getDownloadURL();
+      setState(() {
+        _imageUrl = url;
       });
     }
-    
-    Navigator.pop(context);
   }
-}
 
+  void _saveForm() async {
+    if (_formKey.currentState!.validate()) {
+      final newProduct = Product(
+        id: widget.product?.id ?? DateTime.now().toString(),
+        title: _titleController.text,
+        price: double.parse(_priceController.text),
+        description: _descriptionController.text,
+        imageUrl: _imageUrl,
+      );
+
+      final collection = FirebaseFirestore.instance.collection('products');
+      if (widget.product != null) {
+        await collection.doc(widget.product!.id).update(newProduct.toMap());
+      } else {
+        await collection.add(newProduct.toMap());
+      }
+
+      Navigator.pop(context);
+    }
+  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _priceController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -220,6 +289,12 @@ class _ProductFormPageState extends State<ProductFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.product != null ? 'Edit Product' : 'Add Product'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.photo_camera),
+            onPressed: _selectAndUploadImage,
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -254,10 +329,18 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+                keyboardType: TextInputType.multiline,
+                maxLines: 3,
+              ),
+              if (_imageUrl.isNotEmpty)
+                Image.network(_imageUrl, height: 200, fit: BoxFit.cover),
               ElevatedButton(
                 child: Text('Save'),
                 onPressed: _saveForm,
-              )
+              ),
             ],
           ),
         ),

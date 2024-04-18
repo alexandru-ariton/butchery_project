@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_admin/pagina_admin.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/pagina_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_button.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_textfield.dart';
 import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
@@ -32,7 +33,7 @@ class _PaginaLogInState extends State<PaginaLogIn> {
   Navigator.push(
      context,
      MaterialPageRoute(
-      builder: (context) =>  AdminPage(),
+      builder: (context) => AdminPage(),
      ),
   );
 

@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last, unnecessary_import, use_key_in_widget_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_produs.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_selectare_adresa.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/produs.dart';
+
 
 
 class HomePage extends StatelessWidget {
@@ -100,29 +103,33 @@ void _selectAddress(BuildContext context) {
                 childAspectRatio: 4 / 3, // Aspect ratio pentru dimensiunea cardurilor
               ),
               delegate: SliverChildBuilderDelegate(
-  (BuildContext context, int index) {
-    // Mock product data
-    final product = Product(
-      title: 'Produs $index',
-      description: 'Descriere produs $index',
-      price: (index + 1) * 5.0, // Example price calculation
-      imageUrl: 'https://via.placeholder.com/150', // Placeholder image URL
-    );
-
-    return Card(
-      child: ListTile(
-        title: Text(product.title),
-        subtitle: Text(product.description),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ProductDetailPage(product: product),
-            ),
-          );
-        },
-      ),
-    );
-  },
+     (BuildContext context, int index) {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance.collection('products').snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return CircularProgressIndicator();
+                      var docs = snapshot.data!.docs;
+                      if (index < docs.length) {
+                        var product = Product.fromMap(docs[index].data() as Map<String, dynamic>);
+                        return Card(
+                          child: ListTile(
+                            title: Text(product.title),
+                            subtitle: Text(product.description),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ProductDetailPage(product: product),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      } else {
+                        return SizedBox.shrink(); // Optionally handle this condition
+                      }
+                    },
+                  );
+                },
   childCount: 10, // numărul de produse
 ),
             ),

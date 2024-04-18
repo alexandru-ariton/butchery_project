@@ -4,20 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
 import 'package:provider/provider.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/produs.dart';
 
-class Product {
-  final String title;
-  final String description;
-  final double price;
-  final String imageUrl;
 
-  Product({
-    required this.title,
-    required this.description,
-    required this.price,
-    required this.imageUrl,
-  });
-}
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
