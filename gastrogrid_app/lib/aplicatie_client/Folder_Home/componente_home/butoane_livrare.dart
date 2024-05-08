@@ -1,33 +1,12 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/info_livrare.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-class DeliveryInfo with ChangeNotifier {
-  bool _isDelivery = true;
-  double _deliveryFee = 5.0;
-  String? _selectedAddress;
 
-  bool get isDelivery => _isDelivery;
-  double get deliveryFee => _deliveryFee;
-  String? get selectedAddress => _selectedAddress; 
-
-  void toggleDelivery(bool isDelivery) {
-    _isDelivery = isDelivery;
-    notifyListeners();
-  }
-
-   void setSelectedAddress(String? address) async {
-  _selectedAddress = address;
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('selectedAddress', address ?? '');
-  notifyListeners();
-}
-
-
-}
 
 
 class DeliveryToggleButtons extends StatefulWidget {

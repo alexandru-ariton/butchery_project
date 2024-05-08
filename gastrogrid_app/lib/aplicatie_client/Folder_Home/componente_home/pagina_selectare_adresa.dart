@@ -1,5 +1,3 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
@@ -12,7 +10,6 @@ class AddressSelector extends StatefulWidget {
 
 class _AddressSelectorState extends State<AddressSelector> {
   late GooglePlace googlePlace;
-  List<AutocompletePrediction> predictions = [];
   TextEditingController searchController = TextEditingController();
   GoogleMapController? mapController;
   LatLng? selectedLocation;
@@ -21,45 +18,55 @@ class _AddressSelectorState extends State<AddressSelector> {
   @override
   void initState() {
     super.initState();
-    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ');
-  }
-
-  void autoCompleteSearch(String value) async {
-    if (value.isNotEmpty) {
-      setState(() => loading = true);
-      var result = await googlePlace.autocomplete.get(value);
-      if (result != null && result.predictions != null && mounted) {
-        setState(() {
-          predictions = result.predictions!;
-          loading = false;
-        });
-      } else {
-        setState(() => loading = false);
-      }
-    } else {
-      setState(() {
-        predictions = [];
-      });
-    }
+    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ'); // Use your actual API key here
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setInitialLocation();
+    });
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
 
-  void selectPrediction(AutocompletePrediction prediction) async {
-    var detail = await googlePlace.details.get(prediction.placeId!);
-    if (detail != null && detail.result != null && mounted) {
-      final location = detail.result!.geometry!.location!;
-      final position = LatLng(location.lat!, location.lng!);
-      mapController?.animateCamera(CameraUpdate.newLatLng(position));
-      setState(() {
-        selectedLocation = position;
-        predictions = [];
-        searchController.text = detail.result!.formattedAddress!;
-      });
-    }
+  Future<void> _setInitialLocation() async {
+    LatLng initialLocation = LatLng(40.7128, -74.0060); // Default to New York City
+    mapController?.animateCamera(CameraUpdate.newLatLngZoom(initialLocation, 14.0));
   }
+
+  void _onMapTapped(LatLng position) async {
+    setSelectedLocation(position);
+    fetchAddressFromCoordinates(position);
+  }
+
+  void setSelectedLocation(LatLng position) {
+    setState(() {
+      selectedLocation = position;
+    });
+    if (mapController != null) {
+  mapController!.animateCamera(CameraUpdate.newLatLng(position));
+}
+
+  }
+
+  Future<void> fetchAddressFromCoordinates(LatLng coordinates) async {
+  setState(() {
+    loading = true;
+  });
+  var result = await googlePlace.search.getNearBySearch(
+    Location(lat: coordinates.latitude, lng: coordinates.longitude), 500);
+  if (result != null && result.results != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
+    setState(() {
+      searchController.text = result.results!.first.formattedAddress!;
+      loading = false;
+    });
+  } else {
+    setState(() {
+      searchController.text = 'No address found';
+      loading = false;
+    });
+  }
+}
+
 
   void saveAddress(String address) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -75,6 +82,19 @@ class _AddressSelectorState extends State<AddressSelector> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Select Address'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: () {
+              if (searchController.text.isNotEmpty) {
+                saveAddress(searchController.text);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Address saved successfully"))
+                );
+              }
+            },
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -82,7 +102,6 @@ class _AddressSelectorState extends State<AddressSelector> {
             padding: EdgeInsets.all(16.0),
             child: TextFormField(
               controller: searchController,
-              onChanged: autoCompleteSearch,
               decoration: InputDecoration(
                 hintText: 'Search by street, city, or state',
                 prefixIcon: Icon(Icons.search),
@@ -94,50 +113,30 @@ class _AddressSelectorState extends State<AddressSelector> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: predictions.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Icon(Icons.location_on),
-                  title: Text(predictions[index].description!),
-                  onTap: () {
-                    selectPrediction(predictions[index]);
-                  },
-                );
-              },
-            ),
-          ),
-          if (selectedLocation != null)
-            Expanded(
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                initialCameraPosition: CameraPosition(
-                  target: selectedLocation!,
-                  zoom: 14.0,
-                ),
-                markers: {
+            child: GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(40.7128, -74.0060), // Default coordinates
+                zoom: 14.0,
+              ),
+              markers: {
+                if (selectedLocation != null)
                   Marker(
                     markerId: MarkerId("selectedLocation"),
                     position: selectedLocation!,
-                  ),
-                },
-                onTap: (position) {
-                  setState(() {
-                    selectedLocation = position;
-                  });
-                },
-              ),
-            ),
-          if (selectedLocation != null)
-            ElevatedButton(
-              onPressed: () {
-                if (selectedLocation != null && searchController.text.isNotEmpty) {
-                  saveAddress(searchController.text);
-                }
-                 Navigator.pop(context);
+                    draggable: true,
+                    onDragEnd: (newPosition) {
+  if (newPosition != null) {
+    setSelectedLocation(newPosition);
+    fetchAddressFromCoordinates(newPosition);
+  }
+},
+
+                  )
               },
-              child: Text('Save Address'),
+              onTap: _onMapTapped,
             ),
+          ),
         ],
       ),
     );

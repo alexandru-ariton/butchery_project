@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/aplicatie_admin/pagina_adaugare_produs.dart';
 import 'package:gastrogrid_app/aplicatie_admin/pagina_gestionare_produse.dart';
 
 void main() => runApp(MaterialApp(home: AdminPage()));
@@ -14,7 +15,7 @@ class _AdminPageState extends State<AdminPage> {
   // Pages for navigation
   final _pages = [
     DashboardPage(),
-    ManageProductsPage(),
+    //ProductFormPage(),
     ManageCustomersPage(),
     ManageEmployeesPage(),
   ];

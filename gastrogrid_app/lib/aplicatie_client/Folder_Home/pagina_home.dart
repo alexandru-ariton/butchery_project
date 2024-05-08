@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_produs.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_selectare_adresa.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/produs.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
 
 
 
@@ -110,7 +110,7 @@ void _selectAddress(BuildContext context) {
                       if (!snapshot.hasData) return CircularProgressIndicator();
                       var docs = snapshot.data!.docs;
                       if (index < docs.length) {
-                        var product = Product.fromMap(docs[index].data() as Map<String, dynamic>);
+                        var product = Product.fromMap(docs[index].data() as Map<String, dynamic>, docs[index].id);
                         return Card(
                           child: ListTile(
                             title: Text(product.title),

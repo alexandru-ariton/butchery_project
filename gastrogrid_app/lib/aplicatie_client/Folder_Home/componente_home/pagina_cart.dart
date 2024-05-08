@@ -1,22 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 
-class CartItem {
-  final String title;
-  final double price;
-  int quantity;
-
-  CartItem({required this.title, required this.price, this.quantity = 1});
-
-  void incrementQuantity() {
-    quantity++;
-  }
-
-  void decrementQuantity() {
-    if (quantity > 1) {
-      quantity--;
-    }
-  }
-}
 
 class CartModel extends ChangeNotifier {
   final List<CartItem> _items = [];

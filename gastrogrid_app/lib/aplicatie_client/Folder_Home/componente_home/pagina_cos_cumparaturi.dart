@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/info_livrare.dart';
 import 'package:provider/provider.dart';
 
 class ShoppingCartPage extends StatefulWidget {

@@ -28,16 +28,25 @@ class _PaginaLogInState extends State<PaginaLogIn> {
 
 
 
-
-    //navigarea catre pagina de home a clientului
-  Navigator.push(
-     context,
-     MaterialPageRoute(
-      builder: (context) => BaraNavigare(),
-     ),
-  );
-
+if (emailController.text == "admin@admin.com") {
+    // Navigarea către pagina de admin
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminPage(),
+      ),
+    );
+  } else {
+    // Navigarea către bara de navigare pentru utilizatori non-admin
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BaraNavigare(),
+      ),
+    );
   }
+  
+}
 
 
 
