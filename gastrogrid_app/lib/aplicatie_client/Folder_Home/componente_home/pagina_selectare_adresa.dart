@@ -126,6 +126,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                     position: selectedLocation!,
                     draggable: true,
                     onDragEnd: (newPosition) {
+  // ignore: unnecessary_null_comparison
   if (newPosition != null) {
     setSelectedLocation(newPosition);
     fetchAddressFromCoordinates(newPosition);
