@@ -1,55 +1,24 @@
-// ignore_for_file: unnecessary_import, unused_import
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:gastrogrid_app/aplicatie_admin/pagina_admin.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/pagina_home.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_button.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_textfield.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/authentificare/auth_provider.dart';
 import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
+import 'package:provider/provider.dart';
+import 'componente/my_button.dart';
+import 'componente/my_textfield.dart';
 
-class PaginaLogIn extends StatefulWidget {
-
+class PaginaLogin extends StatefulWidget {
   final void Function()? onTap;
 
-  const PaginaLogIn({super.key, required this.onTap});
+  const PaginaLogin({super.key, this.onTap});
 
   @override
-  State<PaginaLogIn> createState() => _PaginaLogInState();
+  State<PaginaLogin> createState() => _PaginaLoginState();
 }
 
-class _PaginaLogInState extends State<PaginaLogIn> {
-  //controller-ul pentru editarea text-ului
+class _PaginaLoginState extends State<PaginaLogin> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-
-  //functia de login
-  void login() {
-
-
-
-if (emailController.text == "admin@admin.com") {
-    // Navigarea către pagina de admin
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AdminPage(),
-      ),
-    );
-  } else {
-    // Navigarea către bara de navigare pentru utilizatori non-admin
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BaraNavigare(),
-      ),
-    );
-  }
-  
-}
-
-
-
+  String errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -59,65 +28,65 @@ if (emailController.text == "admin@admin.com") {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //logo
             Icon(
-              Icons.lock_open_rounded,
+              Icons.lock_rounded,
               size: 100,
               color: Theme.of(context).colorScheme.inversePrimary,
             ),
-
             const SizedBox(height: 25),
-
-            //titlul aplicatiei
             Text(
-              "Gastro Grid",
+              "Autentificare",
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
-
             const SizedBox(height: 25),
-
-            //campul text pentru email
             MyTextField(
-              conntroller: emailController, 
-              hintText: "Email", 
+              conntroller: emailController,
+              hintText: "Email",
               obscureText: false,
             ),
-
             const SizedBox(height: 10),
-
-            //campul text pentru parola
-             MyTextField(
-              conntroller: passwordController, 
-              hintText: "Parola", 
+            MyTextField(
+              conntroller: passwordController,
+              hintText: "Parola",
               obscureText: true,
             ),
-
-            const SizedBox(height: 10),
-
-            //buton logare
+            const SizedBox(height: 25),
             MyButton(
-              text: "Sign In", 
-              onTap: login,
+              onTap: () async {
+                try {
+                  await Provider.of<AuthProvider>(context, listen: false)
+                      .login(emailController.text, passwordController.text);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Autentificare reușită")),
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => BaraNavigare()), // Redirecționare către BaraNavigare
+                  );
+                } catch (e) {
+                  setState(() {
+                    errorMessage = e.toString();
+                  });
+                }
+              },
+              text: "Autentificare",
             ),
-
-            const SizedBox(height: 10),
-
-            //optiunea de inregistrare
+            const SizedBox(height: 15),
+            Text(
+              errorMessage,
+              style: TextStyle(color: Colors.red),
+            ),
+            const SizedBox(height: 25),
             GestureDetector(
               onTap: widget.onTap,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [ 
-                  Text("Inregistreaza-te", 
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              child: Text(
+                "Nu ai un cont? Înregistrează-te aici",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                ],
               ),
             ),
           ],

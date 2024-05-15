@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_button.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/componente/my_textfield.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/authentificare/auth_provider.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/pagina_login.dart';
+import 'package:provider/provider.dart';
+import 'componente/my_button.dart';
+import 'componente/my_textfield.dart';
 
 
 class PaginaInregistrare extends StatefulWidget {
+  final void Function()? onTap;
 
-    final void Function()? onTap;
-
-  const PaginaInregistrare({
-    super.key, 
-    this.onTap
-  });
+  const PaginaInregistrare({super.key, this.onTap});
 
   @override
   State<PaginaInregistrare> createState() => _PaginaInregistrareState();
 }
 
-
-
 class _PaginaInregistrareState extends State<PaginaInregistrare> {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmpasswordController = TextEditingController();
 
+  String errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +30,12 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //logo
             Icon(
               Icons.lock_open_rounded,
               size: 100,
               color: Theme.of(context).colorScheme.inversePrimary,
             ),
-
             const SizedBox(height: 25),
-
-            //titlul aplicatiei
             Text(
               "Inregistrare",
               style: TextStyle(
@@ -50,57 +43,64 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
-
             const SizedBox(height: 25),
-
-            //campul text pentru email
             MyTextField(
-              conntroller: emailController, 
-              hintText: "Email", 
+              conntroller: emailController,
+              hintText: "Email",
               obscureText: false,
             ),
-
             const SizedBox(height: 10),
-
-            //campul text pentru parola
-             MyTextField(
-              conntroller: passwordController, 
-              hintText: "Parola", 
+            MyTextField(
+              conntroller: passwordController,
+              hintText: "Parola",
               obscureText: true,
             ),
-
             const SizedBox(height: 10),
-
-            //campul text pentru confirmare parola
-             MyTextField(
-              conntroller: confirmpasswordController, 
-              hintText: "Confirmare Parola", 
+            MyTextField(
+              conntroller: confirmpasswordController,
+              hintText: "Confirmare Parola",
               obscureText: true,
             ),
-
-            const SizedBox(height: 10),
-
-            //buton logare
+            const SizedBox(height: 25),
             MyButton(
-              text: "Sign Up", 
-              onTap:() {},
+              onTap: () async {
+                if (passwordController.text == confirmpasswordController.text) {
+                  try {
+                    await Provider.of<AuthProvider>(context, listen: false)
+                        .signUp(emailController.text, passwordController.text);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Înregistrare reușită")),
+                    );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => PaginaLogin()), // Redirecționare către pagina principală
+                    );
+                  } catch (e) {
+                    setState(() {
+                      errorMessage = e.toString();
+                    });
+                  }
+                } else {
+                  setState(() {
+                    errorMessage = "Parolele nu coincid";
+                  });
+                }
+              },
+              text: "Înregistrare",
             ),
-
-            const SizedBox(height: 10),
-
-            //optiunea de logare
+            const SizedBox(height: 15),
+            Text(
+              errorMessage,
+              style: TextStyle(color: Colors.red),
+            ),
+            const SizedBox(height: 25),
             GestureDetector(
               onTap: widget.onTap,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [ 
-                  Text("Logheaza-te", 
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              child: Text(
+                "Ai deja un cont? Autentifică-te aici",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                ],
               ),
             ),
           ],

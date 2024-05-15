@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_editare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_informatii.dart';
+import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_setari.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/profil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -98,14 +100,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.settings,
                     text: 'Setări aplicație',
                     onTap: () {
-                      // Navighează către pagina de setări
+                      Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaginaSetari()),
+                );
                     },
                   ),
                   ProfileOption(
                     icon: Icons.info,
                     text: 'Informații aplicație',
                     onTap: () {
-                      // Navighează către pagina de informații
+                     Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaginaInformatii()),
+                );
                     },
                   ),
                 ],

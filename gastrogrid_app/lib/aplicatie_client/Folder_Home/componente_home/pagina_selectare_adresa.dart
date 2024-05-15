@@ -13,6 +13,7 @@ class _AddressSelectorState extends State<AddressSelector> {
   TextEditingController searchController = TextEditingController();
   GoogleMapController? mapController;
   LatLng? selectedLocation;
+  List<AutocompletePrediction> predictions = [];
   bool loading = false;
 
   @override
@@ -22,6 +23,13 @@ class _AddressSelectorState extends State<AddressSelector> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialLocation();
     });
+  }
+
+  @override
+  void dispose() {
+    mapController?.dispose();
+    searchController.dispose();
+    super.dispose();
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -43,30 +51,34 @@ class _AddressSelectorState extends State<AddressSelector> {
       selectedLocation = position;
     });
     if (mapController != null) {
-  mapController!.animateCamera(CameraUpdate.newLatLng(position));
-}
-
+      mapController!.animateCamera(CameraUpdate.newLatLng(position));
+    }
   }
 
   Future<void> fetchAddressFromCoordinates(LatLng coordinates) async {
-  setState(() {
-    loading = true;
-  });
-  var result = await googlePlace.search.getNearBySearch(
-    Location(lat: coordinates.latitude, lng: coordinates.longitude), 500);
-  if (result != null && result.results != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
     setState(() {
-      searchController.text = result.results!.first.formattedAddress!;
-      loading = false;
+      loading = true;
     });
-  } else {
+    var result = await googlePlace.search.getNearBySearch(
+      Location(lat: coordinates.latitude, lng: coordinates.longitude), 500);
+    if (result != null && result.results != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
+      setState(() {
+        searchController.text = result.results!.first.formattedAddress!;
+      });
+    }
     setState(() {
-      searchController.text = 'No address found';
       loading = false;
     });
   }
-}
 
+  void autoCompleteSearch(String value) async {
+    var result = await googlePlace.autocomplete.get(value);
+    if (result != null && result.predictions != null) {
+      setState(() {
+        predictions = result.predictions!;
+      });
+    }
+  }
 
   void saveAddress(String address) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -74,7 +86,15 @@ class _AddressSelectorState extends State<AddressSelector> {
     if (!savedAddresses.contains(address)) {
       savedAddresses.add(address);
       await prefs.setStringList('savedAddresses', savedAddresses);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Address saved successfully")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Address already saved")),
+      );
     }
+    Navigator.pop(context, true);
   }
 
   @override
@@ -82,14 +102,16 @@ class _AddressSelectorState extends State<AddressSelector> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Select Address'),
+        backgroundColor: Colors.blueGrey[900],
         actions: [
           IconButton(
             icon: Icon(Icons.save),
             onPressed: () {
               if (searchController.text.isNotEmpty) {
                 saveAddress(searchController.text);
+              } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Address saved successfully"))
+                  SnackBar(content: Text("Please enter an address")),
                 );
               }
             },
@@ -100,16 +122,55 @@ class _AddressSelectorState extends State<AddressSelector> {
         children: [
           Padding(
             padding: EdgeInsets.all(16.0),
-            child: TextFormField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search by street, city, or state',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by street, city, or state',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    suffixIcon: loading ? CircularProgressIndicator() : null,
+                  ),
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      autoCompleteSearch(value);
+                    } else {
+                      setState(() {
+                        predictions = [];
+                      });
+                    }
+                  },
                 ),
-                suffixIcon: loading ? CircularProgressIndicator() : null,
-              ),
+                SizedBox(height: 8.0),
+                predictions.isNotEmpty ? Container(
+                  constraints: BoxConstraints(maxHeight: 200),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: predictions.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(predictions[index].description ?? ''),
+                        onTap: () async {
+                          var placeId = predictions[index].placeId!;
+                          var details = await googlePlace.details.get(placeId);
+                          if (details != null && details.result != null) {
+                            var location = details.result!.geometry!.location!;
+                            setSelectedLocation(LatLng(location.lat!, location.lng!));
+                            fetchAddressFromCoordinates(LatLng(location.lat!, location.lng!));
+                            setState(() {
+                              searchController.text = predictions[index].description ?? '';
+                              predictions = [];
+                            });
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ) : Container(),
+              ],
             ),
           ),
           Expanded(
@@ -126,13 +187,11 @@ class _AddressSelectorState extends State<AddressSelector> {
                     position: selectedLocation!,
                     draggable: true,
                     onDragEnd: (newPosition) {
-  // ignore: unnecessary_null_comparison
-  if (newPosition != null) {
-    setSelectedLocation(newPosition);
-    fetchAddressFromCoordinates(newPosition);
-  }
-},
-
+                      if (newPosition != null) {
+                        setSelectedLocation(newPosition);
+                        fetchAddressFromCoordinates(newPosition);
+                      }
+                    },
                   )
               },
               onTap: _onMapTapped,

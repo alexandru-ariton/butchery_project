@@ -22,6 +22,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -32,11 +33,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   _saveProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', _nameController.text);
-    await prefs.setString('phoneNumber', _phoneController.text);
-    await prefs.setString('email', _emailController.text);
-    Navigator.pop(context, true); // Return true when saved
+    if (_formKey.currentState!.validate()) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', _nameController.text);
+      await prefs.setString('phoneNumber', _phoneController.text);
+      await prefs.setString('email', _emailController.text);
+      Navigator.pop(context, true); // Return true when saved
+    }
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vă rugăm să introduceți numele';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    final phoneRegExp = RegExp(r'^[0-9]{10}$');
+    if (value == null || value.isEmpty) {
+      return 'Vă rugăm să introduceți numărul de telefon';
+    } else if (!phoneRegExp.hasMatch(value)) {
+      return 'Numărul de telefon nu este valid';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (value == null || value.isEmpty) {
+      return 'Vă rugăm să introduceți emailul';
+    } else if (!emailRegExp.hasMatch(value)) {
+      return 'Emailul nu este valid';
+    }
+    return null;
   }
 
   @override
@@ -50,45 +80,53 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Nume',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Nume',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+                validator: _validateName,
               ),
-            ),
-            SizedBox(height: 16.0),
-            TextFormField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: 'Număr de telefon',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.phone),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Număr de telefon',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.phone),
+                ),
+                keyboardType: TextInputType.phone,
+                validator: _validatePhone,
               ),
-              keyboardType: TextInputType.phone,
-            ),
-            SizedBox(height: 16.0),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: _validateEmail,
               ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            SizedBox(height: 24.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.green, minimumSize: Size(double.infinity, 50), // foreground (text) color
+              SizedBox(height: 24.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                child: Text('Salvează Modificările'),
+                onPressed: _saveProfile,
               ),
-              child: Text('Salvează Modificările'),
-              onPressed: _saveProfile,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

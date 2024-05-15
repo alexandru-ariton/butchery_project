@@ -16,7 +16,7 @@ class EditAddressPage extends StatefulWidget {
 }
 
 class _EditAddressPageState extends State<EditAddressPage> {
-    final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController _streetController;
   late TextEditingController _numberController;
   late TextEditingController _blockController;
@@ -31,8 +31,8 @@ class _EditAddressPageState extends State<EditAddressPage> {
     _streetController = TextEditingController(text: addressParts.length > 0 ? addressParts[0] : '');
     _numberController = TextEditingController(text: addressParts.length > 1 ? addressParts[1] : '');
     _blockController = TextEditingController(text: addressParts.length > 2 ? addressParts[2] : '');
-    _cityController = TextEditingController(text: addressParts.length > 3 ? addressParts.sublist(3).join(', ') : '');
-    _otherDetailsController = TextEditingController(text: addressParts.length > 4 ? addressParts.sublist(4).join(', ') : '');
+    _cityController = TextEditingController(text: addressParts.length > 3 ? addressParts[3] : '');
+    _otherDetailsController = TextEditingController(text: addressParts.length > 4 ? addressParts[4] : '');
   }
 
   @override
@@ -45,32 +45,32 @@ class _EditAddressPageState extends State<EditAddressPage> {
     super.dispose();
   }
 
-  void _saveAddress() async {
+  Future<void> _saveAddress() async {
     if (_formKey.currentState!.validate()) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      
-      String newAddress = "${_streetController.text},${_numberController.text},${_blockController.text},${_cityController.text}";
-      List<String> allAddresses = prefs.getStringList('savedAddresses') ?? [];
-      int index = allAddresses.indexOf(widget.address);
-      if (index != -1) {
-        allAddresses[index] = newAddress;
+      String fullAddress = '${_streetController.text}, ${_numberController.text}, ${_blockController.text}, ${_cityController.text}, ${_otherDetailsController.text}';
+      List<String> savedAddresses = prefs.getStringList('savedAddresses') ?? [];
+      if (!savedAddresses.contains(fullAddress)) {
+        savedAddresses.add(fullAddress);
+        await prefs.setStringList('savedAddresses', savedAddresses);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Address saved successfully')),
+        );
       } else {
-        allAddresses.add(newAddress);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Address already exists')),
+        );
       }
-
-      await prefs.setStringList('savedAddresses', allAddresses);
-      Provider.of<DeliveryInfo>(context, listen: false).setSelectedAddress(newAddress);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 
-  void _deleteAddress() async {
+  Future<void> _deleteAddress() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> allAddresses = prefs.getStringList('savedAddresses') ?? [];
-    allAddresses.remove(widget.address);
-    await prefs.setStringList('savedAddresses', allAddresses);
-    Provider.of<DeliveryInfo>(context, listen: false).setSelectedAddress(null);
-    Navigator.pop(context);
+    List<String> savedAddresses = prefs.getStringList('savedAddresses') ?? [];
+    savedAddresses.remove(widget.address);
+    await prefs.setStringList('savedAddresses', savedAddresses);
+    Navigator.pop(context, true);
   }
 
   @override
@@ -78,72 +78,102 @@ class _EditAddressPageState extends State<EditAddressPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Address'),
-        leading: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () => Navigator.pop(context), // Close the page
-          ),
+        backgroundColor: Colors.blueGrey[900],
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.all(16.0),
-          children: [
-            TextFormField(
-              controller: _streetController,
-              decoration: InputDecoration(labelText: 'Strada', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the street.';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            TextFormField(
-              controller: _numberController,
-              decoration: InputDecoration(labelText: 'Număr', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the number.';
-                }
-                return null;
-              },
-            ),
-             SizedBox(height: 16),
-            TextFormField(
-              controller: _cityController,
-              decoration: InputDecoration(labelText: 'Bloc, scara, apartament, etaj', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the number.';
-                }
-                return null;
-              },
-            ),
-             SizedBox(height: 16),
-            TextFormField(
-              controller: _blockController,
-              decoration: InputDecoration(labelText: 'Oras/Localitate', border: OutlineInputBorder()),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the number.';
-                }
-                return null;
-              },
-            ),
-            // Repeat TextFormFields for city, county, and otherDetails
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _saveAddress,
-              child: Text('FINALIZAT'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            ),
-            ElevatedButton(
-              onPressed: _deleteAddress,
-              child: Text('ȘTERGE ADRESA'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            ),
-          ],
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _streetController,
+                decoration: InputDecoration(
+                  labelText: 'Strada',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.location_on),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the street.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _numberController,
+                decoration: InputDecoration(
+                  labelText: 'Număr',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.format_list_numbered),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the number.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _blockController,
+                decoration: InputDecoration(
+                  labelText: 'Bloc, Scara, Apartament',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.apartment),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the block, scara, and apartment.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _cityController,
+                decoration: InputDecoration(
+                  labelText: 'Oraș',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.location_city),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the city.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _otherDetailsController,
+                decoration: InputDecoration(
+                  labelText: 'Detalii suplimentare',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.notes),
+                ),
+              ),
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _saveAddress,
+                child: Text('Finalizat'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  minimumSize: Size(double.infinity, 50),
+                ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _deleteAddress,
+                child: Text('Șterge Adresa'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  minimumSize: Size(double.infinity, 50),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

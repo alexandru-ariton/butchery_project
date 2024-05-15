@@ -2,33 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/pagina_inregistrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/pagina_login.dart';
 
-class LoginSauInregistrare extends StatefulWidget {
-  const LoginSauInregistrare({super.key});
 
+class LoginSauInregistrare extends StatefulWidget {
   @override
   State<LoginSauInregistrare> createState() => _LoginSauInregistrareState();
 }
 
 class _LoginSauInregistrareState extends State<LoginSauInregistrare> {
+  bool showLogin = true;
 
-  //afisarea paginii de login
-
-  bool showLoginPage = true;
-
-
-  //mutarea intre cele 2 pagini
-  void schimbarePagini(){
+  void toggleView() {
     setState(() {
-      showLoginPage = !showLoginPage;
+      showLogin = !showLogin;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-      if(showLoginPage) {
-        return PaginaLogIn(onTap: schimbarePagini);
-      } else {
-        return PaginaInregistrare(onTap: schimbarePagini);
-      }
+    if (showLogin) {
+      return PaginaLogin(onTap: toggleView);
+    } else {
+      return PaginaInregistrare(onTap: toggleView);
+    }
   }
 }
