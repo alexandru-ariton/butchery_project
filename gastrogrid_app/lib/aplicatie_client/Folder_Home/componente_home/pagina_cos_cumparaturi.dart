@@ -6,6 +6,7 @@ import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagi
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/info_livrare.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class ShoppingCartPage extends StatefulWidget {
@@ -42,18 +43,21 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     // Setăm costul de livrare la 0 dacă nu există produse în coș
     double deliveryFee = cart.items.isEmpty ? 0.0 : (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0);
     double total = cart.total + deliveryFee;
+    final themeProvider = Provider.of<ThemeProvider>(context);
   
      return Scaffold(
+      backgroundColor: themeProvider.themeData.colorScheme.background,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
             automaticallyImplyLeading: false,
-           
+            backgroundColor: themeProvider.themeData.colorScheme.background,
             floating: false,
             pinned: false,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
-              title: Text('Coș cumpărături', style: TextStyle(color: const Color.fromARGB(255, 7, 7, 7))),
+              
+              title: Text('Coș cumpărături', style: TextStyle(color:themeProvider.themeData.colorScheme.primary)),
               
             ),
           ),
@@ -76,9 +80,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   Widget _buildDeliveryInfoSection(DeliveryInfo deliveryInfo) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Container(
       padding: EdgeInsets.all(8.0),
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: themeProvider.themeData.colorScheme.background,
+        borderRadius:BorderRadius.circular(12.0),
+      ),
       child: deliveryInfo.isDelivery
           ? ListTile(
               title: Text('Selectați adresa de livrare'),
@@ -171,10 +179,11 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   Widget _buildTotalSection(CartModel cart, double deliveryFee, double total) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: themeProvider.themeData.colorScheme.background,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
@@ -199,7 +208,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               onPressed: () {
                 // Logică pentru finalizarea comenzii
               },
-              child: Text('FINALIZEAZĂ COMANDA'),
+              child: Text('FINALIZEAZĂ COMANDA',style: TextStyle(color: themeProvider.themeData.colorScheme.primary),),
             )
           ],
         ),
@@ -208,12 +217,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   Widget _buildSummaryLine(String title, String value, {bool isTotal = false}) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontSize: isTotal ? 18 : 16, color: isTotal ? Colors.black : Colors.grey[600])),
+          Text(title, style: TextStyle(fontSize: isTotal ? 18 : 16, color: isTotal ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.primary,)),
           Text(value, style: TextStyle(fontSize: isTotal ? 18 : 16, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
         ],
       ),

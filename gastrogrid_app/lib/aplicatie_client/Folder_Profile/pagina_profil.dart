@@ -6,6 +6,8 @@ import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_edi
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_informatii.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_setari.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/profil.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -35,8 +37,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: Colors.grey[200], // Schimbă culoarea de fundal
+      backgroundColor: themeProvider.themeData.colorScheme.background, // Schimbă culoarea de fundal
       body: SafeArea(
         child: Column(
           children: [

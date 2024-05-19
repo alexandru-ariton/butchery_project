@@ -1,47 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
-class PaginaSetari extends StatefulWidget {
-  @override
-  _PaginaSetariState createState() => _PaginaSetariState();
-}
 
-class _PaginaSetariState extends State<PaginaSetari> {
-  bool _isDarkTheme = false;
-  String _selectedLanguage = 'English';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
-      _selectedLanguage = prefs.getString('selectedLanguage') ?? 'English';
-    });
-  }
-
-  Future<void> _saveTheme(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkTheme', value);
-    setState(() {
-      _isDarkTheme = value;
-    });
-  }
-
-  Future<void> _saveLanguage(String language) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedLanguage', language);
-    setState(() {
-      _selectedLanguage = language;
-    });
-  }
-
+class PaginaSetari extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Setări Aplicație'),
@@ -53,18 +19,21 @@ class _PaginaSetariState extends State<PaginaSetari> {
           children: [
             SwitchListTile(
               title: Text('Mod Întunecat'),
-              value: _isDarkTheme,
+              value: themeProvider.isDarkMode,
               onChanged: (value) {
-                _saveTheme(value);
+                themeProvider.toggleTheme();
               },
             ),
             SizedBox(height: 20),
-            Text('Limbă', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Limbă',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             DropdownButton<String>(
-              value: _selectedLanguage,
+              value: themeProvider.selectedLanguage,
               onChanged: (String? newValue) {
                 if (newValue != null) {
-                  _saveLanguage(newValue);
+                  themeProvider.changeLanguage(newValue);
                 }
               },
               items: <String>['English', 'Română']

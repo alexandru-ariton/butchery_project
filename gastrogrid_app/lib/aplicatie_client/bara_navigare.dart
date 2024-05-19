@@ -5,6 +5,8 @@ import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagi
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/pagina_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Orders/pagina_order.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagina_profil.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class BaraNavigare extends StatefulWidget {
   @override
@@ -28,7 +30,9 @@ class _BaraNavigareState extends State<BaraNavigare> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
+      backgroundColor: themeProvider.themeData.colorScheme.background,
       body: _pages.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -56,7 +60,7 @@ class _BaraNavigareState extends State<BaraNavigare> {
         elevation: 5.0,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+       
       ),
     );
   }

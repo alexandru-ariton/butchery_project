@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => CartModel()),
         ChangeNotifierProvider(create: (_) => DeliveryInfo()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()), // Adăugarea AuthProvider
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
@@ -46,4 +46,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

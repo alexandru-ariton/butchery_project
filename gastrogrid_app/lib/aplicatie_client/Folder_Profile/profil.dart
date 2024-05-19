@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfileOption extends StatelessWidget {
   final IconData icon;
@@ -13,7 +15,9 @@ class ProfileOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Card(
+      color: themeProvider.themeData.colorScheme.secondary,
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: ListTile(
         leading: Icon(icon, color: Colors.blue[800]),

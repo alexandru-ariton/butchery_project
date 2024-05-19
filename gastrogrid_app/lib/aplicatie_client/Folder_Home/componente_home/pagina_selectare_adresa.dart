@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddressSelector extends StatefulWidget {
@@ -99,10 +101,11 @@ class _AddressSelectorState extends State<AddressSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Select Address'),
-        backgroundColor: Colors.blueGrey[900],
+        backgroundColor: themeProvider.themeData.colorScheme.background,
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -152,6 +155,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                     itemCount: predictions.length,
                     itemBuilder: (context, index) {
                       return ListTile(
+                        textColor: themeProvider.themeData.colorScheme.primary,
                         title: Text(predictions[index].description ?? ''),
                         onTap: () async {
                           var placeId = predictions[index].placeId!;

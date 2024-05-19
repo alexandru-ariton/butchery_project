@@ -26,13 +26,14 @@ class _EditAddressPageState extends State<EditAddressPage> {
   @override
   void initState() {
     super.initState();
-    // Assuming the address is structured with each part separated by a comma
-    List<String> addressParts = widget.address.split(',');
+  List<String> addressParts = widget.address.split(',');
+    // Adjust the indices based on the actual order of the address parts
     _streetController = TextEditingController(text: addressParts.length > 0 ? addressParts[0] : '');
     _numberController = TextEditingController(text: addressParts.length > 1 ? addressParts[1] : '');
     _blockController = TextEditingController(text: addressParts.length > 2 ? addressParts[2] : '');
     _cityController = TextEditingController(text: addressParts.length > 3 ? addressParts[3] : '');
     _otherDetailsController = TextEditingController(text: addressParts.length > 4 ? addressParts[4] : '');
+
   }
 
   @override

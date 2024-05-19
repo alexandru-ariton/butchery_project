@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/aplicatie_admin/admin_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/authentificare/auth_provider.dart';
 import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +65,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
                   );
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => BaraNavigare()), // Redirecționare către BaraNavigare
+                    MaterialPageRoute(builder: (context) => AdminHome()), // Redirecționare către BaraNavigare
                   );
                 } catch (e) {
                   setState(() {

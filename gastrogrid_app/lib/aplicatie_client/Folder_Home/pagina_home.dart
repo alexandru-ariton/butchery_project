@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last, unnecessary_import, use_key_in_widget_constructors
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,26 +5,33 @@ import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/buto
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_produs.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_selectare_adresa.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
+import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
-
-
-class HomePage extends StatelessWidget {
-
-void _selectAddress(BuildContext context) {
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (context) => AddressSelector(),
-    ),
-  );
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
 }
 
+class _HomePageState extends State<HomePage> {
+  TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  void _selectAddress(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddressSelector(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-       SliverAppBar(
+          SliverAppBar(
             floating: true,
             pinned: true,
             snap: false,
@@ -41,17 +46,16 @@ void _selectAddress(BuildContext context) {
                   mainAxisAlignment: MainAxisAlignment.end, // Alinează la baza spațiului flexibil
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                      GestureDetector(
-      onTap: () => _selectAddress(context),
-      child: Row(
-        children: [
-          Icon(Icons.pin_drop_outlined),
-          SizedBox(width: 8),
-          Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
-        ],
-      ),
-    ),
-                    
+                    GestureDetector(
+                      onTap: () => _selectAddress(context),
+                      child: Row(
+                        children: [
+                          Icon(Icons.pin_drop_outlined),
+                          SizedBox(width: 8),
+                          Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 6), // Spațiu între text și butoane
                     DeliveryToggleButtons(), // Includem butoanele aici
                   ],
@@ -62,9 +66,7 @@ void _selectAddress(BuildContext context) {
               ),
             ),
           ),
-
-       
-        SliverPersistentHeader(
+          SliverPersistentHeader(
             delegate: _SliverAppBarDelegate(
               minHeight: 80.0,
               maxHeight: 80.0,
@@ -75,6 +77,7 @@ void _selectAddress(BuildContext context) {
                   elevation: 4.0,
                   borderRadius: BorderRadius.circular(30.0),
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
                       hintText: 'Caută produse',
@@ -83,16 +86,19 @@ void _selectAddress(BuildContext context) {
                       ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: themeProvider.themeData.colorScheme.secondary,
                     ),
-                    
+                    onChanged: (query) {
+                      setState(() {
+                        _searchQuery = query;
+                      });
+                    },
                   ),
                 ),
               ),
             ),
             pinned: false,
           ),
-            // Înlocuiește SliverList cu SliverGrid
           SliverPadding(
             padding: EdgeInsets.all(10),
             sliver: SliverGrid(
@@ -103,15 +109,20 @@ void _selectAddress(BuildContext context) {
                 childAspectRatio: 4 / 3, // Aspect ratio pentru dimensiunea cardurilor
               ),
               delegate: SliverChildBuilderDelegate(
-     (BuildContext context, int index) {
+                (BuildContext context, int index) {
                   return StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance.collection('products').snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) return CircularProgressIndicator();
                       var docs = snapshot.data!.docs;
-                      if (index < docs.length) {
-                        var product = Product.fromMap(docs[index].data() as Map<String, dynamic>, docs[index].id);
+                      var filteredDocs = docs.where((doc) {
+                        var product = Product.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+                        return product.title.toLowerCase().contains(_searchQuery.toLowerCase());
+                      }).toList();
+                      if (index < filteredDocs.length) {
+                        var product = Product.fromMap(filteredDocs[index].data() as Map<String, dynamic>, filteredDocs[index].id);
                         return Card(
+                          color: themeProvider.themeData.colorScheme.primary,
                           child: ListTile(
                             title: Text(product.title),
                             subtitle: Text(product.price.toString() + " lei"),
@@ -130,13 +141,12 @@ void _selectAddress(BuildContext context) {
                     },
                   );
                 },
-  childCount: 10, // numărul de produse
-),
+                childCount: 10, // numărul de produse
+              ),
             ),
           ),
         ],
       ),
-    
     );
   }
 }
