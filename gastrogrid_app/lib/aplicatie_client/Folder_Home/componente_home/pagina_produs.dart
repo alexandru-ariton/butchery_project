@@ -7,8 +7,6 @@ import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
 
-
-
 class ProductDetailPage extends StatefulWidget {
   final Product product;
   ProductDetailPage({required this.product});
@@ -19,8 +17,6 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -34,25 +30,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Image.network(
-  widget.product.imageUrl,
-  fit: BoxFit.cover,
-  height: 300,
-  width: double.infinity,
-  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.error, color: Colors.red, size: 60),
-          Padding(
-            padding: EdgeInsets.only(top: 16),
-            child: Text('Failed to load image', style: TextStyle(fontSize: 16)),
-          ),
-        ],
-      ),
-    );
-  },
-),
+              widget.product.imageUrl,
+              fit: BoxFit.cover,
+              height: 300,
+              width: double.infinity,
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.error, color: Colors.red, size: 60),
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text('Failed to load image', style: TextStyle(fontSize: 16)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
@@ -103,7 +99,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary, backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
@@ -119,7 +116,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-   void addToCart() {
+  void addToCart() {
     var cartItem = CartItem(
       title: widget.product.title,
       price: widget.product.price,

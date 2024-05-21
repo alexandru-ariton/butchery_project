@@ -13,6 +13,7 @@ class AddressSelector extends StatefulWidget {
 class _AddressSelectorState extends State<AddressSelector> {
   late GooglePlace googlePlace;
   TextEditingController searchController = TextEditingController();
+  TextEditingController manualAddressController = TextEditingController();
   GoogleMapController? mapController;
   LatLng? selectedLocation;
   List<AutocompletePrediction> predictions = [];
@@ -21,7 +22,7 @@ class _AddressSelectorState extends State<AddressSelector> {
   @override
   void initState() {
     super.initState();
-    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ'); // Use your actual API key here
+    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialLocation();
     });
@@ -31,6 +32,7 @@ class _AddressSelectorState extends State<AddressSelector> {
   void dispose() {
     mapController?.dispose();
     searchController.dispose();
+    manualAddressController.dispose();
     super.dispose();
   }
 
@@ -63,14 +65,20 @@ class _AddressSelectorState extends State<AddressSelector> {
     });
     var result = await googlePlace.search.getNearBySearch(
       Location(lat: coordinates.latitude, lng: coordinates.longitude), 500);
-    if (result != null && result.results != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
-      setState(() {
-        searchController.text = result.results!.first.formattedAddress!;
-      });
+    if (result != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
+      var address = result.results!.first.formattedAddress!;
+      _parseAddress(address);
     }
     setState(() {
       loading = false;
     });
+  }
+
+  void _parseAddress(String address) {
+    List<String> parts = address.split(', ');
+    // Example parsing - customize based on your specific needs
+    searchController.text = parts[0];
+    if (parts.length > 1) manualAddressController.text = parts.sublist(1).join(', ');
   }
 
   void autoCompleteSearch(String value) async {
@@ -111,7 +119,9 @@ class _AddressSelectorState extends State<AddressSelector> {
             icon: Icon(Icons.save),
             onPressed: () {
               if (searchController.text.isNotEmpty) {
-                saveAddress(searchController.text);
+                saveAddress(searchController.text + ", " + manualAddressController.text);
+              } else if (manualAddressController.text.isNotEmpty) {
+                saveAddress(manualAddressController.text);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("Please enter an address")),
@@ -174,6 +184,16 @@ class _AddressSelectorState extends State<AddressSelector> {
                     },
                   ),
                 ) : Container(),
+                SizedBox(height: 8.0),
+                TextFormField(
+                  controller: manualAddressController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter address manually',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -181,7 +201,7 @@ class _AddressSelectorState extends State<AddressSelector> {
             child: GoogleMap(
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
-                target: LatLng(40.7128, -74.0060), // Default coordinates
+                target: LatLng(40.7128, -74.0060),
                 zoom: 14.0,
               ),
               markers: {

@@ -28,6 +28,7 @@ dependencies:
   location: ^6.0.1
   provider: ^6.1.2
   shared_preferences: ^2.2.2
+  firebase_app_check: "^0.0.3+4" 
 
 dev_dependencies:
   flutter_test:

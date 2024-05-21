@@ -1,17 +1,17 @@
-// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, use_build_context_synchronously, prefer_const_constructors, sort_child_properties_last
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String username;
   final String phoneNumber;
-  final String email;
 
   EditProfilePage({
     required this.username,
     required this.phoneNumber,
-    required this.email,
   });
 
   @override
@@ -21,109 +21,98 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
-  late TextEditingController _emailController;
   final _formKey = GlobalKey<FormState>();
+  File? _image;
+  final picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.username);
     _phoneController = TextEditingController(text: widget.phoneNumber);
-    _emailController = TextEditingController(text: widget.email);
   }
 
-  _saveProfile() async {
-    if (_formKey.currentState!.validate()) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', _nameController.text);
-      await prefs.setString('phoneNumber', _phoneController.text);
-      await prefs.setString('email', _emailController.text);
-      Navigator.pop(context, true); // Return true when saved
-    }
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
   }
 
-  String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vă rugăm să introduceți numele';
-    }
-    return null;
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
   }
 
-  String? _validatePhone(String? value) {
-    final phoneRegExp = RegExp(r'^[0-9]{10}$');
-    if (value == null || value.isEmpty) {
-      return 'Vă rugăm să introduceți numărul de telefon';
-    } else if (!phoneRegExp.hasMatch(value)) {
-      return 'Numărul de telefon nu este valid';
-    }
-    return null;
-  }
+  Future<void> _uploadImage() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw FirebaseAuthException(code: 'ERROR_NO_SIGNED_IN_USER', message: 'No user is signed in.');
+      }
 
-  String? _validateEmail(String? value) {
-    final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (value == null || value.isEmpty) {
-      return 'Vă rugăm să introduceți emailul';
-    } else if (!emailRegExp.hasMatch(value)) {
-      return 'Emailul nu este valid';
+      if (_image != null) {
+        final storageReference = FirebaseStorage.instance
+            .ref()
+            .child('profile_images/${user.uid}');
+        await storageReference.putFile(_image!);
+        final String downloadUrl = await storageReference.getDownloadURL();
+        await user.updatePhotoURL(downloadUrl);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile image updated successfully!')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
     }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editează Profilul'),
-        elevation: 0,
-        backgroundColor: Colors.blueGrey[900], // A more modern color
-        foregroundColor: Colors.white, // Ensures the title is white
+        title: Text('Edit Profile'),
+        backgroundColor: Colors.blueGrey[900],
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: ListView(
             children: [
+              if (_image != null) Image.file(_image!),
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: Text('Change Image'),
+              ),
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Nume',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
-                ),
-                validator: _validateName,
+                decoration: InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person)),
+                validator: (value) => value!.isEmpty ? 'Please enter the name' : null,
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Număr de telefon',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
-                ),
+                decoration: InputDecoration(labelText: 'Phone Number', prefixIcon: Icon(Icons.phone)),
                 keyboardType: TextInputType.phone,
-                validator: _validatePhone,
+                validator: (value) => value!.isEmpty ? 'Please enter the phone number' : null,
               ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                keyboardType: TextInputType.emailAddress,
-                validator: _validateEmail,
-              ),
-              SizedBox(height: 24.0),
+              SizedBox(height: 24),
               ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    await _uploadImage();
+                  }
+                },
+                child: Text('Save Changes'),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
                   backgroundColor: Colors.green,
                   minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text('Salvează Modificările'),
-                onPressed: _saveProfile,
               ),
             ],
           ),

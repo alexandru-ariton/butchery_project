@@ -1,9 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors_in_immutables, library_private_types_in_public_api, prefer_is_empty, use_build_context_synchronously, prefer_const_constructors, sort_child_properties_last
-
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/info_livrare.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditAddressPage extends StatefulWidget {
@@ -26,14 +21,17 @@ class _EditAddressPageState extends State<EditAddressPage> {
   @override
   void initState() {
     super.initState();
-  List<String> addressParts = widget.address.split(',');
-    // Adjust the indices based on the actual order of the address parts
-    _streetController = TextEditingController(text: addressParts.length > 0 ? addressParts[0] : '');
-    _numberController = TextEditingController(text: addressParts.length > 1 ? addressParts[1] : '');
-    _blockController = TextEditingController(text: addressParts.length > 2 ? addressParts[2] : '');
-    _cityController = TextEditingController(text: addressParts.length > 3 ? addressParts[3] : '');
-    _otherDetailsController = TextEditingController(text: addressParts.length > 4 ? addressParts[4] : '');
+    _parseAddress();
+  }
 
+  void _parseAddress() {
+    // Assuming the address format: "Street Name, Number, City, Country, Other Details"
+    List<String> parts = widget.address.split(', ').map((e) => e.trim()).toList();
+    _streetController = TextEditingController(text: parts.length > 0 ? parts[0] : '');
+    _numberController = TextEditingController(text: parts.length > 1 ? parts[1] : '');
+    _cityController = TextEditingController(text: parts.length > 1 ? parts[2] : '');
+    _blockController = TextEditingController(text: parts.length > 3 ? parts[3] : '');  
+    _otherDetailsController = TextEditingController(text: parts.length > 4 ? parts.sublist(4).join(', ') : '');
   }
 
   @override
@@ -49,7 +47,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
   Future<void> _saveAddress() async {
     if (_formKey.currentState!.validate()) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String fullAddress = '${_streetController.text}, ${_numberController.text}, ${_blockController.text}, ${_cityController.text}, ${_otherDetailsController.text}';
+      String fullAddress = '${_streetController.text}, ${_numberController.text}, ${_cityController.text}, ${_blockController.text}, ${_otherDetailsController.text}';
       List<String> savedAddresses = prefs.getStringList('savedAddresses') ?? [];
       if (!savedAddresses.contains(fullAddress)) {
         savedAddresses.add(fullAddress);
@@ -90,7 +88,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
               TextFormField(
                 controller: _streetController,
                 decoration: InputDecoration(
-                  labelText: 'Strada',
+                  labelText: 'Street',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.location_on),
                 ),
@@ -105,7 +103,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
               TextFormField(
                 controller: _numberController,
                 decoration: InputDecoration(
-                  labelText: 'Număr',
+                  labelText: 'Number',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.format_list_numbered),
                 ),
@@ -118,24 +116,9 @@ class _EditAddressPageState extends State<EditAddressPage> {
               ),
               SizedBox(height: 16),
               TextFormField(
-                controller: _blockController,
-                decoration: InputDecoration(
-                  labelText: 'Bloc, Scara, Apartament',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.apartment),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the block, scara, and apartment.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
                 controller: _cityController,
                 decoration: InputDecoration(
-                  labelText: 'Oraș',
+                  labelText: 'City',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.location_city),
                 ),
@@ -148,9 +131,18 @@ class _EditAddressPageState extends State<EditAddressPage> {
               ),
               SizedBox(height: 16),
               TextFormField(
+                controller: _blockController,
+                decoration: InputDecoration(
+                  labelText: 'Block, Scara, Apartment',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.apartment),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextFormField(
                 controller: _otherDetailsController,
                 decoration: InputDecoration(
-                  labelText: 'Detalii suplimentare',
+                  labelText: 'Other details',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.notes),
                 ),
@@ -158,7 +150,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _saveAddress,
-                child: Text('Finalizat'),
+                child: Text('Save'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   minimumSize: Size(double.infinity, 50),
@@ -167,7 +159,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _deleteAddress,
-                child: Text('Șterge Adresa'),
+                child: Text('Delete Address'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: Size(double.infinity, 50),

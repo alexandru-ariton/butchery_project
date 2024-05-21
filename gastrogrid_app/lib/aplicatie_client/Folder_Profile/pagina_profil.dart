@@ -1,6 +1,5 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_const_constructors_in_immutables
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_editare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_informatii.dart';
@@ -19,6 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _username = "Utilizator Nou";
   String _phoneNumber = "0712345678";
   String _email = "utilizatornou@example.com";
+  String? _photoUrl;
 
   @override
   void initState() {
@@ -32,6 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _username = prefs.getString('username') ?? "Utilizator Nou";
       _phoneNumber = prefs.getString('phoneNumber') ?? "0712345678";
       _email = prefs.getString('email') ?? "utilizatornou@example.com";
+      _photoUrl = FirebaseAuth.instance.currentUser?.photoURL;
     });
   }
 
@@ -39,15 +40,18 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: themeProvider.themeData.colorScheme.background, // Schimbă culoarea de fundal
+      backgroundColor: themeProvider.themeData.colorScheme.background,
       body: SafeArea(
         child: Column(
           children: [
             SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.blue[100], // Schimbă culoarea de fundal a avatarului
-              child: Icon(Icons.person, size: 50, color: Colors.blue[800]), // Schimbă culoarea iconiței
+              backgroundColor: Colors.blue[100],
+              backgroundImage: _photoUrl != null ? NetworkImage(_photoUrl!) : null,
+              child: _photoUrl == null
+                  ? Icon(Icons.person, size: 50, color: Colors.blue[800])
+                  : null,
             ),
             SizedBox(height: 10),
             Text(
@@ -55,14 +59,14 @@ class _ProfilePageState extends State<ProfilePage> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[800], // Schimbă culoarea textului
+                color: Colors.blue[800],
               ),
             ),
             Text(
               _phoneNumber,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[800], // Schimbă culoarea textului
+                color: Colors.grey[800],
               ),
             ),
             SizedBox(height: 20),
@@ -76,11 +80,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       final updated = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => EditProfilePage(
-                                  username: _username,
-                                  phoneNumber: _phoneNumber,
-                                  email: _email,
-                                )),
+                          builder: (context) => EditProfilePage(
+                            username: _username,
+                            phoneNumber: _phoneNumber,
+                          ),
+                        ),
                       );
                       if (updated != null && updated) {
                         _loadProfileInfo();
@@ -91,32 +95,36 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.location_on,
                     text: 'Adresele mele',
                     onTap: () async {
-              // Aici folosim Navigator pentru a deschide pagina de adrese
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SavedAddressesPage()),
-              );
-              // Reîncarcă informațiile din profil, dacă este necesar
-            },
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SavedAddressesPage(),
+                        ),
+                      );
+                    },
                   ),
                   ProfileOption(
                     icon: Icons.settings,
                     text: 'Setări aplicație',
                     onTap: () {
                       Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaginaSetari()),
-                );
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaginaSetari(),
+                        ),
+                      );
                     },
                   ),
                   ProfileOption(
                     icon: Icons.info,
                     text: 'Informații aplicație',
                     onTap: () {
-                     Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaginaInformatii()),
-                );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaginaInformatii(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -128,5 +136,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
-

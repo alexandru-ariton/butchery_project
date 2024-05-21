@@ -29,40 +29,56 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
+      backgroundColor: themeProvider.themeData.colorScheme.background,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
             floating: true,
             pinned: true,
             snap: false,
-            expandedHeight: 80, // Înălțimea când este expandat
-            collapsedHeight: 100,
-            toolbarHeight: 60, // Înălțimea când este collapsed
+            expandedHeight: 15,
+            collapsedHeight: 15,
+            toolbarHeight: 15,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.all(16), // Ajustează padding după preferințe
-              title: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end, // Alinează la baza spațiului flexibil
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _selectAddress(context),
-                      child: Row(
-                        children: [
-                          Icon(Icons.pin_drop_outlined),
-                          SizedBox(width: 8),
-                          Text('Selectează Adresa', style: TextStyle(fontSize: 16, color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 6), // Spațiu între text și butoane
-                    DeliveryToggleButtons(), // Includem butoanele aici
-                  ],
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Theme.of(context).primaryColor.withOpacity(0.8)
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
               ),
-              background: Container(
-                color: Theme.of(context).primaryColor, // Alege o culoare pentru fundal sau un gradient
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              color: Theme.of(context).primaryColor,
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () => _selectAddress(context),
+                    child: Row(
+                      children: [
+                        Icon(Icons.pin_drop_outlined, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
+                          'Selectează Adresa',
+                          style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  DeliveryToggleButtons(),
+                  
+                ],
               ),
             ),
           ),
@@ -71,7 +87,7 @@ class _HomePageState extends State<HomePage> {
               minHeight: 80.0,
               maxHeight: 80.0,
               child: Container(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 alignment: Alignment.center,
                 child: Material(
                   elevation: 4.0,
@@ -82,11 +98,12 @@ class _HomePageState extends State<HomePage> {
                       prefixIcon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
                       hintText: 'Caută produse',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide.none,
                       ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                       filled: true,
-                      fillColor: themeProvider.themeData.colorScheme.secondary,
+                      fillColor: themeProvider.themeData.colorScheme.surface,
                     ),
                     onChanged: (query) {
                       setState(() {
@@ -99,33 +116,36 @@ class _HomePageState extends State<HomePage> {
             ),
             pinned: false,
           ),
-          SliverPadding(
-            padding: EdgeInsets.all(10),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Numărul de coloane
-                crossAxisSpacing: 10, // Spațierea orizontală între elemente
-                mainAxisSpacing: 10, // Spațierea verticală între elemente
-                childAspectRatio: 4 / 3, // Aspect ratio pentru dimensiunea cardurilor
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance.collection('products').snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) return CircularProgressIndicator();
-                      var docs = snapshot.data!.docs;
-                      var filteredDocs = docs.where((doc) {
-                        var product = Product.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-                        return product.title.toLowerCase().contains(_searchQuery.toLowerCase());
-                      }).toList();
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('products').snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return SliverFillRemaining(child: Center(child: CircularProgressIndicator()));
+              var docs = snapshot.data!.docs;
+              var filteredDocs = docs.where((doc) {
+                var product = Product.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+                return product.title.toLowerCase().contains(_searchQuery.toLowerCase());
+              }).toList();
+
+              return SliverPadding(
+                padding: EdgeInsets.all(10),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 2 / 3, // Adjusted for better card aspect ratio
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
                       if (index < filteredDocs.length) {
                         var product = Product.fromMap(filteredDocs[index].data() as Map<String, dynamic>, filteredDocs[index].id);
                         return Card(
-                          color: themeProvider.themeData.colorScheme.primary,
-                          child: ListTile(
-                            title: Text(product.title),
-                            subtitle: Text(product.price.toString() + " lei"),
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(15.0),
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -133,17 +153,44 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               );
                             },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+                                      image: DecorationImage(
+                                        image: NetworkImage(product.imageUrl), // Ensure you have an imageUrl in your Product model
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(product.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                      SizedBox(height: 4),
+                                      Text('${product.price} lei', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       } else {
-                        return SizedBox.shrink(); // Optionally handle this condition
+                        return SizedBox.shrink();
                       }
                     },
-                  );
-                },
-                childCount: 10, // numărul de produse
-              ),
-            ),
+                    childCount: filteredDocs.length,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -169,8 +216,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight > minHeight ? maxHeight : minHeight;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(child: child);
   }
 

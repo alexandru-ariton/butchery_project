@@ -65,7 +65,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
                   );
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => AdminHome()), // Redirecționare către BaraNavigare
+                    MaterialPageRoute(builder: (context) => BaraNavigare()), // Redirecționare către BaraNavigare
                   );
                 } catch (e) {
                   setState(() {
