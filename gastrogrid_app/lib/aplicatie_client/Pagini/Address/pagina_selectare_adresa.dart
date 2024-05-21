@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -112,7 +114,7 @@ class _AddressSelectorState extends State<AddressSelector> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Address'),
+        title: Text('Alege Adresa'),
         backgroundColor: themeProvider.themeData.colorScheme.background,
         actions: [
           IconButton(
@@ -134,7 +136,7 @@ class _AddressSelectorState extends State<AddressSelector> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(top: 0.0,left: 18.0,right: 18.0),
             child: Column(
               children: [
                 TextFormField(
@@ -165,7 +167,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                     itemCount: predictions.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        textColor: themeProvider.themeData.colorScheme.primary,
+                        textColor:themeProvider.themeData.colorScheme.primary,
                         title: Text(predictions[index].description ?? ''),
                         onTap: () async {
                           var placeId = predictions[index].placeId!;
@@ -185,15 +187,15 @@ class _AddressSelectorState extends State<AddressSelector> {
                   ),
                 ) : Container(),
                 SizedBox(height: 8.0),
-                TextFormField(
-                  controller: manualAddressController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter address manually',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                ),
+                // TextFormField(
+                //   controller: manualAddressController,
+                //   decoration: InputDecoration(
+                //     hintText: 'Enter address manually',
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(15),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -211,11 +213,9 @@ class _AddressSelectorState extends State<AddressSelector> {
                     position: selectedLocation!,
                     draggable: true,
                     onDragEnd: (newPosition) {
-                      if (newPosition != null) {
-                        setSelectedLocation(newPosition);
-                        fetchAddressFromCoordinates(newPosition);
-                      }
-                    },
+                      setSelectedLocation(newPosition);
+                      fetchAddressFromCoordinates(newPosition);
+                                        },
                   )
               },
               onTap: _onMapTapped,

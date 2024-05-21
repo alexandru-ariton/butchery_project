@@ -1,8 +1,8 @@
 // ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_editare_adrese.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/info_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare_adrese.dart';
+import 'package:gastrogrid_app/aplicatie_client/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,9 +28,12 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
   }
 
   void _handleAddressTap(String address) {
-    Provider.of<DeliveryInfo>(context, listen: false).setSelectedAddress(address);
-    Navigator.pop(context); // Go back
+    Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address);
+    Navigator.pop(context,address); // Go back
+    
   }
+
+  
 
   Widget _buildAddressCard(String address) {
     return GestureDetector(

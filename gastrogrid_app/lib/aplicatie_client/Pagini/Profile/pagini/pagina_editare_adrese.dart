@@ -61,6 +61,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
         );
       }
       Navigator.pop(context, true);
+      Navigator.pop(context, fullAddress);
     }
   }
 

@@ -1,9 +1,8 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/info_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -17,7 +16,7 @@ class DeliveryToggleButtons extends StatefulWidget {
 class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
   @override
   Widget build(BuildContext context) {
-    final deliveryInfo = Provider.of<DeliveryInfo>(context);
+    final deliveryInfo = Provider.of<DeliveryProvider>(context);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -28,6 +27,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               _buildDeliveryButton(deliveryInfo.isDelivery),
+              SizedBox(width: 10),
               _buildPickupButton(!deliveryInfo.isDelivery),
             ],
           ),
@@ -47,13 +47,13 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
 
   Widget _buildDeliveryButton(bool isDeliverySelected) {
     return _buildToggleButton('Livrare', isDeliverySelected, () {
-      Provider.of<DeliveryInfo>(context, listen: false).toggleDelivery(true);
+      Provider.of<DeliveryProvider>(context, listen: false).toggleDelivery(true);
     });
   }
 
   Widget _buildPickupButton(bool isPickupSelected) {
     return _buildToggleButton('Ridicare', isPickupSelected, () {
-      Provider.of<DeliveryInfo>(context, listen: false).toggleDelivery(false);
+      Provider.of<DeliveryProvider>(context, listen: false).toggleDelivery(false);
     });
   }
 
@@ -62,7 +62,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        color: isSelected ? Colors.blue : Colors.grey[200],
+        color: isSelected ? Colors.blue : const Color.fromARGB(255, 238, 238, 238),
         borderRadius: BorderRadius.circular(10),
       ),
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),

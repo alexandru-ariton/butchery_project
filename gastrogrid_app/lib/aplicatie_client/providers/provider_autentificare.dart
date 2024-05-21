@@ -31,6 +31,12 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> logout() async {
     await _auth.signOut();
+    resetAppState(); // Apelăm metoda de resetare la logout
     notifyListeners();
+  }
+
+  void resetAppState() {
+    // Resetați toate stările aplicației aici
+    // Exemplu: Resetați coșul de cumpărături, informațiile de livrare, etc.
   }
 }

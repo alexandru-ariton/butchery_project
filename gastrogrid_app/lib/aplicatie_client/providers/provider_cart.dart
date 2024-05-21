@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 
 
-class CartModel extends ChangeNotifier {
+class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];
 
   List<CartItem> get items => _items;

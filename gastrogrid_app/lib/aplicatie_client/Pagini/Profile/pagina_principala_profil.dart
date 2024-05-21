@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_adrese.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_editare.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_informatii.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagini/pagina_setari.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/profil.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_informatii.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/profil.dart';
 import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,9 +15,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _username = "Utilizator Nou";
-  String _phoneNumber = "0712345678";
-  String _email = "utilizatornou@example.com";
   String? _photoUrl;
 
   @override
@@ -27,11 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadProfileInfo() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _username = prefs.getString('username') ?? "Utilizator Nou";
-      _phoneNumber = prefs.getString('phoneNumber') ?? "0712345678";
-      _email = prefs.getString('email') ?? "utilizatornou@example.com";
       _photoUrl = FirebaseAuth.instance.currentUser?.photoURL;
     });
   }
@@ -54,21 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   : null,
             ),
             SizedBox(height: 10),
-            Text(
-              _username,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
-            ),
-            Text(
-              _phoneNumber,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[800],
-              ),
-            ),
+            
             SizedBox(height: 20),
             Expanded(
               child: ListView(
@@ -80,9 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       final updated = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditProfilePage(
-                            username: _username,
-                            phoneNumber: _phoneNumber,
+                          builder: (context) => EditProfilePage(userId: '',
+                            
                           ),
                         ),
                       );

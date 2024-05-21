@@ -10,17 +10,22 @@ class AdminHome extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Admin Dashboard'),
+          title: Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+          backgroundColor: Colors.teal,
           bottom: TabBar(
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(icon: Icon(Icons.dashboard), text: 'Dashboard'),
-              Tab(icon: Icon(Icons.shopping_bag), text: 'Products'),
-              Tab(icon: Icon(Icons.receipt), text: 'Orders'),
+              Tab(icon: Icon(Icons.dashboard, size: 28), text: 'Dashboard'),
+              Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Products'),
+              Tab(icon: Icon(Icons.receipt, size: 28), text: 'Orders'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
+            Dashboard(),
             ProductManagement(),
             OrderManagement(),
           ],

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:gastrogrid_app/aplicatie_admin/edit_product.dart';
 
 class ProductManagement extends StatelessWidget {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
 
-  void _addProduct() async {
-    await FirebaseFirestore.instance.collection('products').add({
-      'title': _titleController.text,
-      'price': double.parse(_priceController.text),
-    });
-    _titleController.clear();
-    _priceController.clear();
+  void _addProduct(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProductPage(),
+      ),
+    );
   }
 
   void _deleteProduct(String id) async {
@@ -21,53 +23,110 @@ class ProductManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Product Management'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: 'Product Title'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _priceController,
-              decoration: InputDecoration(labelText: 'Product Price'),
-              keyboardType: TextInputType.number,
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _addProduct,
-            child: Text('Add Product'),
-          ),
-          Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('products').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return CircularProgressIndicator();
-                return ListView.builder(
-                  itemCount: snapshot.data!.docs.length,
+      backgroundColor: Colors.grey[200],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('products').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount = (constraints.maxWidth ~/ 200).clamp(2, 6);
+                double fontSize = constraints.maxWidth / 50;
+
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: 1 / 1.5,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: snapshot.data!.docs.length + 1,
                   itemBuilder: (context, index) {
-                    var product = snapshot.data!.docs[index];
-                    return ListTile(
-                      title: Text(product['title']),
-                      subtitle: Text('${product['price']} lei'),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => _deleteProduct(product.id),
+                    if (index == 0) {
+                      return GestureDetector(
+                        onTap: () => _addProduct(context),
+                        child: Card(
+                          color: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 5,
+                          child: Center(
+                            child: Icon(Icons.add, size: fontSize * 2, color: Colors.white),
+                          ),
+                        ),
+                      );
+                    }
+
+                    var product = snapshot.data!.docs[index - 1];
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                              child: Image.network(
+                                product['imageUrl'],
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Center(child: Icon(Icons.broken_image, size: fontSize * 2));
+                                },
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                            child: Text(
+                              product['title'],
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text('${product['price']} lei', style: TextStyle(fontSize: fontSize * 0.8)),
+                          ),
+                          ButtonBar(
+                            alignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditProductPage(
+                                        productId: product.id,
+                                        currentTitle: product['title'],
+                                        currentPrice: product['price'].toString(),
+                                        currentImageUrl: product['imageUrl'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text('Edit', style: TextStyle(fontSize: fontSize * 0.8)),
+                              ),
+                              TextButton(
+                                onPressed: () => _deleteProduct(product.id),
+                                child: Text('Delete', style: TextStyle(fontSize: fontSize * 0.8)),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     );
                   },
                 );
               },
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

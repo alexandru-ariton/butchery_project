@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/butoane_livrare.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_produs.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_selectare_adresa.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/pagina_produs.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
 import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -32,50 +32,23 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: themeProvider.themeData.colorScheme.background,
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverAppBar(
-            floating: true,
-            pinned: true,
-            snap: false,
-            expandedHeight: 15,
-            collapsedHeight: 15,
-            toolbarHeight: 15,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor,
-                      Theme.of(context).primaryColor.withOpacity(0.8)
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          
           SliverToBoxAdapter(
             child: Container(
               color: Theme.of(context).primaryColor,
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              padding: EdgeInsets.only(top: 50,bottom: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
                     onTap: () => _selectAddress(context),
-                    child: Row(
-                      children: [
-                        Icon(Icons.pin_drop_outlined, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Selectează Adresa',
-                          style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    child: Center(
+                         
+                        child:Icon(Icons.pin_drop_outlined, color: Colors.white,size: 40,)
+                      
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 20),
                   DeliveryToggleButtons(),
                   
                 ],
@@ -130,10 +103,10 @@ class _HomePageState extends State<HomePage> {
                 padding: EdgeInsets.all(10),
                 sliver: SliverGrid(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 2 / 3, // Adjusted for better card aspect ratio
+                    crossAxisCount: 1,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 1.5 / 1.2, // Adjusted for better card aspect ratio
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
@@ -162,19 +135,39 @@ class _HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
                                       image: DecorationImage(
                                         image: NetworkImage(product.imageUrl), // Ensure you have an imageUrl in your Product model
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.fill,
                                       ),
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.only(bottom: 30.0,left: 20, top: 20),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(product.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                      SizedBox(height: 4),
-                                      Text('${product.price} lei', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                      Center(
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              product.title, 
+                                              style: TextStyle(
+                                                fontSize: 16, 
+                                                fontWeight: FontWeight.bold
+                                                     ),
+                                            ),
+                                            SizedBox(width: 230,),
+                                            Text(
+                                              '${product.price} lei', 
+                                              style: TextStyle(
+                                                fontSize: 14, 
+                                                color: Colors.grey[600]
+                                                      )
+                                            )
+                                          ]
+                                        )
+                                      ),
+                                      
+                                     
                                     ],
                                   ),
                                 ),

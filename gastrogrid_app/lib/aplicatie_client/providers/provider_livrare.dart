@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class DeliveryInfo with ChangeNotifier {
+class DeliveryProvider with ChangeNotifier {
   bool _isDelivery = true;
   double _deliveryFee = 5.0;
   String? _selectedAddress;

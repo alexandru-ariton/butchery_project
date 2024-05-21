@@ -1,10 +1,10 @@
 // ignore_for_file: use_key_in_widget_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cos_cumparaturi.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/pagina_home.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Orders/pagina_order.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Profile/pagina_profil.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/pagina_cos_cumparaturi.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/pagina_principala_home.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Orders/pagina_order.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagina_principala_profil.dart';
 import 'package:gastrogrid_app/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 

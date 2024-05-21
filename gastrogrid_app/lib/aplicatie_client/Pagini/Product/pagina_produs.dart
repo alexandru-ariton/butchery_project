@@ -1,7 +1,8 @@
 // ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors_in_immutables, library_private_types_in_public_api, prefer_const_constructors, deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_Home/componente_home/pagina_cart.dart';
+import 'package:flutter/widgets.dart';
+import 'package:gastrogrid_app/aplicatie_client/providers/provider_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           children: <Widget>[
             Image.network(
               widget.product.imageUrl,
-              fit: BoxFit.cover,
+              fit: BoxFit.fill,
               height: 300,
               width: double.infinity,
               errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
@@ -49,27 +50,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 );
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            SizedBox(height: 60,),
+            Center(
               child: Text(
                 widget.product.title,
                 style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            SizedBox(height: 70,),
+            Center(
               child: Text(
                 widget.product.description,
                 style: Theme.of(context).textTheme.bodyText2,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                '\$${widget.product.price.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.headline6?.copyWith(color: Theme.of(context).colorScheme.secondary),
-              ),
-            ),
+          
+          SizedBox(height: 80,),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
@@ -92,20 +88,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       quantity++;
                     });
                   }),
+                  SizedBox(width: 150,),
+                  Text(
+                '\$${widget.product.price.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.headline6?.copyWith(color: Theme.of(context).colorScheme.primary),
+              ),
                 ],
               ),
             ),
+            SizedBox(height: 80,),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(left: 150.0),
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  minimumSize: Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
+                
                 onPressed: addToCart,
                 child: Text('Add to Cart'),
               ),
@@ -123,7 +118,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       quantity: quantity, // Use the current quantity value
     );
     // Use the current quantity to add or update the cart item
-    Provider.of<CartModel>(context, listen: false).addProduct(cartItem);
+    Provider.of<CartProvider>(context, listen: false).addProduct(cartItem);
 
     // Navigate to the ShoppingCartPage without resetting the quantity
     Navigator.of(context).push(

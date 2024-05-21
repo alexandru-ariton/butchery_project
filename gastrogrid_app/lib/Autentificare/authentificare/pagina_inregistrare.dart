@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_admin/admin_home.dart';
-import 'package:gastrogrid_app/aplicatie_client/Folder_LogIn/authentificare/auth_provider.dart';
-import 'package:gastrogrid_app/aplicatie_client/bara_navigare.dart';
+import 'package:gastrogrid_app/aplicatie_client/providers/provider_autentificare.dart';
+import 'package:gastrogrid_app/Autentificare/authentificare/pagina_login.dart';
 import 'package:provider/provider.dart';
-import 'componente/my_button.dart';
-import 'componente/my_textfield.dart';
+import '../componente/my_button.dart';
+import '../componente/my_textfield.dart';
 
-class PaginaLogin extends StatefulWidget {
+
+class PaginaInregistrare extends StatefulWidget {
   final void Function()? onTap;
 
-  const PaginaLogin({super.key, this.onTap});
+  const PaginaInregistrare({super.key, this.onTap});
 
   @override
-  State<PaginaLogin> createState() => _PaginaLoginState();
+  State<PaginaInregistrare> createState() => _PaginaInregistrareState();
 }
 
-class _PaginaLoginState extends State<PaginaLogin> {
+class _PaginaInregistrareState extends State<PaginaInregistrare> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmpasswordController = TextEditingController();
 
   String errorMessage = '';
 
@@ -30,13 +31,13 @@ class _PaginaLoginState extends State<PaginaLogin> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.lock_rounded,
+              Icons.lock_open_rounded,
               size: 100,
               color: Theme.of(context).colorScheme.inversePrimary,
             ),
             const SizedBox(height: 25),
             Text(
-              "Autentificare",
+              "Inregistrare",
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -54,26 +55,38 @@ class _PaginaLoginState extends State<PaginaLogin> {
               hintText: "Parola",
               obscureText: true,
             ),
+            const SizedBox(height: 10),
+            MyTextField(
+              conntroller: confirmpasswordController,
+              hintText: "Confirmare Parola",
+              obscureText: true,
+            ),
             const SizedBox(height: 25),
             MyButton(
               onTap: () async {
-                try {
-                  await Provider.of<AuthProvider>(context, listen: false)
-                      .login(emailController.text, passwordController.text);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Autentificare reușită")),
-                  );
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => BaraNavigare()), // Redirecționare către BaraNavigare
-                  );
-                } catch (e) {
+                if (passwordController.text == confirmpasswordController.text) {
+                  try {
+                    await Provider.of<AuthProvider>(context, listen: false)
+                        .signUp(emailController.text, passwordController.text);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Înregistrare reușită")),
+                    );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => PaginaLogin()), // Redirecționare către pagina principală
+                    );
+                  } catch (e) {
+                    setState(() {
+                      errorMessage = e.toString();
+                    });
+                  }
+                } else {
                   setState(() {
-                    errorMessage = e.toString();
+                    errorMessage = "Parolele nu coincid";
                   });
                 }
               },
-              text: "Autentificare",
+              text: "Înregistrare",
             ),
             const SizedBox(height: 15),
             Text(
@@ -84,7 +97,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
             GestureDetector(
               onTap: widget.onTap,
               child: Text(
-                "Nu ai un cont? Înregistrează-te aici",
+                "Ai deja un cont? Autentifică-te aici",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                 ),
