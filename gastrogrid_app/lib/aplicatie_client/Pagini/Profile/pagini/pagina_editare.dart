@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'pagina_editare_adrese.dart';
+import 'package:flutter/scheduler.dart';
+import 'pagina_adrese.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userId;
@@ -34,7 +34,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
     _dobController = TextEditingController();
-   
+    _loadUserProfile();
   }
 
   @override
@@ -46,7 +46,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
- 
+  Future<void> _loadUserProfile() async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(widget.userId).get();
+      if (userDoc.exists) {
+        setState(() {
+          _nameController.text = userDoc['username'] ?? '';
+          _phoneController.text = userDoc['phoneNumber'] ?? '';
+          _addressController.text = userDoc['address'] ?? '';
+          _dobController.text = userDoc['dateOfBirth'] ?? '';
+          _gender = userDoc['gender'];
+          _photoUrl = userDoc['photoUrl'];
+        });
+      }
+    } catch (e) {
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load profile: $e')));
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -75,7 +93,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
       return _photoUrl;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
+      });
       return null;
     }
   }
@@ -89,6 +109,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
 
         String? photoUrl = await _uploadImage();
+        if (photoUrl != null) {
+          await user.updatePhotoURL(photoUrl);
+          setState(() {
+            _photoUrl = photoUrl;
+          });
+        }
 
         await FirebaseFirestore.instance.collection('users').doc(widget.userId).set({
           'username': _nameController.text,
@@ -99,9 +125,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'photoUrl': photoUrl,
         }, SetOptions(merge: true));
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully!')));
+        SchedulerBinding.instance?.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully!')));
+        });
+
+        Navigator.pop(context, true);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
+        SchedulerBinding.instance?.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
+        });
       }
     }
   }
@@ -153,7 +185,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
               if (_image != null)
                 Image.file(_image!)
               else if (_photoUrl != null)
-                Image.network(_photoUrl!),
+                Image.network(_photoUrl!, errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error);
+                })
+              else
+                Icon(Icons.person, size: 100),
               ElevatedButton(
                 onPressed: _pickImage,
                 child: Text('Change Image'),

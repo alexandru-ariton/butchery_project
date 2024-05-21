@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare_adrese.dart';
-import 'package:gastrogrid_app/aplicatie_client/providers/provider_livrare.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

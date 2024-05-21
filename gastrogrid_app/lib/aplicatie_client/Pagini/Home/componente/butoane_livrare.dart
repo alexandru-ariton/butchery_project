@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/providers/provider_livrare.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
 
 

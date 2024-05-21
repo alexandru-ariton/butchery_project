@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-
 
 class PaginaSetari extends StatelessWidget {
   @override
@@ -43,6 +42,29 @@ class PaginaSetari extends StatelessWidget {
                   child: Text(value),
                 );
               }).toList(),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Dimensiune text',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Slider(
+              value: themeProvider.textSize,
+              min: 12.0,
+              max: 24.0,
+              divisions: 6,
+              label: themeProvider.textSize.toString(),
+              onChanged: (double newValue) {
+                themeProvider.changeTextSize(newValue);
+              },
+            ),
+            SizedBox(height: 20),
+            SwitchListTile(
+              title: Text('Notificări'),
+              value: themeProvider.notificationsEnabled,
+              onChanged: (value) {
+                themeProvider.toggleNotifications();
+              },
             ),
           ],
         ),

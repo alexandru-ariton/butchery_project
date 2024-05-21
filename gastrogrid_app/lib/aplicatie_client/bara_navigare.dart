@@ -5,7 +5,7 @@ import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/pagina_cos_cumparatu
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/pagina_principala_home.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Orders/pagina_order.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagina_principala_profil.dart';
-import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class BaraNavigare extends StatefulWidget {

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
 import 'package:provider/provider.dart';
-import 'package:gastrogrid_app/aplicatie_client/providers/provider_cart.dart';
+import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
-import 'package:gastrogrid_app/aplicatie_client/providers/provider_livrare.dart';
-import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:gastrogrid_app/providers/theme_provider.dart';
 
 class ShoppingCartPage extends StatefulWidget {
 

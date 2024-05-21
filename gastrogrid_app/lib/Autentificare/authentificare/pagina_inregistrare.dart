@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/providers/provider_autentificare.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart';
 import 'package:gastrogrid_app/Autentificare/authentificare/pagina_login.dart';
 import 'package:provider/provider.dart';
 import '../componente/my_button.dart';

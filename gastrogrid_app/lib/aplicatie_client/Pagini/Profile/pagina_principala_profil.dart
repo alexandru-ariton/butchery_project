@@ -5,9 +5,8 @@ import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_edi
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_informatii.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/profil.dart';
-import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -16,6 +15,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String? _photoUrl;
+  String? _userId;
 
   @override
   void initState() {
@@ -24,8 +24,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadProfileInfo() async {
+    final user = FirebaseAuth.instance.currentUser;
     setState(() {
-      _photoUrl = FirebaseAuth.instance.currentUser?.photoURL;
+      _photoUrl = user?.photoURL;
+      _userId = user?.uid;  // Obține userId-ul utilizatorului curent
     });
   }
 
@@ -54,18 +56,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   ProfileOption(
                     icon: Icons.edit,
-                    text: 'Editează informații personale',
+                    text: 'Editeaza profil',
                     onTap: () async {
-                      final updated = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditProfilePage(userId: '',
-                            
+                      if (_userId != null) {
+                        final updated = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditProfilePage(userId: _userId!),
                           ),
-                        ),
-                      );
-                      if (updated != null && updated) {
-                        _loadProfileInfo();
+                        );
+                        if (updated != null && updated) {
+                          _loadProfileInfo();
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('User ID not found'),
+                        ));
                       }
                     },
                   ),
@@ -83,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   ProfileOption(
                     icon: Icons.settings,
-                    text: 'Setări aplicație',
+                    text: 'Setari',
                     onTap: () {
                       Navigator.push(
                         context,
@@ -95,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   ProfileOption(
                     icon: Icons.info,
-                    text: 'Informații aplicație',
+                    text: 'Informatii',
                     onTap: () {
                       Navigator.push(
                         context,

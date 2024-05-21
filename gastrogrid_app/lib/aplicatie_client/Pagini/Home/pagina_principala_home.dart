@@ -5,7 +5,7 @@ import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/butoane_l
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/pagina_produs.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
-import 'package:gastrogrid_app/themes/theme_provider.dart';
+import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
