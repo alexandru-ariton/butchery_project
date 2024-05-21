@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
@@ -16,6 +17,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String? _photoUrl;
   String? _userId;
+  String? _username;
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -24,11 +27,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadProfileInfo() async {
-    final user = FirebaseAuth.instance.currentUser;
-    setState(() {
-      _photoUrl = user?.photoURL;
-      _userId = user?.uid;  // Obține userId-ul utilizatorului curent
-    });
+     final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _userId = user.uid;
+      _photoUrl = user.photoURL;
+
+      // Load username from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(_userId).get();
+      setState(() {
+        _username = userDoc['username'];
+      });
+    }
   }
 
   @override
@@ -49,7 +58,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   : null,
             ),
             SizedBox(height: 10),
-            
+            Text(
+              _username ?? 'N/A',
+              style: TextStyle(
+                fontSize: themeProvider.textSize,
+              ),
+            ),
             SizedBox(height: 20),
             Expanded(
               child: ListView(

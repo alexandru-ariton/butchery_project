@@ -9,7 +9,7 @@ import 'package:gastrogrid_app/Autentificare/authentificare/login_sau_inregistra
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'firebase_options.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,6 +1,8 @@
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
+
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';

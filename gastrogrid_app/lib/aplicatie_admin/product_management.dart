@@ -1,11 +1,11 @@
+// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gastrogrid_app/aplicatie_admin/edit_product.dart';
 
 class ProductManagement extends StatelessWidget {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
+
 
   void _addProduct(BuildContext context) {
     Navigator.push(

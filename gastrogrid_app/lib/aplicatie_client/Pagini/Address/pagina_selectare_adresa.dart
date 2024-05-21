@@ -1,11 +1,10 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AddressSelector extends StatefulWidget {
   @override
@@ -24,7 +23,7 @@ class _AddressSelectorState extends State<AddressSelector> {
   @override
   void initState() {
     super.initState();
-    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ');
+    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ');  // Folosește cheia API din configurare
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialLocation();
     });
@@ -44,7 +43,10 @@ class _AddressSelectorState extends State<AddressSelector> {
 
   Future<void> _setInitialLocation() async {
     LatLng initialLocation = LatLng(40.7128, -74.0060); // Default to New York City
-    mapController?.animateCamera(CameraUpdate.newLatLngZoom(initialLocation, 14.0));
+    await Future.delayed(Duration(milliseconds: 300));  // Adaugă un mic delay
+    if (mapController != null) {
+      mapController!.animateCamera(CameraUpdate.newLatLngZoom(initialLocation, 14.0));
+    }
   }
 
   void _onMapTapped(LatLng position) async {
@@ -78,7 +80,6 @@ class _AddressSelectorState extends State<AddressSelector> {
 
   void _parseAddress(String address) {
     List<String> parts = address.split(', ');
-    // Example parsing - customize based on your specific needs
     searchController.text = parts[0];
     if (parts.length > 1) manualAddressController.text = parts.sublist(1).join(', ');
   }
@@ -93,17 +94,21 @@ class _AddressSelectorState extends State<AddressSelector> {
   }
 
   void saveAddress(String address) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> savedAddresses = prefs.getStringList('savedAddresses') ?? [];
-    if (!savedAddresses.contains(address)) {
-      savedAddresses.add(address);
-      await prefs.setStringList('savedAddresses', savedAddresses);
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      DocumentReference docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('addresses')
+          .doc();
+      await docRef.set({'address': address});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Address saved successfully")),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Address already saved")),
+        SnackBar(content: Text("User not found")),
       );
     }
     Navigator.pop(context, true);
@@ -136,7 +141,7 @@ class _AddressSelectorState extends State<AddressSelector> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 0.0,left: 18.0,right: 18.0),
+            padding: EdgeInsets.only(top: 0.0, left: 18.0, right: 18.0),
             child: Column(
               children: [
                 TextFormField(
@@ -160,42 +165,35 @@ class _AddressSelectorState extends State<AddressSelector> {
                   },
                 ),
                 SizedBox(height: 8.0),
-                predictions.isNotEmpty ? Container(
-                  constraints: BoxConstraints(maxHeight: 200),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: predictions.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        textColor:themeProvider.themeData.colorScheme.primary,
-                        title: Text(predictions[index].description ?? ''),
-                        onTap: () async {
-                          var placeId = predictions[index].placeId!;
-                          var details = await googlePlace.details.get(placeId);
-                          if (details != null && details.result != null) {
-                            var location = details.result!.geometry!.location!;
-                            setSelectedLocation(LatLng(location.lat!, location.lng!));
-                            fetchAddressFromCoordinates(LatLng(location.lat!, location.lng!));
-                            setState(() {
-                              searchController.text = predictions[index].description ?? '';
-                              predictions = [];
-                            });
-                          }
-                        },
-                      );
-                    },
-                  ),
-                ) : Container(),
+                predictions.isNotEmpty
+                    ? Container(
+                        constraints: BoxConstraints(maxHeight: 200),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: predictions.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              textColor: themeProvider.themeData.colorScheme.primary,
+                              title: Text(predictions[index].description ?? ''),
+                              onTap: () async {
+                                var placeId = predictions[index].placeId!;
+                                var details = await googlePlace.details.get(placeId);
+                                if (details != null && details.result != null) {
+                                  var location = details.result!.geometry!.location!;
+                                  setSelectedLocation(LatLng(location.lat!, location.lng!));
+                                  fetchAddressFromCoordinates(LatLng(location.lat!, location.lng!));
+                                  setState(() {
+                                    searchController.text = predictions[index].description ?? '';
+                                    predictions = [];
+                                  });
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      )
+                    : Container(),
                 SizedBox(height: 8.0),
-                // TextFormField(
-                //   controller: manualAddressController,
-                //   decoration: InputDecoration(
-                //     hintText: 'Enter address manually',
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(15),
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -215,7 +213,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                     onDragEnd: (newPosition) {
                       setSelectedLocation(newPosition);
                       fetchAddressFromCoordinates(newPosition);
-                                        },
+                    },
                   )
               },
               onTap: _onMapTapped,

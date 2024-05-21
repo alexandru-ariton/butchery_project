@@ -17,7 +17,7 @@ class PaginaSetari extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SwitchListTile(
-              title: Text('Mod Întunecat'),
+              title: Text('Mod Întunecat', style: TextStyle(fontSize: themeProvider.textSize)),
               value: themeProvider.isDarkMode,
               onChanged: (value) {
                 themeProvider.toggleTheme();
@@ -26,7 +26,7 @@ class PaginaSetari extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               'Limbă',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: themeProvider.textSize, fontWeight: FontWeight.bold),
             ),
             DropdownButton<String>(
               value: themeProvider.selectedLanguage,
@@ -39,14 +39,14 @@ class PaginaSetari extends StatelessWidget {
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(value, style: TextStyle(fontSize: themeProvider.textSize)),
                 );
               }).toList(),
             ),
             SizedBox(height: 20),
             Text(
               'Dimensiune text',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: themeProvider.textSize, fontWeight: FontWeight.bold),
             ),
             Slider(
               value: themeProvider.textSize,
@@ -60,7 +60,7 @@ class PaginaSetari extends StatelessWidget {
             ),
             SizedBox(height: 20),
             SwitchListTile(
-              title: Text('Notificări'),
+              title: Text('Notificări', style: TextStyle(fontSize: themeProvider.textSize)),
               value: themeProvider.notificationsEnabled,
               onChanged: (value) {
                 themeProvider.toggleNotifications();

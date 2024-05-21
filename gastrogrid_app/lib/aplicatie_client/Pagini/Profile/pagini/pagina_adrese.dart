@@ -1,10 +1,9 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare_adrese.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SavedAddressesPage extends StatefulWidget {
   @override
@@ -13,6 +12,7 @@ class SavedAddressesPage extends StatefulWidget {
 
 class _SavedAddressesPageState extends State<SavedAddressesPage> {
   List<String> savedAddresses = [];
+  String? userId;
 
   @override
   void initState() {
@@ -21,19 +21,38 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
   }
 
   void loadSavedAddresses() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      savedAddresses = prefs.getStringList('savedAddresses') ?? [];
-    });
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userId = user.uid;
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('addresses')
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        setState(() {
+          savedAddresses = querySnapshot.docs.map((doc) => doc['address'] as String).toList();
+        });
+      });
+    }
   }
 
   void _handleAddressTap(String address) {
     Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address);
-    Navigator.pop(context,address); // Go back
-    
+    Navigator.pop(context, address); // Go back
   }
 
-  
+  void _addNewAddress(String newAddress) async {
+    if (userId != null) {
+      DocumentReference docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('addresses')
+          .doc();
+      await docRef.set({'address': newAddress});
+      loadSavedAddresses();
+    }
+  }
 
   Widget _buildAddressCard(String address) {
     return GestureDetector(
@@ -79,6 +98,13 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
         itemBuilder: (context, index) {
           return _buildAddressCard(savedAddresses[index]);
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Adaugă logica pentru a adăuga o nouă adresă
+          _addNewAddress('Noua Adresă');
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
