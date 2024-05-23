@@ -23,7 +23,7 @@ class _AddressSelectorState extends State<AddressSelector> {
   @override
   void initState() {
     super.initState();
-    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ');  // Folosește cheia API din configurare
+    googlePlace = GooglePlace('YOUR_API_KEY');  // Replace with your API key
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialLocation();
     });
@@ -43,7 +43,7 @@ class _AddressSelectorState extends State<AddressSelector> {
 
   Future<void> _setInitialLocation() async {
     LatLng initialLocation = LatLng(40.7128, -74.0060); // Default to New York City
-    await Future.delayed(Duration(milliseconds: 300));  // Adaugă un mic delay
+    await Future.delayed(Duration(milliseconds: 300));  // Add a small delay
     if (mapController != null) {
       mapController!.animateCamera(CameraUpdate.newLatLngZoom(initialLocation, 14.0));
     }

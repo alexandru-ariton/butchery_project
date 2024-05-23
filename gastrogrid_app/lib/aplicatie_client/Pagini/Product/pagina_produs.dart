@@ -19,6 +19,29 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
 
+
+  void addToCart() {
+    var cartItem = CartItem(
+      title: widget.product.title,
+      price: widget.product.price,
+      quantity: quantity, 
+    );
+   
+    Provider.of<CartProvider>(context, listen: false).addProduct(cartItem);
+
+   
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BaraNavigare(),
+      ),
+    );
+
+   
+    setState(() {
+      quantity = 1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,27 +134,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  void addToCart() {
-    var cartItem = CartItem(
-      title: widget.product.title,
-      price: widget.product.price,
-      quantity: quantity, // Use the current quantity value
-    );
-    // Use the current quantity to add or update the cart item
-    Provider.of<CartProvider>(context, listen: false).addProduct(cartItem);
-
-    // Navigate to the ShoppingCartPage without resetting the quantity
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => BaraNavigare(),
-      ),
-    );
-
-    // Reset the quantity to 1 for the next product detail visit
-    setState(() {
-      quantity = 1;
-    });
-  }
+ 
 
   Widget _buildQuantityButton(IconData icon, VoidCallback onPressed) {
     return CircleAvatar(

@@ -32,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _userId = user.uid;
       _photoUrl = user.photoURL;
 
-      // Load username from Firestore
+      
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(_userId).get();
       setState(() {
         _username = userDoc['username'];

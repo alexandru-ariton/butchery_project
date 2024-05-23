@@ -9,7 +9,8 @@
 
     <application
         android:label="gastrogrid_app"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -36,6 +37,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        
+        <meta-data
+    android:name="com.google.android.geo.API_KEY"
+    android:value="AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ"/>
+
         
     <meta-data
     android:name="com.google.android.gms.car.application"

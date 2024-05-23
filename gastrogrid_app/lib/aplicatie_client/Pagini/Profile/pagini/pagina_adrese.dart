@@ -49,7 +49,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
           .doc(userId)
           .collection('addresses')
           .doc();
-      await docRef.set({'address': newAddress});
+      //await docRef.set({'address': newAddress});
       loadSavedAddresses();
     }
   }
@@ -101,7 +101,6 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Adaugă logica pentru a adăuga o nouă adresă
           _addNewAddress('Noua Adresă');
         },
         child: Icon(Icons.add),
