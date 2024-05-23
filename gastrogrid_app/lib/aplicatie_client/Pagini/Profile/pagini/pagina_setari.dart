@@ -24,31 +24,15 @@ class PaginaSetari extends StatelessWidget {
               },
             ),
             SizedBox(height: 20),
-            Text(
-              'Limbă',
-              style: TextStyle(fontSize: themeProvider.textSize, fontWeight: FontWeight.bold),
-            ),
-            DropdownButton<String>(
-              value: themeProvider.selectedLanguage,
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  themeProvider.changeLanguage(newValue);
-                }
-              },
-              items: <String>['English', 'Română']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: TextStyle(fontSize: themeProvider.textSize)),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Dimensiune text',
-              style: TextStyle(fontSize: themeProvider.textSize, fontWeight: FontWeight.bold),
-            ),
-            Slider(
+            Padding(
+              padding: const EdgeInsets.only(left:15.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Dimensiune text',
+                    style: TextStyle(fontSize: themeProvider.textSize, fontWeight: FontWeight.bold),
+                  ),
+                  Slider(
               value: themeProvider.textSize,
               min: 12.0,
               max: 24.0,
@@ -58,6 +42,10 @@ class PaginaSetari extends StatelessWidget {
                 themeProvider.changeTextSize(newValue);
               },
             ),
+                ],
+              ),
+            ),
+            
             SizedBox(height: 20),
             SwitchListTile(
               title: Text('Notificări', style: TextStyle(fontSize: themeProvider.textSize)),

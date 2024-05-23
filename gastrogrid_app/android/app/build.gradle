@@ -30,7 +30,7 @@ android {
     namespace "com.example.gastrogrid_app"
     compileSdk 34
     ndkVersion '26.2.11394342'
-    apply plugin: 'com.google.gms.google-services'
+    
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -75,7 +75,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.8.0')
     implementation "androidx.multidex:multidex:2.0.1"
     implementation 'com.android.tools:r8:8.3.37'
+    implementation 'com.google.android.gms:play-services-maps:18.0.2' // Directly set the version here
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     
 
 
 }
+
+apply plugin: 'com.google.gms.google-services'

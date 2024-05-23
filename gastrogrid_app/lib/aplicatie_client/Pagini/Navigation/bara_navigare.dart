@@ -17,7 +17,7 @@ class _BaraNavigareState extends State<BaraNavigare> {
   int _selectedIndex = 0;
   List<Widget> _pages = [
     HomePage(),
-    OrdersPage(),
+    PaginaOrder(),
     ShoppingCartPage(),
     ProfilePage(),
   ];

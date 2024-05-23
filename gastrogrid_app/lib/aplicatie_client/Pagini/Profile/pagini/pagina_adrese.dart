@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare_adrese.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:geocoding/geocoding.dart';
 
 class SavedAddressesPage extends StatefulWidget {
   @override
@@ -11,19 +13,33 @@ class SavedAddressesPage extends StatefulWidget {
 }
 
 class _SavedAddressesPageState extends State<SavedAddressesPage> {
-  List<String> savedAddresses = [];
+  List<Map<String, String>> savedAddresses = [];
   String? userId;
 
   @override
   void initState() {
     super.initState();
-    loadSavedAddresses();
+    _initializeUser();
+  }
+
+  void _initializeUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid;
+      });
+      print('User ID: $userId'); // Mesaj de debug pentru a verifica User ID-ul
+      loadSavedAddresses();
+    } else {
+      print("User is not logged in");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Utilizatorul nu este autentificat')),
+      );
+    }
   }
 
   void loadSavedAddresses() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      userId = user.uid;
+    if (userId != null) {
       FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
@@ -31,32 +47,38 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
           .get()
           .then((QuerySnapshot querySnapshot) {
         setState(() {
-          savedAddresses = querySnapshot.docs.map((doc) => doc['address'] as String).toList();
+          savedAddresses = querySnapshot.docs.map((doc) => {
+            'addressId': doc.id,
+            'address': doc['address'] as String,
+          }).toList();
         });
+      }).catchError((error) {
+        print("Failed to load addresses: $error");
       });
     }
   }
 
-  void _handleAddressTap(String address) {
-    Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address);
+  Future<LatLng?> _getLocationFromAddress(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        return LatLng(locations.first.latitude, locations.first.longitude);
+      }
+    } catch (e) {
+      print("Error getting location from address: $e");
+    }
+    return null;
+  }
+
+  void _handleAddressTap(String address) async {
+    LatLng? location = await _getLocationFromAddress(address);
+    Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address, location);
     Navigator.pop(context, address); // Go back
   }
 
-  void _addNewAddress(String newAddress) async {
-    if (userId != null) {
-      DocumentReference docRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('addresses')
-          .doc();
-      //await docRef.set({'address': newAddress});
-      loadSavedAddresses();
-    }
-  }
-
-  Widget _buildAddressCard(String address) {
+  Widget _buildAddressCard(Map<String, String> addressData) {
     return GestureDetector(
-      onTap: () => _handleAddressTap(address),
+      onTap: () => _handleAddressTap(addressData['address']!),
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         shape: RoundedRectangleBorder(
@@ -67,7 +89,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           title: Text(
-            address,
+            addressData['address']!,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           trailing: IconButton(
@@ -75,7 +97,12 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditAddressPage(address: address)),
+                MaterialPageRoute(
+                  builder: (context) => EditAddressPage(
+                    address: addressData['address']!,
+                    addressId: addressData['addressId']!,
+                  ),
+                ),
               );
             },
           ),
@@ -98,12 +125,6 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
         itemBuilder: (context, index) {
           return _buildAddressCard(savedAddresses[index]);
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _addNewAddress('Noua Adresă');
-        },
-        child: Icon(Icons.add),
       ),
     );
   }

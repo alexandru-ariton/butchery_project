@@ -1,56 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 
-
-class CartProvider extends ChangeNotifier {
-  final List<CartItem> _items = [];
+class CartProvider with ChangeNotifier {
+  List<CartItem> _items = [];
 
   List<CartItem> get items => _items;
 
-  CartItem? findItemByTitle(String title) {
-    try {
-      return _items.firstWhere((element) => element.title == title);
-    } catch (e) {
-      // If no item is found, return null
-      return null;
-    }
+  double get total {
+    return _items.fold(0, (sum, item) => sum + item.product.price * item.quantity);
   }
 
- void addProduct(CartItem newItem) {
-  // Check if the item is already in the cart.
-  var existingItemIndex = _items.indexWhere((item) => item.title == newItem.title);
-  if (existingItemIndex != -1) {
-    // If the item exists, increase its quantity by the new item's quantity.
-    _items[existingItemIndex].quantity += newItem.quantity;
-  } else {
-    // If the item is new, add it to the cart with the provided quantity.
-    _items.add(newItem);
+  int get totalItemsQuantity {
+    return _items.fold(0, (sum, item) => sum + item.quantity);
   }
-  notifyListeners();
-}
 
-
-  void removeProduct(CartItem item) {
-    var existingItem = findItemByTitle(item.title);
-    if (existingItem != null && existingItem.quantity > 1) {
-      // If item exists and quantity is more than one, decrement it
-      existingItem.decrementQuantity();
-    } else if (existingItem != null) {
-      // Remove the item if quantity is 1
-      _items.remove(existingItem);
+  void addProductToCart(CartItem cartItem) {
+    int index = _items.indexWhere((item) => item.product.id == cartItem.product.id);
+    if (index >= 0) {
+      _items[index].quantity += cartItem.quantity;
+    } else {
+      _items.add(cartItem);
     }
     notifyListeners();
   }
 
-  void updateProductQuantity(CartItem item, int newQuantity) {
-    var existingItemIndex = _items.indexWhere((element) => element.title == item.title);
-    if (existingItemIndex != -1) {
-      _items[existingItemIndex].quantity = newQuantity;
+  void updateProductQuantity(CartItem cartItem, int quantity) {
+    int index = _items.indexWhere((item) => item.product.id == cartItem.product.id);
+    if (index >= 0) {
+      _items[index].quantity = quantity;
+      if (_items[index].quantity <= 0) {
+        _items.removeAt(index);
+      }
       notifyListeners();
     }
   }
 
-   int get totalItemsQuantity => _items.fold(0, (total, current) => total + current.quantity);
+  void removeProduct(CartItem cartItem) {
+    _items.removeWhere((item) => item.product.id == cartItem.product.id);
+    notifyListeners();
+  }
 
-  double get total => _items.fold(0, (sum, item) => sum + (item.price * item.quantity));
+  void clear() {
+    _items.clear();
+    notifyListeners();
+  }
 }

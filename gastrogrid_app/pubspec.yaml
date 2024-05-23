@@ -7,7 +7,7 @@ environment:
   sdk: '>=3.3.1 <4.0.0'
 
 dependencies:
-  charts_flutter: ^0.12.0
+  charts_flutter: 0.12.0
   cloud_firestore: ^4.17.0
   custom_navigation_bar: ^0.8.2
   firebase_auth: ^4.17.9
@@ -31,6 +31,7 @@ dependencies:
   firebase_app_check: ^0.2.2+6 
   image_picker_web: ^3.1.1
   universal_html: ^2.2.4
+  geolocator: ^12.0.0
 
 dev_dependencies:
   flutter_test:

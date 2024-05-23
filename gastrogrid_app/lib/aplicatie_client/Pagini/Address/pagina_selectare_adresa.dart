@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,11 +20,12 @@ class _AddressSelectorState extends State<AddressSelector> {
   LatLng? selectedLocation;
   List<AutocompletePrediction> predictions = [];
   bool loading = false;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    googlePlace = GooglePlace('YOUR_API_KEY');  // Replace with your API key
+    googlePlace = GooglePlace('AIzaSyBPKl6hVOD0zauA38oy1RQ3KXW8SM6pwZQ'); // Replace with your actual API key
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialLocation();
     });
@@ -34,24 +36,28 @@ class _AddressSelectorState extends State<AddressSelector> {
     mapController?.dispose();
     searchController.dispose();
     manualAddressController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    print("Map created");
   }
 
   Future<void> _setInitialLocation() async {
-    LatLng initialLocation = LatLng(40.7128, -74.0060); // Default to New York City
-    await Future.delayed(Duration(milliseconds: 300));  // Add a small delay
+    LatLng initialLocation = LatLng(40.7128, -74.0060);
+    await Future.delayed(Duration(milliseconds: 300));
     if (mapController != null) {
       mapController!.animateCamera(CameraUpdate.newLatLngZoom(initialLocation, 14.0));
+      print("Initial location set to: $initialLocation");
     }
   }
 
   void _onMapTapped(LatLng position) async {
+    print("Map tapped at position: $position");
     setSelectedLocation(position);
-    fetchAddressFromCoordinates(position);
+    await fetchAddressFromCoordinates(position);
   }
 
   void setSelectedLocation(LatLng position) {
@@ -67,30 +73,55 @@ class _AddressSelectorState extends State<AddressSelector> {
     setState(() {
       loading = true;
     });
-    var result = await googlePlace.search.getNearBySearch(
-      Location(lat: coordinates.latitude, lng: coordinates.longitude), 500);
-    if (result != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
-      var address = result.results!.first.formattedAddress!;
-      _parseAddress(address);
+    try {
+      var result = await googlePlace.search.getNearBySearch(
+        Location(lat: coordinates.latitude, lng: coordinates.longitude), 500);
+      if (result != null && result.results != null && result.results!.isNotEmpty && result.results!.first.formattedAddress != null) {
+        var address = result.results!.first.formattedAddress!;
+        _parseAddress(address);
+        print("Address fetched: $address");
+      }
+    } catch (e) {
+      debugPrint('Error fetching address: $e');
+    } finally {
+      setState(() {
+        loading = false;
+      });
     }
-    setState(() {
-      loading = false;
-    });
   }
 
   void _parseAddress(String address) {
-    List<String> parts = address.split(', ');
-    searchController.text = parts[0];
-    if (parts.length > 1) manualAddressController.text = parts.sublist(1).join(', ');
+    searchController.text = address; // Update the searchController with the full address
   }
 
-  void autoCompleteSearch(String value) async {
-    var result = await googlePlace.autocomplete.get(value);
-    if (result != null && result.predictions != null) {
+  void autoCompleteSearch(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(Duration(milliseconds: 300), () async {
+      if (value.isEmpty) {
+        setState(() {
+          predictions = [];
+        });
+        return;
+      }
       setState(() {
-        predictions = result.predictions!;
+        loading = true;
       });
-    }
+      try {
+        var result = await googlePlace.autocomplete.get(value);
+        if (result != null && result.predictions != null) {
+          setState(() {
+            predictions = result.predictions!;
+          });
+          print("Predictions fetched: ${predictions.map((p) => p.description).join(', ')}");
+        }
+      } catch (e) {
+        debugPrint('Error fetching predictions: $e');
+      } finally {
+        setState(() {
+          loading = false;
+        });
+      }
+    });
   }
 
   void saveAddress(String address) async {
@@ -154,15 +185,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                     ),
                     suffixIcon: loading ? CircularProgressIndicator() : null,
                   ),
-                  onChanged: (value) {
-                    if (value.isNotEmpty) {
-                      autoCompleteSearch(value);
-                    } else {
-                      setState(() {
-                        predictions = [];
-                      });
-                    }
-                  },
+                  onChanged: autoCompleteSearch,
                 ),
                 SizedBox(height: 8.0),
                 predictions.isNotEmpty
@@ -181,7 +204,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                                 if (details != null && details.result != null) {
                                   var location = details.result!.geometry!.location!;
                                   setSelectedLocation(LatLng(location.lat!, location.lng!));
-                                  fetchAddressFromCoordinates(LatLng(location.lat!, location.lng!));
+                                  await fetchAddressFromCoordinates(LatLng(location.lat!, location.lng!));
                                   setState(() {
                                     searchController.text = predictions[index].description ?? '';
                                     predictions = [];
@@ -210,9 +233,9 @@ class _AddressSelectorState extends State<AddressSelector> {
                     markerId: MarkerId("selectedLocation"),
                     position: selectedLocation!,
                     draggable: true,
-                    onDragEnd: (newPosition) {
+                    onDragEnd: (newPosition) async {
                       setSelectedLocation(newPosition);
-                      fetchAddressFromCoordinates(newPosition);
+                      await fetchAddressFromCoordinates(newPosition);
                     },
                   )
               },

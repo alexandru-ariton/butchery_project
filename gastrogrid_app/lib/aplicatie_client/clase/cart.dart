@@ -1,17 +1,23 @@
+import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
+
+
 class CartItem {
-  final String title;
-  final double price;
+  final Product product;
   int quantity;
 
-  CartItem({required this.title, required this.price, this.quantity = 1});
+  CartItem({required this.product, required this.quantity});
 
-  void incrementQuantity() {
-    quantity++;
+  Map<String, dynamic> toMap() {
+    return {
+      'product': product.toMap(),
+      'quantity': quantity,
+    };
   }
 
-  void decrementQuantity() {
-    if (quantity > 1) {
-      quantity--;
-    }
+  factory CartItem.fromMap(Map<String, dynamic> data) {
+    return CartItem(
+      product: Product.fromMap(data['product'], data['product']['id']),
+      quantity: data['quantity'],
+    );
   }
 }

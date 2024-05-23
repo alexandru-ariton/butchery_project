@@ -6,32 +6,86 @@ class OrderManagement extends StatelessWidget {
     await FirebaseFirestore.instance.collection('orders').doc(id).delete();
   }
 
+  void _updateOrderStatus(String orderId, String newStatus) async {
+    try {
+      await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': newStatus});
+    } catch (e) {
+      print("Failed to update order status: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Order Management'),
-      ),
-      body: StreamBuilder(
+      
+      body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('orders').snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return CircularProgressIndicator();
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          var orders = snapshot.data!.docs;
           return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
+            itemCount: orders.length,
             itemBuilder: (context, index) {
-              var order = snapshot.data!.docs[index];
-              return ListTile(
-                title: Text('Order ${order.id}'),
-                subtitle: Text('Total: ${order['total']} lei'),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _deleteOrder(order.id),
+              var order = orders[index];
+              var orderId = order.id;
+              var orderData = order.data() as Map<String, dynamic>;
+
+              return Card(
+                margin: EdgeInsets.all(8),
+                child: ListTile(
+                  title: Text('Order $orderId'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Status: ${orderData['status'] ?? 'Unknown'}'),
+                      Text('Total: ${orderData['total'] ?? 'Unknown'} lei'),
+                      _buildOrderItems(orderData['items'] ?? []),
+                    ],
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButton<String>(
+                        value: orderData['status'],
+                        items: ['Pending', 'In Progress', 'Completed']
+                            .map((status) => DropdownMenuItem(
+                                  value: status,
+                                  child: Text(status),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            _updateOrderStatus(orderId, value);
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => _deleteOrder(orderId),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
           );
         },
       ),
+    );
+  }
+
+  Widget _buildOrderItems(List<dynamic> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: items.map((item) {
+        var productData = item['product'] ?? {};
+        var productName = productData['title'] ?? 'Unknown Product';
+        var quantity = item['quantity'] ?? 'Unknown Quantity';
+        return Text('$productName x $quantity');
+      }).toList(),
     );
   }
 }

@@ -1,25 +1,20 @@
-// ignore_for_file: unused_field
-
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:gastrogrid_app/providers/theme_provider.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
 
 class ShoppingCartPage extends StatefulWidget {
-
- 
   @override
   _ShoppingCartPageState createState() => _ShoppingCartPageState();
 }
 
 class _ShoppingCartPageState extends State<ShoppingCartPage> {
-
   String? _selectedAddress;
-  
 
   void _selectDeliveryAddress() async {
     final selectedAddress = await Navigator.of(context).push(
@@ -35,12 +30,47 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     }
   }
 
+  void finalizeOrder(BuildContext context) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      CollectionReference orders = FirebaseFirestore.instance.collection('orders');
+
+      final cart = Provider.of<CartProvider>(context, listen: false);
+      final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
+
+      List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
+      Map<String, dynamic> orderData = {
+        'userId': userId,
+        'items': items,
+        'status': 'Pending',
+        'address': _selectedAddress ?? 'No address selected',
+        'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      try {
+        await orders.add(orderData);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Order finalized successfully")),
+        );
+        cart.clear(); // Clear the cart after finalizing the order
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to finalize order: $e")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("You must be logged in to finalize an order")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     final deliveryInfo = Provider.of<DeliveryProvider>(context);
-    
-
     double deliveryFee = cart.items.isEmpty ? 0.0 : (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0);
     double total = cart.total + deliveryFee;
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -89,7 +119,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       child: deliveryInfo.isDelivery
           ? ListTile(
               title: Text('Selectați adresa de livrare'),
-              subtitle: Text(deliveryInfo.selectedAddress ?? 'Nu a fost selectată nicio adresă'),
+              subtitle: Text(_selectedAddress ?? 'Nu a fost selectată nicio adresă'),
               trailing: Icon(Icons.keyboard_arrow_right),
               onTap: _selectDeliveryAddress,
             )
@@ -101,7 +131,6 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   Widget _buildCartItem(CartItem item) {
-   
     return Card(
       elevation: 2.0,
       margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -115,16 +144,15 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                   
                     Text(
-                      item.title,
+                      item.product.title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      'Price: \$${item.price.toStringAsFixed(2)}',
+                      'Price: \$${item.product.price.toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -176,7 +204,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   Widget _buildTotalSection(CartProvider cart, double deliveryFee, double total) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Container(
-      padding: EdgeInsets.only(top:0,left:15,right:15),
+      padding: EdgeInsets.only(top: 0, left: 15, right: 15),
       decoration: BoxDecoration(
         color: themeProvider.themeData.colorScheme.background,
         boxShadow: [
@@ -199,9 +227,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             _buildSummaryLine('Total:', '${total.toStringAsFixed(2)} lei', isTotal: true),
             SizedBox(height: 20),
             ElevatedButton(
-              
               onPressed: () {
-                // Logică pentru finalizarea comenzii
+                finalizeOrder(context);
               },
               child: Text('FINALIZEAZA COMANDA', style: TextStyle(color: themeProvider.themeData.colorScheme.primary)),
             ),
