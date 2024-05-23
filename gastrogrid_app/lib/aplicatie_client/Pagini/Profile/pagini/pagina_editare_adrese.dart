@@ -29,7 +29,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
     setState(() {
       userId = user.uid;
     });
-    print('User ID in Edit Page: $userId'); // Mesaj de debug pentru a verifica User ID-ul în pagina de editare
+    print('User ID in Edit Page: $userId'); 
   } else {
     print('User is not logged in');
     ScaffoldMessenger.of(context).showSnackBar(

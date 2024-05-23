@@ -54,7 +54,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Order finalized successfully")),
         );
-        cart.clear(); // Clear the cart after finalizing the order
+        cart.clear(); 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to finalize order: $e")),

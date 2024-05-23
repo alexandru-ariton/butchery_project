@@ -26,7 +26,7 @@ class PaginaInformatii extends StatelessWidget {
             SizedBox(height: 10),
             Text('Nume Dezvoltator 1'),
             Text('Nume Dezvoltator 2'),
-            // Adăugați mai mulți dezvoltatori dacă este necesar
+          
           ],
         ),
       ),

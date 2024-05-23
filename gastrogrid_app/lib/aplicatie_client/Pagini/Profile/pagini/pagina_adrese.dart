@@ -28,7 +28,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
       setState(() {
         userId = user.uid;
       });
-      print('User ID: $userId'); // Mesaj de debug pentru a verifica User ID-ul
+      print('User ID: $userId'); 
       loadSavedAddresses();
     } else {
       print("User is not logged in");

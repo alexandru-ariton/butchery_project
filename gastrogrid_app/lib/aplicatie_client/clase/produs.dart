@@ -1,5 +1,5 @@
 class Product {
-  final String id;  // Added ID field
+  final String id;  
   final String title;
   final String description;
   final double price;

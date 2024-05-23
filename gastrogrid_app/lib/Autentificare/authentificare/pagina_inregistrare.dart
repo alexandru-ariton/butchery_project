@@ -73,7 +73,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
                     );
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => PaginaLogin()), // Redirecționare către pagina principală
+                      MaterialPageRoute(builder: (context) => PaginaLogin()),
                     );
                   } catch (e) {
                     setState(() {
