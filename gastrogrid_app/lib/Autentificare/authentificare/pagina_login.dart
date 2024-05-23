@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gastrogrid_app/aplicatie_admin/admin_home.dart';
 import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
