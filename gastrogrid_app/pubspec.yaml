@@ -37,6 +37,7 @@ dependencies:
   cloud_functions: ^4.7.5
   stripe_platform_interface: ^4.0.0
   flutter_braintree: ^4.0.0
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:
