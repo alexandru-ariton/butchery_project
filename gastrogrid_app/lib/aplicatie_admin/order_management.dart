@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gastrogrid_app/aplicatie_admin/order_detail_page.dart';
+
 
 class OrderManagement extends StatelessWidget {
   void _deleteOrder(String id) async {
@@ -17,7 +19,7 @@ class OrderManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      appBar: AppBar(title: Text('Order Management')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('orders').snapshots(),
         builder: (context, snapshot) {
@@ -68,6 +70,11 @@ class OrderManagement extends StatelessWidget {
                       ),
                     ],
                   ),
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => OrderDetailsPage(orderId: orderId, orderData: orderData),
+                    ));
+                  },
                 ),
               );
             },
@@ -78,6 +85,10 @@ class OrderManagement extends StatelessWidget {
   }
 
   Widget _buildOrderItems(List<dynamic> items) {
+    if (items.isEmpty) {
+      return Text('No items found.');
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: items.map((item) {

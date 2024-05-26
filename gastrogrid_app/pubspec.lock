@@ -9,6 +9,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.34"
+  args:
+    dependency: transitive
+    description:
+      name: args
+      sha256: "7cf60b9f0cc88203c5a190b4cd62a99feea42759a7fa695010eb5de1c0b2252a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.0"
+  asn1lib:
+    dependency: transitive
+    description:
+      name: asn1lib
+      sha256: "58082b3f0dca697204dbab0ef9ff208bfaea7767ea771076af9a343488428dda"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.3"
   async:
     dependency: transitive
     description:
@@ -89,6 +105,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.12.4"
+  cloud_functions:
+    dependency: "direct main"
+    description:
+      name: cloud_functions
+      sha256: fd10d81b7bba2f8a6da7c6d7dce5a92be6944c6b3a1341b4c102c34279d23e18
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.7.5"
+  cloud_functions_platform_interface:
+    dependency: transitive
+    description:
+      name: cloud_functions_platform_interface
+      sha256: d78f5313e6eea27bfccd35841753a9395ab32a4465159fd1a5891072054b3702
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.5.27"
+  cloud_functions_web:
+    dependency: transitive
+    description:
+      name: cloud_functions_web
+      sha256: c90ac25c6a2bbf2fdb9864e36507bc661e7d1e1b4da2f702e513622ef56d4ad1
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.5"
   collection:
     dependency: transitive
     description:
@@ -97,6 +137,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  convert:
+    dependency: transitive
+    description:
+      name: convert
+      sha256: "0f08b14755d163f6e2134cb58222dd25ea2a2ee8a195e53983d57c075324d592"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.1"
   cross_file:
     dependency: transitive
     description:
@@ -129,6 +177,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.8.2"
+  encrypt:
+    dependency: "direct main"
+    description:
+      name: encrypt
+      sha256: "62d9aa4670cc2a8798bab89b39fc71b6dfbacf615de6cf5001fb39f7e4a996a2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -302,6 +358,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_braintree:
+    dependency: "direct main"
+    description:
+      name: flutter_braintree
+      sha256: d58a91212c21f97aa1e8fcbcbb394744eb5997c7ba929274daf3cf903ceef8db
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   flutter_google_places:
     dependency: "direct main"
     description:
@@ -326,6 +390,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.19"
+  flutter_stripe:
+    dependency: "direct main"
+    description:
+      name: flutter_stripe
+      sha256: "54670bd24fad81847c3dbf86f9fe3d06df18eda1e0f49f332e9f113420523c90"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -336,6 +408,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: c3fd9336eb55a38cc1bbd79ab17573113a8deccd0ecbbf926cca3c62803b5c2d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
   geocoding:
     dependency: "direct main"
     description:
@@ -816,6 +896,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      sha256: "4be0097fcf3fd3e8449e53730c631200ebc7b88016acecab2b0da2f0149222fe"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.9.1"
   provider:
     dependency: "direct main"
     description:
@@ -949,6 +1037,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  stripe_android:
+    dependency: transitive
+    description:
+      name: stripe_android
+      sha256: f2f2cadb918b631e119df73052b49f4a38d0beabf5ecf92c011bbe3239079364
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+  stripe_ios:
+    dependency: transitive
+    description:
+      name: stripe_ios
+      sha256: "22afab97f193cc4499ecfa7a9cc9a8f8b29306c9430c439e1bb7779ea9f205a6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+  stripe_platform_interface:
+    dependency: "direct main"
+    description:
+      name: stripe_platform_interface
+      sha256: cebb101234b5b04c5c548e5aad04225388e35bedfb410bdfe471dbe2017e3048
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   term_glyph:
     dependency: transitive
     description:

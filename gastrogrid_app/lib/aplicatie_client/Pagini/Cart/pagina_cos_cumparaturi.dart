@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_select_card.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:gastrogrid_app/providers/theme_provider.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
+
 
 class ShoppingCartPage extends StatefulWidget {
   @override
@@ -15,6 +17,8 @@ class ShoppingCartPage extends StatefulWidget {
 
 class _ShoppingCartPageState extends State<ShoppingCartPage> {
   String? _selectedAddress;
+  String? _selectedPaymentMethod;
+  Map<String, dynamic>? _selectedCardDetails;
 
   void _selectDeliveryAddress() async {
     final selectedAddress = await Navigator.of(context).push(
@@ -30,42 +34,72 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     }
   }
 
-  void finalizeOrder(BuildContext context) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String userId = user.uid;
-      CollectionReference orders = FirebaseFirestore.instance.collection('orders');
-
-      final cart = Provider.of<CartProvider>(context, listen: false);
-      final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
-
-      List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
-      Map<String, dynamic> orderData = {
-        'userId': userId,
-        'items': items,
-        'status': 'Pending',
-        'address': _selectedAddress ?? 'No address selected',
-        'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
-        'timestamp': FieldValue.serverTimestamp(),
-      };
-
-      try {
-        await orders.add(orderData);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Order finalized successfully")),
-        );
-        cart.clear(); 
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to finalize order: $e")),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("You must be logged in to finalize an order")),
+  void _selectPaymentMethod(String? method) async {
+    setState(() {
+      _selectedPaymentMethod = method;
+    });
+    
+    if (method == 'Card') {
+      final cardDetails = await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SelectCardPage(),
+        ),
       );
+
+      if (cardDetails != null) {
+        setState(() {
+          _selectedCardDetails = cardDetails;
+        });
+      }
     }
   }
+
+ void finalizeOrder(BuildContext context) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+    CollectionReference orders = FirebaseFirestore.instance.collection('orders');
+
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
+
+    List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
+    Map<String, dynamic> orderData = {
+      'userId': userId,
+      'items': items,
+      'status': 'Pending',
+      'address': _selectedAddress ?? 'No address selected',
+      'paymentMethod': _selectedPaymentMethod ?? 'No payment method selected',
+      'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    try {
+      DocumentReference orderRef = await orders.add(orderData);
+
+      if (_selectedPaymentMethod == 'Card' && _selectedCardDetails != null) {
+        await orderRef.collection('cardDetails').add(_selectedCardDetails!);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Order finalized successfully")),
+      );
+      cart.clear(); 
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to finalize order: $e")),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("You must be logged in to finalize an order")),
+    );
+  }
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +133,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildDeliveryInfoSection(deliveryInfo),
+                _buildPaymentMethodSection(),
                 _buildTotalSection(cart, deliveryFee, total),
               ],
             ),
@@ -127,6 +162,30 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               title: Text('Ridicare personală activată'),
               subtitle: Text('Produsele vor fi ridicate de la magazin'),
             ),
+    );
+  }
+
+  Widget _buildPaymentMethodSection() {
+    return Column(
+      children: [
+        ListTile(
+          title: Text('Selectați metoda de plată'),
+          trailing: DropdownButton<String>(
+            value: _selectedPaymentMethod,
+            items: [
+              DropdownMenuItem(child: Text('Cash'), value: 'Cash'),
+              DropdownMenuItem(child: Text('Card'), value: 'Card'),
+            ],
+            onChanged: (value) {
+              _selectPaymentMethod(value);
+            },
+          ),
+        ),
+        if (_selectedPaymentMethod == 'Card' && _selectedCardDetails != null)
+          ListTile(
+            title: Text('Card selectat: ${_selectedCardDetails!['last4']}'), // Afișează ultimele 4 cifre ale cardului
+          ),
+      ],
     );
   }
 
