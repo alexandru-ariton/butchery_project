@@ -19,6 +19,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   String? _selectedAddress;
   String? _selectedPaymentMethod;
   Map<String, dynamic>? _selectedCardDetails;
+  bool _orderFinalized = false; // Pasul 1
 
   void _selectDeliveryAddress() async {
     final selectedAddress = await Navigator.of(context).push(
@@ -30,8 +31,12 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     if (selectedAddress != null) {
       setState(() {
         _selectedAddress = selectedAddress;
+         _orderFinalized = false;
       });
     }
+   
+               
+             
   }
 
   void _selectPaymentMethod(String? method) async {
@@ -49,6 +54,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       if (cardDetails != null) {
         setState(() {
           _selectedCardDetails = cardDetails;
+           _orderFinalized = false;
         });
       }
     }
@@ -94,6 +100,10 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                 SnackBar(content: Text("Plata a fost efectuată cu succes")),
               );
               cart.clear();
+               // Actualizează starea comenzii
+              setState(() {
+                _orderFinalized = true;
+              });
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Plata a eșuat")),
@@ -151,7 +161,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               children: [
                 _buildDeliveryInfoSection(deliveryInfo),
                 _buildPaymentMethodSection(),
-                _buildTotalSection(cart, deliveryFee, total),
+                if (!_orderFinalized)_buildTotalSection(cart, deliveryFee, total),
+              
               ],
             ),
           ),
@@ -302,7 +313,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             Divider(),
             _buildSummaryLine('Total:', '${total.toStringAsFixed(2)} lei', isTotal: true),
             SizedBox(height: 20),
-            ElevatedButton(
+             if (!_orderFinalized && !cart.items.isEmpty) ElevatedButton(
               onPressed: () {
                 finalizeOrder(context);
               },

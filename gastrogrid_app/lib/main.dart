@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_notificari.dart'; // Import corect pentru NotificationProvider
 import 'package:gastrogrid_app/providers/provider_autentificare.dart' as local; // Adaugă alias pentru AuthProvider local
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => DeliveryProvider()),
         ChangeNotifierProvider(create: (_) => local.AuthProvider()), // Utilizează aliasul pentru AuthProvider local
-        ChangeNotifierProvider(create: (_) => NotificationProvider()), // Adaugă NotificationProvider
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),// Adaugă NotificationProvider
+        ChangeNotifierProvider(create: (_) => OrderStatusProvider()), 
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {

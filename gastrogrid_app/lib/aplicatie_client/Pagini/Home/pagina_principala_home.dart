@@ -135,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
                                       image: DecorationImage(
                                         image: NetworkImage(product.imageUrl), // Ensure you have an imageUrl in your Product model
-                                        fit: BoxFit.fill,
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                                                 fontWeight: FontWeight.bold
                                                      ),
                                             ),
-                                            SizedBox(width: 230,),
+                                            SizedBox(width: 180),
                                             Text(
                                               '${product.price} lei', 
                                               style: TextStyle(
