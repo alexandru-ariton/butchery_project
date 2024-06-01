@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_import
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,7 +24,7 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
-      child: MyApp(),
+      child: MyApp(), 
     ),
   );
 }
