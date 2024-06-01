@@ -1,9 +1,7 @@
-// ignore_for_file: unused_import
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
 
@@ -17,22 +15,87 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
+  bool isAddingToCart = false;
 
-     void addToCart() {
-    var cartItem = CartItem(
-      product: widget.product,
-      quantity: quantity,
-    );
-    Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem);
+   Future<void> addToCart() async {
+    if (isAddingToCart) return; // Prevent multiple rapid clicks
+    setState(() {
+      isAddingToCart = true;
+    });
+
+    try {
+      // Verifică cantitatea actuală din Firestore
+      DocumentSnapshot productSnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.product.id)
+          .get();
+
+      if (productSnapshot.exists) {
+        int currentStock = productSnapshot['quantity'];
+
+        if (currentStock == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Stoc Epuizat')),
+          );
+          return;
+        }
+
+        if (quantity > currentStock) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Cantitate indisponibilă')),
+          );
+          return;
+        }
+
+        var cartItem = CartItem(
+          product: widget.product,
+          quantity: quantity,
+        );
+
+        // Add the product to the cart
+        await Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem);
+
+        if (currentStock - quantity < 3) {
+          // Notifică clientul și adminul
+          notifyLowStock(widget.product);
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Added ${widget.product.title} to cart')),
+        );
+
+        // Resetăm quantity după ce am făcut toate operațiunile
+        setState(() {
+          quantity = 1;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Produsul nu există')),
+        );
+      }
+    } finally {
+      setState(() {
+        isAddingToCart = false;
+      });
+    }
+  }
+
+  void notifyLowStock(Product product) {
+    // Notifică clientul
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Added ${widget.product.title} to cart')),
+      SnackBar(content: Text('Stoc redus pentru ${product.title}')),
     );
+
+    // Notifică adminul - salvați notificarea în Firestore
+    FirebaseFirestore.instance.collection('notifications').add({
+      'message': 'Stoc redus pentru ${product.title}',
+      'productId': product.id,
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         child: Column(
@@ -121,12 +184,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ),
             SizedBox(height: 40),
             Padding(
-              padding: const EdgeInsets.only(left: 140.0,top: 30),
+              padding: const EdgeInsets.only(left: 140.0, top: 30),
               child: SizedBox(
-                
                 child: ElevatedButton(
                   onPressed: addToCart,
-                  
                   child: Text('Add to Cart', style: TextStyle(fontSize: 16)),
                 ),
               ),

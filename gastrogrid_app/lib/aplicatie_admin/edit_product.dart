@@ -1,5 +1,3 @@
-// ignore_for_file: unused_field, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, library_private_types_in_public_api, use_build_context_synchronously, prefer_const_constructors, sort_child_properties_last
-
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -13,6 +11,7 @@ class EditProductPage extends StatefulWidget {
   final String? currentPrice;
   final String? currentDescription;
   final String? currentImageUrl;
+  final String? currentQuantity;
 
   EditProductPage({
     this.productId,
@@ -20,6 +19,7 @@ class EditProductPage extends StatefulWidget {
     this.currentPrice,
     this.currentDescription,
     this.currentImageUrl,
+    this.currentQuantity,
   });
 
   @override
@@ -31,6 +31,7 @@ class _EditProductPageState extends State<EditProductPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _quantityController = TextEditingController();
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
@@ -46,6 +47,9 @@ class _EditProductPageState extends State<EditProductPage> {
     }
     if (widget.currentDescription != null) {
       _descriptionController.text = widget.currentDescription!;
+    }
+    if (widget.currentQuantity != null) {
+      _quantityController.text = widget.currentQuantity!;
     }
   }
 
@@ -98,6 +102,7 @@ class _EditProductPageState extends State<EditProductPage> {
           'price': double.parse(_priceController.text),
           'description': _descriptionController.text,
           'imageUrl': imageUrl,
+          'quantity': int.parse(_quantityController.text),
         });
       } else {
         // Update existing product
@@ -106,6 +111,7 @@ class _EditProductPageState extends State<EditProductPage> {
           'price': double.parse(_priceController.text),
           'description': _descriptionController.text,
           'imageUrl': imageUrl,
+          'quantity': int.parse(_quantityController.text),
         });
       }
 
@@ -184,6 +190,26 @@ class _EditProductPageState extends State<EditProductPage> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a product description';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      controller: _quantityController,
+                      decoration: InputDecoration(
+                        labelText: 'Product Quantity',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a product quantity';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter a valid number';
                         }
                         return null;
                       },

@@ -1,11 +1,8 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_admin/edit_product.dart';
 
 class ProductManagement extends StatelessWidget {
-
 
   void _addProduct(BuildContext context) {
     Navigator.push(
@@ -93,6 +90,10 @@ class ProductManagement extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text('${product['price']} lei', style: TextStyle(fontSize: fontSize * 0.8)),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text('Quantity: ${product['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
+                          ),
                           ButtonBar(
                             alignment: MainAxisAlignment.end,
                             children: [
@@ -105,7 +106,9 @@ class ProductManagement extends StatelessWidget {
                                         productId: product.id,
                                         currentTitle: product['title'],
                                         currentPrice: product['price'].toString(),
+                                        currentDescription: product['description'],
                                         currentImageUrl: product['imageUrl'],
+                                        currentQuantity: product['quantity'].toString(),
                                       ),
                                     ),
                                   );

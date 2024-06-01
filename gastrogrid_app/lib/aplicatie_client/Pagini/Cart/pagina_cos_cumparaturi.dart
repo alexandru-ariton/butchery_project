@@ -19,7 +19,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   String? _selectedAddress;
   String? _selectedPaymentMethod;
   Map<String, dynamic>? _selectedCardDetails;
-  bool _orderFinalized = false; // Pasul 1
+  bool _orderFinalized = false;
 
   void _selectDeliveryAddress() async {
     final selectedAddress = await Navigator.of(context).push(
@@ -31,12 +31,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     if (selectedAddress != null) {
       setState(() {
         _selectedAddress = selectedAddress;
-         _orderFinalized = false;
+        _orderFinalized = false;
       });
     }
-   
-               
-             
   }
 
   void _selectPaymentMethod(String? method) async {
@@ -54,7 +51,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       if (cardDetails != null) {
         setState(() {
           _selectedCardDetails = cardDetails;
-           _orderFinalized = false;
+          _orderFinalized = false;
         });
       }
     }
@@ -89,18 +86,16 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               builder: (context) => PaymentPage(
                 cardDetails: _selectedCardDetails!,
                 amount: orderData['total'],
-                orderId: orderRef.id, // Asigură-te că transmiți orderId
+                orderId: orderRef.id,
               ),
             ),
           ).then((paymentSuccess) async {
             if (paymentSuccess == true) {
-              // Actualizează comanda cu statusul de plătit
               await orderRef.update({'status': 'Paid'});
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Plata a fost efectuată cu succes")),
               );
               cart.clear();
-               // Actualizează starea comenzii
               setState(() {
                 _orderFinalized = true;
               });
@@ -161,8 +156,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               children: [
                 _buildDeliveryInfoSection(deliveryInfo),
                 _buildPaymentMethodSection(),
-                if (!_orderFinalized)_buildTotalSection(cart, deliveryFee, total),
-              
+                if (!_orderFinalized) _buildTotalSection(cart, deliveryFee, total),
               ],
             ),
           ),
@@ -211,7 +205,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         ),
         if (_selectedPaymentMethod == 'Card' && _selectedCardDetails != null)
           ListTile(
-            title: Text('Card selectat: ${_selectedCardDetails!['last4']}'), // Afișează ultimele 4 cifre ale cardului
+            title: Text('Card selectat: ${_selectedCardDetails!['last4']}'),
           ),
       ],
     );
@@ -313,12 +307,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             Divider(),
             _buildSummaryLine('Total:', '${total.toStringAsFixed(2)} lei', isTotal: true),
             SizedBox(height: 20),
-             if (!_orderFinalized && !cart.items.isEmpty) ElevatedButton(
-              onPressed: () {
-                finalizeOrder(context);
-              },
-              child: Text('FINALIZEAZA COMANDA', style: TextStyle(color: themeProvider.themeData.colorScheme.primary)),
-            ),
+            if (!_orderFinalized && !cart.items.isEmpty)
+              ElevatedButton(
+                onPressed: () {
+                  finalizeOrder(context);
+                },
+                child: Text('FINALIZEAZA COMANDA', style: TextStyle(color: themeProvider.themeData.colorScheme.primary)),
+              ),
             SizedBox(height: 40),
           ],
         ),
