@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_card.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_select_card.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Notificare/notificare_page.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_informatii.dart';

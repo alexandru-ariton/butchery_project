@@ -1,9 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gastrogrid_app/aplicatie_admin/pagina_notificari.dart';
+import 'package:gastrogrid_app/providers/pagina_notificare_stoc.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
+
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -17,7 +20,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
   bool isAddingToCart = false;
 
-   Future<void> addToCart() async {
+  Future<void> addToCart() async {
     if (isAddingToCart) return; // Prevent multiple rapid clicks
     setState(() {
       isAddingToCart = true;
@@ -37,6 +40,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Stoc Epuizat')),
           );
+          notifyOutOfStock(widget.product);
           return;
         }
 
@@ -56,8 +60,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         await Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem);
 
         if (currentStock - quantity < 3) {
-          // Notifică clientul și adminul
+          // Notifică clientul și adminul pentru stoc redus
           notifyLowStock(widget.product);
+        } else {
+          // Șterge notificarea dacă stocul este suficient
+          Provider.of<NotificationProviderStoc>(context, listen: false).removeNotification(widget.product.id);
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -87,10 +94,35 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
 
     // Notifică adminul - salvați notificarea în Firestore
-    FirebaseFirestore.instance.collection('notifications').add({
-      'message': 'Stoc redus pentru ${product.title}',
-      'productId': product.id,
-    });
+    Provider.of<NotificationProviderStoc>(context, listen: false).addNotification(
+      'Stoc redus pentru ${product.title}',
+      product.id,
+    );
+
+    // Navighează la pagina notificărilor de stoc redus
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LowStockNotificationPage()),
+    );
+  }
+
+  void notifyOutOfStock(Product product) {
+    // Notifică clientul
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Stoc Epuizat pentru ${product.title}')),
+    );
+
+    // Notifică adminul - salvați notificarea în Firestore
+    Provider.of<NotificationProviderStoc>(context, listen: false).addNotification(
+      'Stoc Epuizat pentru ${product.title}',
+      product.id,
+    );
+
+    // Navighează la pagina notificărilor de stoc epuizat
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LowStockNotificationPage()),
+    );
   }
 
   @override

@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:gastrogrid_app/providers/pagina_notificare_stoc.dart';
+import 'package:provider/provider.dart';
 import 'package:universal_html/html.dart' as html;
 
 class EditProductPage extends StatefulWidget {
@@ -95,6 +97,8 @@ class _EditProductPageState extends State<EditProductPage> {
 
       String imageUrl = await _uploadImage(widget.productId ?? '');
 
+      int newQuantity = int.parse(_quantityController.text);
+
       if (widget.productId == null) {
         // Add new product
         await FirebaseFirestore.instance.collection('products').add({
@@ -102,7 +106,7 @@ class _EditProductPageState extends State<EditProductPage> {
           'price': double.parse(_priceController.text),
           'description': _descriptionController.text,
           'imageUrl': imageUrl,
-          'quantity': int.parse(_quantityController.text),
+          'quantity': newQuantity,
         });
       } else {
         // Update existing product
@@ -111,8 +115,13 @@ class _EditProductPageState extends State<EditProductPage> {
           'price': double.parse(_priceController.text),
           'description': _descriptionController.text,
           'imageUrl': imageUrl,
-          'quantity': int.parse(_quantityController.text),
+          'quantity': newQuantity,
         });
+
+        // Șterge notificările dacă stocul este suficient
+        if (newQuantity > 0) {
+          Provider.of<NotificationProviderStoc>(context, listen: false).removeNotification(widget.productId!);
+        }
       }
 
       setState(() {

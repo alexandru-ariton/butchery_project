@@ -23,37 +23,7 @@ class PaginaSetari extends StatelessWidget {
                 themeProvider.toggleTheme();
               },
             ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.only(left:15.0),
-              child: Column(
-                children: [
-                  Text(
-                    'Dimensiune text',
-                    style: TextStyle(fontSize: themeProvider.textSize, fontWeight: FontWeight.bold),
-                  ),
-                  Slider(
-              value: themeProvider.textSize,
-              min: 12.0,
-              max: 24.0,
-              divisions: 6,
-              label: themeProvider.textSize.toString(),
-              onChanged: (double newValue) {
-                themeProvider.changeTextSize(newValue);
-              },
-            ),
-                ],
-              ),
-            ),
             
-            SizedBox(height: 20),
-            SwitchListTile(
-              title: Text('Notificări', style: TextStyle(fontSize: themeProvider.textSize)),
-              value: themeProvider.notificationsEnabled,
-              onChanged: (value) {
-                themeProvider.toggleNotifications();
-              },
-            ),
           ],
         ),
       ),
