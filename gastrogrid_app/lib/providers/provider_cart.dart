@@ -1,7 +1,9 @@
+// ignore_for_file: prefer_final_fields
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
-import 'package:gastrogrid_app/providers/pagina_notificare_stoc.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 
 class CartProvider with ChangeNotifier {
   final NotificationProviderStoc notificationProviderStoc;

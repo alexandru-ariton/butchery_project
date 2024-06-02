@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_admin/pagina_notificari.dart';
-import 'product_management.dart';
-import 'order_management.dart';
-import 'dashboard.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_notificari.dart';
+import 'Produs/pagina_produse.dart';
+import 'Comenzi/pagina_comenzi.dart';
+import 'pagina_dashboard.dart';
 
 class AdminHome extends StatelessWidget {
   @override

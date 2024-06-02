@@ -7,7 +7,7 @@ import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
-import 'package:gastrogrid_app/providers/theme_provider.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
 
 class ShoppingCartPage extends StatefulWidget {
@@ -58,6 +58,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void finalizeOrder(BuildContext context) async {
+    if (_selectedAddress == null || _selectedPaymentMethod == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select an address and a payment method")),
+      );
+      return;
+    }
+
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String userId = user.uid;
@@ -170,7 +177,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     return Container(
       padding: EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: themeProvider.themeData.colorScheme.background,
+        color: themeProvider.themeData.colorScheme.surface,
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: deliveryInfo.isDelivery
@@ -310,7 +317,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             if (!_orderFinalized && !cart.items.isEmpty)
               ElevatedButton(
                 onPressed: () {
-                  finalizeOrder(context);
+                  if (_selectedAddress != null && _selectedPaymentMethod != null) {
+                    finalizeOrder(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Please select an address and a payment method")),
+                    );
+                  }
                 },
                 child: Text('FINALIZEAZA COMANDA', style: TextStyle(color: themeProvider.themeData.colorScheme.primary)),
               ),

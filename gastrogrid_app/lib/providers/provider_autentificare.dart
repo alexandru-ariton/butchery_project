@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/Autentificare/pagini/pagina_login.dart';
+import 'package:gastrogrid_app/providers/provider_cart.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:provider/provider.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -29,14 +33,23 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+ Future<void> logout(BuildContext context) async {
     await _auth.signOut();
-    resetAppState(); // Apelăm metoda de resetare la logout
+    resetAppState(context); // Apelăm metoda de resetare la logout
     notifyListeners();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => PaginaLogin()),
+    );
   }
 
-  void resetAppState() {
-    // Resetați toate stările aplicației aici
-    // Exemplu: Resetați coșul de cumpărături, informațiile de livrare, etc.
+   void resetAppState(BuildContext context) {
+    // Exemplu de resetare a coșului de cumpărături
+    Provider.of<CartProvider>(context, listen: false).clear();
+
+    // Exemplu de resetare a informațiilor de livrare
+    Provider.of<DeliveryProvider>(context, listen: false).resetDeliveryInfo();
+
+    // Adăugați aici alte resetări necesare
   }
 }

@@ -1,11 +1,12 @@
+// ignore_for_file: prefer_final_fields
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/pagina_produs.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
-import 'package:gastrogrid_app/providers/theme_provider.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -106,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisCount: 1,
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 20,
-                    childAspectRatio: 1.5 / 1.2, // Adjusted for better card aspect ratio
+                    childAspectRatio: 1.5 / 1.2, 
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
@@ -134,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
                                       image: DecorationImage(
-                                        image: NetworkImage(product.imageUrl), // Ensure you have an imageUrl in your Product model
+                                        image: NetworkImage(product.imageUrl), 
                                         fit: BoxFit.cover,
                                       ),
                                     ),

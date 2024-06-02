@@ -1,8 +1,11 @@
-// ignore_for_file: unused_import
-
+// ignore_for_file: unused_import, prefer_const_literals_to_create_immutables
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/charts.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_ComenziPeZile.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_FrecventaComenziUtilizatori.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_HeapMap.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_IncasariLunare.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_StatusComenzi.dart';
 
 
 

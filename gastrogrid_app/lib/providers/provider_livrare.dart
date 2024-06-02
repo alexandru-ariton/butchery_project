@@ -49,4 +49,10 @@ class DeliveryProvider with ChangeNotifier {
     double distance = Geolocator.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude) / 1000; // Distance in kilometers
     return distance;
   }
+
+   void resetDeliveryInfo() {
+    _deliveryFee = 5.0;
+    _deliveryTime = 60;
+    notifyListeners();
+  }
 }

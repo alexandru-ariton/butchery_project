@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/order_detail_page.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
 
 class OrderManagement extends StatelessWidget {
   void _deleteOrder(String id) async {

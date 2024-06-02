@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/providers/provider_autentificare.dart';
-import 'package:gastrogrid_app/Autentificare/authentificare/pagina_login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_home.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
 import 'package:provider/provider.dart';
 import '../componente/my_button.dart';
 import '../componente/my_textfield.dart';
 
-
-class PaginaInregistrare extends StatefulWidget {
+class PaginaLogin extends StatefulWidget {
   final void Function()? onTap;
 
-  const PaginaInregistrare({super.key, this.onTap});
+  const PaginaLogin({super.key, this.onTap});
 
   @override
-  State<PaginaInregistrare> createState() => _PaginaInregistrareState();
+  State<PaginaLogin> createState() => _PaginaLoginState();
 }
 
-class _PaginaInregistrareState extends State<PaginaInregistrare> {
+class _PaginaLoginState extends State<PaginaLogin> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmpasswordController = TextEditingController();
 
   String errorMessage = '';
+
+  Future<bool> isAdmin(String email) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('admin_users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +41,13 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.lock_open_rounded,
+              Icons.lock_rounded,
               size: 100,
               color: Theme.of(context).colorScheme.inversePrimary,
             ),
             const SizedBox(height: 25),
             Text(
-              "Inregistrare",
+              "Autentificare",
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -55,38 +65,42 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
               hintText: "Parola",
               obscureText: true,
             ),
-            const SizedBox(height: 10),
-            MyTextField(
-              conntroller: confirmpasswordController,
-              hintText: "Confirmare Parola",
-              obscureText: true,
-            ),
             const SizedBox(height: 25),
             MyButton(
               onTap: () async {
-                if (passwordController.text == confirmpasswordController.text) {
-                  try {
-                    await Provider.of<AuthProvider>(context, listen: false)
-                        .signUp(emailController.text, passwordController.text);
+                try {
+                  String email = emailController.text;
+                  String password = passwordController.text;
+
+                  await Provider.of<customAuth.AuthProvider>(context, listen: false)
+                      .login(email, password);
+
+                  // Check if the user is an admin
+                  bool isAdminUser = await isAdmin(email);
+
+                  if (isAdminUser) {
+                    // Navigate to AdminPage if the user is an admin
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => AdminHome()),
+                    );
+                  } else {
+                    // Regular user login
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Înregistrare reușită")),
+                      SnackBar(content: Text("Autentificare reușită")),
                     );
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => PaginaLogin()),
+                      MaterialPageRoute(builder: (context) => BaraNavigare()),
                     );
-                  } catch (e) {
-                    setState(() {
-                      errorMessage = e.toString();
-                    });
                   }
-                } else {
+                } catch (e) {
                   setState(() {
-                    errorMessage = "Parolele nu coincid";
+                    errorMessage = e.toString();
                   });
                 }
               },
-              text: "Înregistrare",
+              text: "Autentificare",
             ),
             const SizedBox(height: 15),
             Text(
@@ -97,7 +111,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
             GestureDetector(
               onTap: widget.onTap,
               child: Text(
-                "Ai deja un cont? Autentifică-te aici",
+                "Nu ai un cont? Înregistrează-te aici",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                 ),

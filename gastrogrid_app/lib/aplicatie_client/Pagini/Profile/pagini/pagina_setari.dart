@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/providers/theme_provider.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class PaginaSetari extends StatelessWidget {
@@ -17,7 +17,7 @@ class PaginaSetari extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SwitchListTile(
-              title: Text('Mod Întunecat', style: TextStyle(fontSize: themeProvider.textSize)),
+              title: Text('Mod Întunecat', style: TextStyle(fontSize: 16)),
               value: themeProvider.isDarkMode,
               onChanged: (value) {
                 themeProvider.toggleTheme();

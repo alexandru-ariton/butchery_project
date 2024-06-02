@@ -6,11 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_card.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_select_card.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_informatii.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_editare_profil.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/profil.dart';
-import 'package:gastrogrid_app/providers/theme_provider.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -65,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Text(
               _username ?? 'N/A',
               style: TextStyle(
-                fontSize: themeProvider.textSize,
+                fontSize: 16,
               ),
             ),
             SizedBox(height: 20),
@@ -117,7 +117,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       );
                     },
                   ),
-                 
+                  ProfileOption(
+                    icon: Icons.logout,
+                    text: 'Logout',
+                    onTap: () {
+                      Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
+                    },
+                  ),
                 ],
               ),
             ),

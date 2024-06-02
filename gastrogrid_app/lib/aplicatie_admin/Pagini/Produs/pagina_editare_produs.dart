@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:gastrogrid_app/providers/pagina_notificare_stoc.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:provider/provider.dart';
 import 'package:universal_html/html.dart' as html;
 

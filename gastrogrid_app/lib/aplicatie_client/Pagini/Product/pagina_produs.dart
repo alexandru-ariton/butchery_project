@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/pagina_notificari.dart';
-import 'package:gastrogrid_app/providers/pagina_notificare_stoc.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_notificari.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';

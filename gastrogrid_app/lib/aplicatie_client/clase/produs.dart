@@ -4,7 +4,7 @@ class Product {
   final String description;
   final double price;
   final String imageUrl;
-  int quantity; // Adăugăm acest câmp
+  int quantity; 
   
 
   Product({
@@ -13,7 +13,7 @@ class Product {
     required this.description,
     required this.price,
     required this.imageUrl,
-   this.quantity = 0
+    this.quantity = 0
   });
 
     factory Product.fromMap(Map<String, dynamic> data, String id) {
@@ -23,7 +23,7 @@ class Product {
       description: data['description'] ?? '',
       price: (data['price'] as num).toDouble(),
       imageUrl: data['imageUrl'] ?? '',
-       quantity: data['cantitate'] ?? 0,
+      quantity: data['quantity'] ?? 0,
     );
   } 
 
@@ -33,7 +33,7 @@ class Product {
       'description': description,
       'price': price,
       'imageUrl': imageUrl,
-      'cantitate': quantity,
+      'quantity': quantity,
     };
   }
 
