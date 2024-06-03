@@ -1,48 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/pagina_editare_produs.dart';  
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:gastrogrid_app/aplicatie_admin/pagina_editare_materiiPrime.dart';
+import 'package:universal_html/html.dart' as html;
 
-class ProductManagement extends StatelessWidget {
-  void _addProduct(BuildContext context) {
+class RawMaterialsManagement extends StatelessWidget {
+  void _addRawMaterial(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProductPage(),
+        builder: (context) => EditRawMaterialPage(),
       ),
     );
   }
 
-  void _deleteProduct(String id) async {
-    await FirebaseFirestore.instance.collection('products').doc(id).delete();
+  void _deleteRawMaterial(String id) async {
+    await FirebaseFirestore.instance.collection('rawMaterials').doc(id).delete();
   }
-
-
-
-Future<void> loadImage(BuildContext context) async {
-  try {
-    String imageUrl = await firebase_storage.FirebaseStorage.instance
-        .ref('product_images/imaginea1.jpeg')
-        .getDownloadURL();
-
-    // Use the imageUrl in an Image widget or however you need
-    print('Download URL: $imageUrl');
-  } catch (e) {
-    print('Error occurred while loading the image: $e');
-    // Handle errors or set a state to show an error image
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('products').snapshots(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          stream: FirebaseFirestore.instance.collection('rawMaterials').snapshots(),
+          builder: (context, snapshot) {
             if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
             return LayoutBuilder(
               builder: (context, constraints) {
@@ -52,7 +37,7 @@ Future<void> loadImage(BuildContext context) async {
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    childAspectRatio: 1 / 2,
+                    childAspectRatio: 1 / 1.5,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
@@ -60,7 +45,7 @@ Future<void> loadImage(BuildContext context) async {
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return GestureDetector(
-                        onTap: () => _addProduct(context),
+                        onTap: () => _addRawMaterial(context),
                         child: Card(
                           color: Colors.blueAccent,
                           shape: RoundedRectangleBorder(
@@ -74,9 +59,7 @@ Future<void> loadImage(BuildContext context) async {
                       );
                     }
 
-                    var product = snapshot.data!.docs[index - 1];
-                    String imageUrl = product['imageUrl'];
-
+                    var rawMaterial = snapshot.data!.docs[index - 1];
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -89,41 +72,25 @@ Future<void> loadImage(BuildContext context) async {
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               child: Image.network(
-  product['imageUrl'],
-  fit: BoxFit.cover,
-  width: double.infinity,
-  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-    if (loadingProgress == null) return child;
-    return Center(
-      child: CircularProgressIndicator(
-        value: loadingProgress.expectedTotalBytes != null
-            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-            : null,
-      ),
-    );
-  },
-  errorBuilder: (context, error, stackTrace) {
-    print('Failed to load image: $error');
-    return Center(child: Text('Failed to load image'));
-  },
-),
-
+                                rawMaterial['imageUrl'],
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Center(child: Icon(Icons.broken_image, size: fontSize * 2));
+                                },
+                              ),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                             child: Text(
-                              product['title'],
+                              rawMaterial['name'],
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('${product['price']} lei', style: TextStyle(fontSize: fontSize * 0.8)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('Quantity: ${product['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
+                            child: Text('Quantity: ${rawMaterial['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
                           ),
                           ButtonBar(
                             alignment: MainAxisAlignment.end,
@@ -133,13 +100,11 @@ Future<void> loadImage(BuildContext context) async {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => EditProductPage(
-                                        productId: product.id,
-                                        currentTitle: product['title'],
-                                        currentPrice: product['price'].toString(),
-                                        currentDescription: product['description'],
-                                        currentImageUrl: imageUrl, // Pass imageUrl to EditProductPage
-                                        currentQuantity: product['quantity'].toString(),
+                                      builder: (context) => EditRawMaterialPage(
+                                        rawMaterialId: rawMaterial.id,
+                                        currentName: rawMaterial['name'],
+                                        currentQuantity: rawMaterial['quantity'].toString(),
+                                        currentImageUrl: rawMaterial['imageUrl'],
                                       ),
                                     ),
                                   );
@@ -147,7 +112,7 @@ Future<void> loadImage(BuildContext context) async {
                                 child: Text('Edit', style: TextStyle(fontSize: fontSize * 0.8)),
                               ),
                               TextButton(
-                                onPressed: () => _deleteProduct(product.id),
+                                onPressed: () => _deleteRawMaterial(rawMaterial.id),
                                 child: Text('Delete', style: TextStyle(fontSize: fontSize * 0.8)),
                               ),
                             ],

@@ -1,5 +1,3 @@
-// ignore_for_file: unused_field
-
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -39,6 +37,7 @@ class _EditProductPageState extends State<EditProductPage> {
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
+  final Map<String, int> _selectedRawMaterials = {};
 
   @override
   void initState() {
@@ -51,9 +50,6 @@ class _EditProductPageState extends State<EditProductPage> {
     }
     if (widget.currentDescription != null) {
       _descriptionController.text = widget.currentDescription!;
-    }
-    if (widget.currentQuantity != null) {
-      _quantityController.text = widget.currentQuantity!;
     }
   }
 
@@ -91,19 +87,45 @@ class _EditProductPageState extends State<EditProductPage> {
     return widget.currentImageUrl ?? '';
   }
 
+  Future<List<Map<String, dynamic>>> _fetchRawMaterials() async {
+    final rawMaterialsSnapshot = await FirebaseFirestore.instance.collection('rawMaterials').get();
+    return rawMaterialsSnapshot.docs.map((doc) => {'id': doc.id, 'name': doc['name'], 'quantity': doc['quantity']}).toList();
+  }
+
   void _saveProduct() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _selectedRawMaterials.isNotEmpty) {
       setState(() {
         _isLoading = true;
       });
+
+      // Verifică dacă există suficiente materii prime
+      bool insufficientMaterials = false;
+      for (final entry in _selectedRawMaterials.entries) {
+        final rawMaterialDoc = await FirebaseFirestore.instance.collection('rawMaterials').doc(entry.key).get();
+        if (entry.value > rawMaterialDoc['quantity']) {
+          insufficientMaterials = true;
+          break;
+        }
+      }
+
+      if (insufficientMaterials) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Insufficient raw materials')));
+        return;
+      }
 
       String imageUrl = await _uploadImage(widget.productId ?? '');
 
       int newQuantity = int.parse(_quantityController.text);
 
+      DocumentReference productRef;
+      DocumentSnapshot productSnapshot;
+
       if (widget.productId == null) {
         // Add new product
-        await FirebaseFirestore.instance.collection('products').add({
+        productRef = await FirebaseFirestore.instance.collection('products').add({
           'title': _titleController.text,
           'price': double.parse(_priceController.text),
           'description': _descriptionController.text,
@@ -111,19 +133,35 @@ class _EditProductPageState extends State<EditProductPage> {
           'quantity': newQuantity,
         });
       } else {
-        // Update existing product
-        await FirebaseFirestore.instance.collection('products').doc(widget.productId).update({
+        // Get existing product
+        productRef = FirebaseFirestore.instance.collection('products').doc(widget.productId!);
+        productSnapshot = await productRef.get();
+        int currentQuantity = productSnapshot['quantity'];
+
+        // Update existing product with new quantity added to current quantity
+        await productRef.update({
           'title': _titleController.text,
           'price': double.parse(_priceController.text),
           'description': _descriptionController.text,
           'imageUrl': imageUrl,
-          'quantity': newQuantity,
+          'quantity': currentQuantity + newQuantity,
         });
 
         // Șterge notificările dacă stocul este suficient
-        if (newQuantity > 0) {
+        if (currentQuantity + newQuantity > 0) {
           Provider.of<NotificationProviderStoc>(context, listen: false).removeNotification(widget.productId!);
         }
+      }
+
+      // Adaugă materii prime pentru produs și actualizează cantitatea acestora
+      for (final entry in _selectedRawMaterials.entries) {
+        await productRef.collection('rawMaterials').add({
+          'rawMaterialId': entry.key,
+          'quantity': entry.value,
+        });
+        await FirebaseFirestore.instance.collection('rawMaterials').doc(entry.key).update({
+          'quantity': FieldValue.increment(-entry.value),
+        });
       }
 
       setState(() {
@@ -131,6 +169,8 @@ class _EditProductPageState extends State<EditProductPage> {
       });
 
       Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select at least one raw material')));
     }
   }
 
@@ -239,6 +279,36 @@ class _EditProductPageState extends State<EditProductPage> {
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.blueGrey[900],
                       ),
+                    ),
+                    SizedBox(height: 16),
+                    FutureBuilder(
+                      future: _fetchRawMaterials(),
+                      builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                        if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                        return Column(
+                          children: snapshot.data!.map((rawMaterial) {
+                            return Row(
+                              children: [
+                                Expanded(child: Text(rawMaterial['name'])),
+                                Expanded(
+                                  child: TextFormField(
+                                    decoration: InputDecoration(labelText: 'Quantity'),
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      final quantity = int.tryParse(value);
+                                      if (quantity != null) {
+                                        _selectedRawMaterials[rawMaterial['id']] = quantity;
+                                      } else {
+                                        _selectedRawMaterials.remove(rawMaterial['id']);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        );
+                      },
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
