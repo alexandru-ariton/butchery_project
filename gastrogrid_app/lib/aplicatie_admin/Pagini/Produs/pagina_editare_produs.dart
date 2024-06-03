@@ -38,6 +38,7 @@ class _EditProductPageState extends State<EditProductPage> {
   String? _imageName;
   bool _isLoading = false;
   final Map<String, int> _selectedRawMaterials = {};
+  final Map<String, TextEditingController> _rawMaterialControllers = {};
 
   @override
   void initState() {
@@ -50,6 +51,9 @@ class _EditProductPageState extends State<EditProductPage> {
     }
     if (widget.currentDescription != null) {
       _descriptionController.text = widget.currentDescription!;
+    }
+    if (widget.currentQuantity != null) {
+      _quantityController.text = widget.currentQuantity!;
     }
   }
 
@@ -188,7 +192,7 @@ class _EditProductPageState extends State<EditProductPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(32.0),
               child: Form(
                 key: _formKey,
                 child: ListView(
@@ -267,10 +271,29 @@ class _EditProductPageState extends State<EditProductPage> {
                     ),
                     SizedBox(height: 16),
                     _imageData != null
-                        ? Image.memory(_imageData!)
+                        ? Image.memory(_imageData!, height: 150)
                         : widget.currentImageUrl != null
-                            ? Image.network(widget.currentImageUrl!)
-                            : Container(height: 200, color: Colors.grey[200], child: Center(child: Text('No Image'))),
+                            ? Image.network(widget.currentImageUrl!, height: 150, errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 150,
+                                  color: Colors.grey[200],
+                                  child: Center(child: Text('Failed to load image')),
+                                );
+                              }, loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              })
+                            : Container(
+                                height: 150,
+                                color: Colors.grey[200],
+                                child: Center(child: Text('No Image')),
+                              ),
                     SizedBox(height: 16),
                     TextButton.icon(
                       onPressed: _pickImage,
@@ -287,24 +310,40 @@ class _EditProductPageState extends State<EditProductPage> {
                         if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
                         return Column(
                           children: snapshot.data!.map((rawMaterial) {
-                            return Row(
-                              children: [
-                                Expanded(child: Text(rawMaterial['name'])),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: InputDecoration(labelText: 'Quantity'),
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (value) {
-                                      final quantity = int.tryParse(value);
-                                      if (quantity != null) {
-                                        _selectedRawMaterials[rawMaterial['id']] = quantity;
-                                      } else {
-                                        _selectedRawMaterials.remove(rawMaterial['id']);
-                                      }
-                                    },
+                            final controller = _rawMaterialControllers.putIfAbsent(
+                              rawMaterial['id'],
+                              () => TextEditingController(),
+                            );
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      rawMaterial['name'],
+                                      style: TextStyle(fontSize: 16),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextFormField(
+                                      controller: controller,
+                                      decoration: InputDecoration(labelText: 'Quantity'),
+                                      keyboardType: TextInputType.number,
+                                      onChanged: (value) {
+                                        final quantity = int.tryParse(value);
+                                        if (quantity != null) {
+                                          _selectedRawMaterials[rawMaterial['id']] = quantity;
+                                        } else {
+                                          _selectedRawMaterials.remove(rawMaterial['id']);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             );
                           }).toList(),
                         );

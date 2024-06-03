@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_home.dart';
 import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
@@ -34,90 +34,102 @@ class _PaginaLoginState extends State<PaginaLogin> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 600;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.lock_rounded,
-              size: 100,
-              color: Theme.of(context).colorScheme.inversePrimary,
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 20 : 50),
+            constraints: BoxConstraints(
+              maxWidth: kIsWeb ? 600 : (isSmallScreen ? screenSize.width * 0.9 : 400),
             ),
-            const SizedBox(height: 25),
-            Text(
-              "Autentificare",
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-            ),
-            const SizedBox(height: 25),
-            MyTextField(
-              conntroller: emailController,
-              hintText: "Email",
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            MyTextField(
-              conntroller: passwordController,
-              hintText: "Parola",
-              obscureText: true,
-            ),
-            const SizedBox(height: 25),
-            MyButton(
-              onTap: () async {
-                try {
-                  String email = emailController.text;
-                  String password = passwordController.text;
-
-                  await Provider.of<customAuth.AuthProvider>(context, listen: false)
-                      .login(email, password);
-
-                  // Check if the user is an admin
-                  bool isAdminUser = await isAdmin(email);
-
-                  if (isAdminUser) {
-                    // Navigate to AdminPage if the user is an admin
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => AdminHome()),
-                    );
-                  } else {
-                    // Regular user login
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Autentificare reușită")),
-                    );
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => BaraNavigare()),
-                    );
-                  }
-                } catch (e) {
-                  setState(() {
-                    errorMessage = e.toString();
-                  });
-                }
-              },
-              text: "Autentificare",
-            ),
-            const SizedBox(height: 15),
-            Text(
-              errorMessage,
-              style: TextStyle(color: Colors.red),
-            ),
-            const SizedBox(height: 25),
-            GestureDetector(
-              onTap: widget.onTap,
-              child: Text(
-                "Nu ai un cont? Înregistrează-te aici",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.lock_rounded,
+                  size: kIsWeb ? 120 : (isSmallScreen ? 80 : 100),
+                  color: Theme.of(context).colorScheme.inversePrimary,
                 ),
-              ),
+                const SizedBox(height: 25),
+                Text(
+                  "Autentificare",
+                  style: TextStyle(
+                    fontSize: kIsWeb ? 32 : (isSmallScreen ? 24 : 32),
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
+                ),
+                const SizedBox(height: 25),
+                MyTextField(
+                  conntroller: emailController,
+                  hintText: "Email",
+                  obscureText: false,
+                ),
+                const SizedBox(height: 10),
+                MyTextField(
+                  conntroller: passwordController,
+                  hintText: "Parola",
+                  obscureText: true,
+                ),
+                const SizedBox(height: 25),
+                MyButton(
+                  onTap: () async {
+                    try {
+                      String email = emailController.text;
+                      String password = passwordController.text;
+
+                      await Provider.of<customAuth.AuthProvider>(context, listen: false)
+                          .login(email, password);
+
+                      // Check if the user is an admin
+                      bool isAdminUser = await isAdmin(email);
+
+                      if (isAdminUser) {
+                        // Navigate to AdminPage if the user is an admin
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => AdminHome()),
+                        );
+                      } else {
+                        // Regular user login
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Autentificare reușită")),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => BaraNavigare()),
+                        );
+                      }
+                    } catch (e) {
+                      setState(() {
+                        errorMessage = e.toString();
+                      });
+                    }
+                  },
+                  text: "Autentificare",
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 25),
+                if (!kIsWeb)
+                  GestureDetector(
+                    onTap: widget.onTap,
+                    child: Text(
+                      "Nu ai un cont? Înregistrează-te aici",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

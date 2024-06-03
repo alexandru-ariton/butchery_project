@@ -12,19 +12,33 @@ class AdminHome extends StatelessWidget {
       length: 5,
       child: Scaffold(
         appBar: AppBar(
-          title: Center(child: Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24))),
+          title: Center(
+            child: Text(
+              'Admin Dashboard',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
           backgroundColor: Colors.teal,
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: [
-              Tab(icon: Icon(Icons.dashboard, size: 28), text: 'Dashboard'),
-              Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Products'),
-              Tab(icon: Icon(Icons.receipt, size: 28), text: 'Orders'),
-              Tab(icon: Icon(Icons.notifications, size: 28), text: 'Notifications'),
-              Tab(icon: Icon(Icons.check_box_outline_blank_rounded, size: 28), text: 'Materii Prime'),
-            ],
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: Container(
+              alignment: Alignment.center,
+              child: TabBar(
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                tabs: [
+                  Tab(icon: Icon(Icons.dashboard, size: 28), text: 'Dashboard'),
+                  Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Products'),
+                  Tab(icon: Icon(Icons.receipt, size: 28), text: 'Orders'),
+                  Tab(icon: Icon(Icons.notifications, size: 28), text: 'Notifications'),
+                  Tab(icon: Icon(Icons.check_box_outline_blank_rounded, size: 28), text: 'Materii Prime'),
+                ],
+              ),
+            ),
           ),
         ),
         body: TabBarView(

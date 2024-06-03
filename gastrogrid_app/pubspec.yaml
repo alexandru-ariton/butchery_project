@@ -38,6 +38,8 @@ dependencies:
   stripe_platform_interface: ^4.0.0
   flutter_braintree: ^4.0.0
   fl_chart: ^0.68.0
+  pdf: ^3.10.8
+  printing: ^5.12.0
 
 dev_dependencies:
   flutter_test:

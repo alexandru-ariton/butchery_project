@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/pagina_editare_produs.dart';  
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/pagina_editare_produs.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ProductManagement extends StatelessWidget {
@@ -17,44 +17,41 @@ class ProductManagement extends StatelessWidget {
     await FirebaseFirestore.instance.collection('products').doc(id).delete();
   }
 
+  Future<void> loadImage(BuildContext context) async {
+    try {
+      String imageUrl = await firebase_storage.FirebaseStorage.instance
+          .ref('product_images/imaginea1.jpeg')
+          .getDownloadURL();
 
-
-Future<void> loadImage(BuildContext context) async {
-  try {
-    String imageUrl = await firebase_storage.FirebaseStorage.instance
-        .ref('product_images/imaginea1.jpeg')
-        .getDownloadURL();
-
-    // Use the imageUrl in an Image widget or however you need
-    print('Download URL: $imageUrl');
-  } catch (e) {
-    print('Error occurred while loading the image: $e');
-    // Handle errors or set a state to show an error image
+      // Use the imageUrl in an Image widget or however you need
+      print('Download URL: $imageUrl');
+    } catch (e) {
+      print('Error occurred while loading the image: $e');
+      // Handle errors or set a state to show an error image
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('products').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
             return LayoutBuilder(
               builder: (context, constraints) {
-                int crossAxisCount = (constraints.maxWidth ~/ 200).clamp(2, 6);
-                double fontSize = constraints.maxWidth / 50;
+                int crossAxisCount = (constraints.maxWidth ~/ 250).clamp(2, 6);
+                double fontSize = constraints.maxWidth / 60;
 
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    childAspectRatio: 1 / 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    childAspectRatio: 2 / 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                   ),
                   itemCount: snapshot.data!.docs.length + 1,
                   itemBuilder: (context, index) {
@@ -89,25 +86,27 @@ Future<void> loadImage(BuildContext context) async {
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               child: Image.network(
-  product['imageUrl'],
-  fit: BoxFit.cover,
-  width: double.infinity,
-  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-    if (loadingProgress == null) return child;
-    return Center(
-      child: CircularProgressIndicator(
-        value: loadingProgress.expectedTotalBytes != null
-            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-            : null,
-      ),
-    );
-  },
-  errorBuilder: (context, error, stackTrace) {
-    print('Failed to load image: $error');
-    return Center(child: Text('Failed to load image'));
-  },
-),
-
+                                product['imageUrl'],
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/placeholder.png',
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  );
+                                },
+                                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                           Padding(
@@ -138,7 +137,7 @@ Future<void> loadImage(BuildContext context) async {
                                         currentTitle: product['title'],
                                         currentPrice: product['price'].toString(),
                                         currentDescription: product['description'],
-                                        currentImageUrl: imageUrl, // Pass imageUrl to EditProductPage
+                                        currentImageUrl: imageUrl,
                                         currentQuantity: product['quantity'].toString(),
                                       ),
                                     ),
