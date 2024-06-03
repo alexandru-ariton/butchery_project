@@ -1,9 +1,83 @@
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'dart:html' as html;
+
+// Conditional import
+import 'file_handler.dart'
+    if (dart.library.html) 'chrome_file_handler.dart';
+
+void _generateAndViewPDF(BuildContext context, String orderId, Map<String, dynamic> orderData) async {
+  final userId = orderData['userId'];
+  final userData = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  final pdf = pw.Document();
+
+  pdf.addPage(
+    pw.Page(
+      build: (context) => pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text('Receipt', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 16),
+          pw.Text('Order ID: $orderId', style: pw.TextStyle(fontSize: 18)),
+          pw.Text('Total: ${orderData['total'] ?? 'Unknown'} lei', style: pw.TextStyle(fontSize: 18)),
+          pw.SizedBox(height: 16),
+          pw.Text('Items:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+          _buildOrderItemsPDF(orderData['items'] ?? []),
+          pw.SizedBox(height: 16),
+          pw.Text('Address: ${orderData['address'] ?? 'No address provided'}', style: pw.TextStyle(fontSize: 18)),
+          pw.Text('Payment Method: ${orderData['paymentMethod'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 18)),
+          pw.SizedBox(height: 16),
+          pw.Text('User Details:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+          _buildUserDetailsPDF(userData.data() as Map<String, dynamic>),
+        ],
+      ),
+    ),
+  );
+
+  final bytes = await pdf.save();
+
+  if (kIsWeb) {
+    viewPdf(bytes);
+  } else {
+    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => bytes);
+  }
+}
+
+pw.Widget _buildOrderItemsPDF(List<dynamic> items) {
+  if (items.isEmpty) {
+    return pw.Text('No items found.', style: pw.TextStyle(fontSize: 16));
+  }
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: items.map((item) {
+      var productData = item['product'] ?? {};
+      var productName = productData['title'] ?? 'Unknown Product';
+      var quantity = item['quantity'] ?? 'Unknown Quantity';
+      return pw.Text('$productName x $quantity', style: pw.TextStyle(fontSize: 16));
+    }).toList(),
+  );
+}
+
+pw.Widget _buildUserDetailsPDF(Map<String, dynamic> userData) {
+  if (userData.isEmpty) {
+    return pw.Text('No user details available.', style: pw.TextStyle(fontSize: 16));
+  }
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Text('Name: ${userData['username'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
+      pw.Text('Email: ${userData['email'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
+      pw.Text('Phone: ${userData['phoneNumber'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
+      pw.Text('Address: ${userData['address'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
+    ],
+  );
+}
 
 class OrderDetailsPage extends StatelessWidget {
   final String orderId;
@@ -36,7 +110,7 @@ class OrderDetailsPage extends StatelessWidget {
             _buildUserDetails(orderData['userId']),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => _generateAndViewPDF(context),
+              onPressed: () => _generateAndViewPDF(context, orderId, orderData),
               child: Text('Print Receipt', style: TextStyle(fontSize: 18)),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white, backgroundColor: Colors.blue, padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
@@ -87,76 +161,6 @@ class OrderDetailsPage extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  void _generateAndViewPDF(BuildContext context) async {
-    final userId = orderData['userId'];
-    final userData = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text('Receipt', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 16),
-            pw.Text('Order ID: $orderId', style: pw.TextStyle(fontSize: 18)),
-            pw.Text('Total: ${orderData['total'] ?? 'Unknown'} lei', style: pw.TextStyle(fontSize: 18)),
-            pw.SizedBox(height: 16),
-            pw.Text('Items:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-            _buildOrderItemsPDF(orderData['items'] ?? []),
-            pw.SizedBox(height: 16),
-            pw.Text('Address: ${orderData['address'] ?? 'No address provided'}', style: pw.TextStyle(fontSize: 18)),
-            pw.Text('Payment Method: ${orderData['paymentMethod'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 18)),
-            pw.SizedBox(height: 16),
-            pw.Text('User Details:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-            _buildUserDetailsPDF(userData.data() as Map<String, dynamic>),
-          ],
-        ),
-      ),
-    );
-
-    final bytes = await pdf.save();
-
-    final blob = html.Blob([bytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute('target', '_blank')
-      ..click();
-    html.Url.revokeObjectUrl(url);
-  }
-
-  pw.Widget _buildOrderItemsPDF(List<dynamic> items) {
-    if (items.isEmpty) {
-      return pw.Text('No items found.', style: pw.TextStyle(fontSize: 16));
-    }
-
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: items.map((item) {
-        var productData = item['product'] ?? {};
-        var productName = productData['title'] ?? 'Unknown Product';
-        var quantity = item['quantity'] ?? 'Unknown Quantity';
-        return pw.Text('$productName x $quantity', style: pw.TextStyle(fontSize: 16));
-      }).toList(),
-    );
-  }
-
-  pw.Widget _buildUserDetailsPDF(Map<String, dynamic> userData) {
-    if (userData.isEmpty) {
-      return pw.Text('No user details available.', style: pw.TextStyle(fontSize: 16));
-    }
-
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text('Name: ${userData['username'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
-        pw.Text('Email: ${userData['email'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
-        pw.Text('Phone: ${userData['phoneNumber'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
-        pw.Text('Address: ${userData['address'] ?? 'Unknown'}', style: pw.TextStyle(fontSize: 16)),
-      ],
     );
   }
 }

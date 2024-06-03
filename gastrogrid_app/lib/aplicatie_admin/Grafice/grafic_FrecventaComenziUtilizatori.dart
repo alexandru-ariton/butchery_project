@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-
-
-
 class CustomerOrderFrequencyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -28,10 +25,31 @@ class CustomerOrderFrequencyChart extends StatelessWidget {
           )
         ];
 
-        return charts.BarChart(
-          series,
-          animate: true,
-          behaviors: [charts.ChartTitle('Customer Order Frequency')],
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Customer Order Frequency',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  SizedBox(height: 8.0),
+                  Expanded(
+                    child: charts.BarChart(
+                      series,
+                      animate: true,
+                      vertical: false, // Set to true for vertical bars, false for horizontal bars
+                      behaviors: [charts.ChartTitle('Customer Order Frequency')],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );

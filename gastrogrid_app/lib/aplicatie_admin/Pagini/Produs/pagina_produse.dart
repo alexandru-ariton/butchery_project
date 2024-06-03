@@ -90,12 +90,11 @@ class ProductManagement extends StatelessWidget {
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    'assets/placeholder.png',
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                  );
+                                 return Center(child: Icon(Icons.broken_image, size: fontSize * 2));
+                                  
+                                
                                 },
+                                
                                 loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(

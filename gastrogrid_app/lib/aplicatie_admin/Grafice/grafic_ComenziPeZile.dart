@@ -26,11 +26,29 @@ class DailyOrdersChart extends StatelessWidget {
           )
         ];
 
-        return charts.TimeSeriesChart(
-          series,
-          animate: true,
-          dateTimeFactory: const charts.LocalDateTimeFactory(),
-          behaviors: [charts.ChartTitle('Daily Orders')],
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Daily Orders',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Expanded(
+                    child: charts.TimeSeriesChart(
+                      series,
+                      animate: true,
+                      dateTimeFactory: const charts.LocalDateTimeFactory(),
+                      behaviors: [charts.ChartTitle('Daily Orders')],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
