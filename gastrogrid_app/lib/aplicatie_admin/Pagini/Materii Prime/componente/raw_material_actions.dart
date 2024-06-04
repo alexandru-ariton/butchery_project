@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 Future<String> uploadImage(String rawMaterialId, Uint8List? imageData, String? currentImageUrl) async {

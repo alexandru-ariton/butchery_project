@@ -2,8 +2,7 @@ import 'package:GastroGrid/aplicatie_client/Pagini/Orders/componente/order_card.
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
-import 'package:GastroGrid/providers/provider_cart.dart';
+
 
 class PaginaOrder extends StatelessWidget {
   @override

@@ -2,7 +2,6 @@ import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/componente/order_items
 import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/componente/pdf_generator.dart';
 import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/componente/user_details.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class OrderDetailsPage extends StatelessWidget {

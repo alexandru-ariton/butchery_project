@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
@@ -6,8 +8,6 @@ import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/produ
 import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/raw_material_list.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/providers/provider_notificareStoc.dart';
-import 'package:provider/provider.dart';
 import 'package:universal_html/html.dart' as html;
 
 class EditProductPage extends StatefulWidget {
