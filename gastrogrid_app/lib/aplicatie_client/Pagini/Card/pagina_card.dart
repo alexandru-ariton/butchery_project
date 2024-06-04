@@ -63,16 +63,19 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Detalii card')),
-      body: Padding(
+      appBar: AppBar(
+        title: Text('Detalii card'),
+      ),
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
+              _buildTextField(
                 controller: _cardNumberController,
-                decoration: InputDecoration(labelText: 'Numărul cardului'),
+                labelText: 'Numărul cardului',
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -81,9 +84,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   return null;
                 },
               ),
-              TextFormField(
+              _buildTextField(
                 controller: _expiryDateController,
-                decoration: InputDecoration(labelText: 'Data expirării (MM/YY)'),
+                labelText: 'Data expirării (MM/YY)',
                 keyboardType: TextInputType.datetime,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -92,9 +95,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   return null;
                 },
               ),
-              TextFormField(
+              _buildTextField(
                 controller: _cvvController,
-                decoration: InputDecoration(labelText: 'CVV'),
+                labelText: 'CVV',
                 keyboardType: TextInputType.number,
                 obscureText: true,
                 validator: (value) {
@@ -107,11 +110,56 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveCardDetails,
-                child: Text('Salvează detaliile cardului'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.save),
+                    SizedBox(width: 10),
+                    Text('Salvează detaliile cardului'),
+                  ],
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required TextInputType keyboardType,
+    required String? Function(String?) validator,
+    bool obscureText = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+        keyboardType: keyboardType,
+        validator: validator,
+        obscureText: obscureText,
       ),
     );
   }

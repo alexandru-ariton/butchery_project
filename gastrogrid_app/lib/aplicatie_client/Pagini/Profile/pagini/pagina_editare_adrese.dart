@@ -3,41 +3,53 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditAddressPage extends StatefulWidget {
-  final String address;
   final String addressId;
+  final String street;
+  final String city;
+  final String state;
+  final String zipCode;
 
-  EditAddressPage({required this.address, required this.addressId});
+  EditAddressPage({
+    required this.addressId,
+    required this.street,
+    required this.city,
+    required this.state,
+    required this.zipCode,
+  });
 
   @override
   _EditAddressPageState createState() => _EditAddressPageState();
 }
 
 class _EditAddressPageState extends State<EditAddressPage> {
-  late TextEditingController _addressController;
+  late TextEditingController _streetController;
+  late TextEditingController _cityController;
+  late TextEditingController _stateController;
+  late TextEditingController _zipCodeController;
   String? userId;
 
   @override
   void initState() {
     super.initState();
-    _addressController = TextEditingController(text: widget.address);
+    _streetController = TextEditingController(text: widget.street);
+    _cityController = TextEditingController(text: widget.city);
+    _stateController = TextEditingController(text: widget.state);
+    _zipCodeController = TextEditingController(text: widget.zipCode);
     _initializeUser();
   }
 
   void _initializeUser() async {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    setState(() {
-      userId = user.uid;
-    });
-    print('User ID in Edit Page: $userId'); 
-  } else {
-    print('User is not logged in');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Utilizatorul nu este autentificat')),
-    );
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Utilizatorul nu este autentificat')),
+      );
+    }
   }
-}
-
 
   void _saveAddress() async {
     if (userId != null && widget.addressId.isNotEmpty) {
@@ -47,19 +59,22 @@ class _EditAddressPageState extends State<EditAddressPage> {
             .doc(userId)
             .collection('addresses')
             .doc(widget.addressId);
-        await docRef.set({'address': _addressController.text});
+        await docRef.set({
+          'street': _streetController.text,
+          'city': _cityController.text,
+          'state': _stateController.text,
+          'zipCode': _zipCodeController.text,
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Adresa a fost salvată cu succes!')),
         );
         Navigator.pop(context, true);
       } catch (e) {
-        print('Eroare la salvarea adresei: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Eroare la salvarea adresei: $e')),
         );
       }
     } else {
-      print('User ID sau Address ID lipsește');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('User ID sau Address ID lipsește')),
       );
@@ -80,13 +95,11 @@ class _EditAddressPageState extends State<EditAddressPage> {
         );
         Navigator.pop(context, true);
       } catch (e) {
-        print('Eroare la ștergerea adresei: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Eroare la ștergerea adresei: $e')),
         );
       }
     } else {
-      print('User ID sau Address ID lipsește');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('User ID sau Address ID lipsește')),
       );
@@ -95,7 +108,10 @@ class _EditAddressPageState extends State<EditAddressPage> {
 
   @override
   void dispose() {
-    _addressController.dispose();
+    _streetController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _zipCodeController.dispose();
     super.dispose();
   }
 
@@ -110,8 +126,23 @@ class _EditAddressPageState extends State<EditAddressPage> {
         child: Column(
           children: [
             TextField(
-              controller: _addressController,
-              decoration: InputDecoration(labelText: 'Adresa'),
+              controller: _streetController,
+              decoration: InputDecoration(labelText: 'Strada'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _cityController,
+              decoration: InputDecoration(labelText: 'Oraș'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _stateController,
+              decoration: InputDecoration(labelText: 'Județ'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _zipCodeController,
+              decoration: InputDecoration(labelText: 'Cod poștal'),
             ),
             SizedBox(height: 20),
             Row(

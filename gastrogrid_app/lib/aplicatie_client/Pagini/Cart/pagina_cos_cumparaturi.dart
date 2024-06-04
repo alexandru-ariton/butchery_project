@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_payment.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_select_card.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Card/pagina_payment.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Card/pagina_select_card.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
+import 'package:GastroGrid/aplicatie_client/clase/cart.dart';
 import 'package:provider/provider.dart';
-import 'package:gastrogrid_app/providers/provider_cart.dart';
-import 'package:gastrogrid_app/providers/provider_livrare.dart';
-import 'package:gastrogrid_app/providers/provider_themes.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
+import 'package:GastroGrid/providers/provider_adresa_plata_cart.dart';
+import 'package:GastroGrid/providers/provider_cart.dart';
+import 'package:GastroGrid/providers/provider_livrare.dart';
+import 'package:GastroGrid/providers/provider_themes.dart';
 
 class ShoppingCartPage extends StatefulWidget {
   @override
@@ -16,9 +17,6 @@ class ShoppingCartPage extends StatefulWidget {
 }
 
 class _ShoppingCartPageState extends State<ShoppingCartPage> {
-  String? _selectedAddress;
-  String? _selectedPaymentMethod;
-  Map<String, dynamic>? _selectedCardDetails;
   bool _orderFinalized = false;
 
   void _selectDeliveryAddress() async {
@@ -29,17 +27,16 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     );
 
     if (selectedAddress != null) {
+      Provider.of<SelectedOptionsProvider>(context, listen: false).setSelectedAddress(selectedAddress);
       setState(() {
-        _selectedAddress = selectedAddress;
         _orderFinalized = false;
       });
     }
   }
 
   void _selectPaymentMethod(String? method) async {
-    setState(() {
-      _selectedPaymentMethod = method;
-    });
+    final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
+    optionsProvider.setSelectedPaymentMethod(method!);
 
     if (method == 'Card') {
       final cardDetails = await Navigator.of(context).push(
@@ -49,8 +46,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       );
 
       if (cardDetails != null) {
+        optionsProvider.setSelectedPaymentMethod(method, cardDetails);
         setState(() {
-          _selectedCardDetails = cardDetails;
           _orderFinalized = false;
         });
       }
@@ -58,7 +55,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void finalizeOrder(BuildContext context) async {
-    if (_selectedAddress == null || _selectedPaymentMethod == null) {
+    final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
+
+    if (optionsProvider.selectedAddress == null || optionsProvider.selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please select an address and a payment method")),
       );
@@ -78,8 +77,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         'userId': userId,
         'items': items,
         'status': 'Pending',
-        'address': _selectedAddress ?? 'No address selected',
-        'paymentMethod': _selectedPaymentMethod ?? 'No payment method selected',
+        'address': optionsProvider.selectedAddress ?? 'No address selected',
+        'paymentMethod': optionsProvider.selectedPaymentMethod ?? 'No payment method selected',
         'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
         'timestamp': FieldValue.serverTimestamp(),
       };
@@ -87,11 +86,11 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       try {
         DocumentReference orderRef = await orders.add(orderData);
 
-        if (_selectedPaymentMethod == 'Card' && _selectedCardDetails != null) {
+        if (optionsProvider.selectedPaymentMethod == 'Card' && optionsProvider.selectedCardDetails != null) {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => PaymentPage(
-                cardDetails: _selectedCardDetails!,
+                cardDetails: optionsProvider.selectedCardDetails!,
                 amount: orderData['total'],
                 orderId: orderRef.id,
               ),
@@ -103,6 +102,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                 SnackBar(content: Text("Plata a fost efectuată cu succes")),
               );
               cart.clear();
+              optionsProvider.clear();
               setState(() {
                 _orderFinalized = true;
               });
@@ -117,6 +117,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             SnackBar(content: Text("Order finalized successfully")),
           );
           cart.clear();
+          optionsProvider.clear();
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -134,45 +135,50 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     final deliveryInfo = Provider.of<DeliveryProvider>(context);
+    final optionsProvider = Provider.of<SelectedOptionsProvider>(context);
     double deliveryFee = cart.items.isEmpty ? 0.0 : (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0);
     double total = cart.total + deliveryFee;
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       backgroundColor: themeProvider.themeData.colorScheme.background,
-      body: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: Column(
-              children: [
-                Flexible(
-                  child: ListView.builder(
-                    itemCount: cart.items.length,
-                    itemBuilder: (context, index) => _buildCartItem(cart.items[index]),
-                  ),
-                ),
-              ],
+      appBar: AppBar(
+        title: Center(child: Text('Shopping Cart')),
+       
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: cart.items.length,
+              itemBuilder: (context, index) => _buildCartItem(cart.items[index]),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildDeliveryInfoSection(deliveryInfo),
-                _buildPaymentMethodSection(),
-                if (!_orderFinalized) _buildTotalSection(cart, deliveryFee, total),
-              ],
-            ),
+          _buildExpandableSection(
+            title: 'Selectați adresa de livrare',
+            content: _buildDeliveryInfoSection(deliveryInfo, optionsProvider),
           ),
+          _buildExpandableSection(
+            title: 'Selectați metoda de plată',
+            content: _buildPaymentMethodSection(optionsProvider),
+          ),
+          if (!_orderFinalized) _buildTotalSection(cart, deliveryFee, total),
         ],
       ),
     );
   }
 
-  Widget _buildDeliveryInfoSection(DeliveryProvider deliveryInfo) {
+  Widget _buildExpandableSection({required String title, required Widget content}) {
+    return ExpansionTile(
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      children: [content],
+    );
+  }
+
+  Widget _buildDeliveryInfoSection(DeliveryProvider deliveryInfo, SelectedOptionsProvider optionsProvider) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Container(
       padding: EdgeInsets.all(8.0),
@@ -182,8 +188,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       ),
       child: deliveryInfo.isDelivery
           ? ListTile(
-              title: Text('Selectați adresa de livrare'),
-              subtitle: Text(_selectedAddress ?? 'Nu a fost selectată nicio adresă'),
+              title: Text('Adresa selectată'),
+              subtitle: Text(optionsProvider.selectedAddress ?? 'Nu a fost selectată nicio adresă'),
               trailing: Icon(Icons.keyboard_arrow_right),
               onTap: _selectDeliveryAddress,
             )
@@ -194,107 +200,211 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     );
   }
 
-  Widget _buildPaymentMethodSection() {
-    return Column(
-      children: [
-        ListTile(
-          title: Text('Selectați metoda de plată'),
-          trailing: DropdownButton<String>(
-            value: _selectedPaymentMethod,
-            items: [
-              DropdownMenuItem(child: Text('Cash'), value: 'Cash'),
-              DropdownMenuItem(child: Text('Card'), value: 'Card'),
-            ],
-            onChanged: (value) {
-              _selectPaymentMethod(value);
+  Widget _buildPaymentMethodSection(SelectedOptionsProvider optionsProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: themeProvider.themeData.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+         
+          _buildPaymentOption(
+            'Cash',
+            optionsProvider.selectedPaymentMethod == 'Cash',
+            Icons.money,
+            () {
+              _selectPaymentMethod('Cash');
             },
           ),
-        ),
-        if (_selectedPaymentMethod == 'Card' && _selectedCardDetails != null)
-          ListTile(
-            title: Text('Card selectat: ${_selectedCardDetails!['last4']}'),
+          _buildPaymentOption(
+            'Card',
+            optionsProvider.selectedPaymentMethod == 'Card',
+            Icons.credit_card,
+            () {
+              _selectPaymentMethod('Card');
+            },
           ),
-      ],
+          if (optionsProvider.selectedPaymentMethod == 'Card' && optionsProvider.selectedCardDetails != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Row(
+                children: [
+                  Icon(Icons.credit_card, color: themeProvider.themeData.colorScheme.primary),
+                  SizedBox(width: 8),
+                  Text(
+                    'Card selectat: ${optionsProvider.selectedCardDetails!['last4']}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: themeProvider.themeData.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 
-  Widget _buildCartItem(CartItem item) {
-    return Card(
-      elevation: 2.0,
-      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      child: Padding(
-        padding: EdgeInsets.all(8),
+  Widget _buildPaymentOption(String title, bool selected, IconData icon, VoidCallback onTap) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? themeProvider.themeData.colorScheme.primary.withOpacity(0.1) : themeProvider.themeData.colorScheme.background,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onBackground.withOpacity(0.5),
+            width: 1,
+          ),
+        ),
         child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(left: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      item.product.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      'Price: \$${item.product.price.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Text(
-                      'Quantity: ${item.quantity}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
+          children: [
+            Icon(icon, color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onBackground),
+            SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onBackground,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-            _buildQuantityControls(item),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuantityControls(CartItem item) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: Icon(Icons.remove),
-          onPressed: () {
-            if (item.quantity > 1) {
-              Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity - 1);
-            } else {
-              Provider.of<CartProvider>(context, listen: false).removeProduct(item);
-            }
-          },
+Widget _buildCartItem(CartItem item) {
+  final themeProvider = Provider.of<ThemeProvider>(context);
+  return Card(
+    elevation: 4.0,
+    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: <Widget>[
+          if (item.product.imageUrl != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                item.product.imageUrl!,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            )
+          else
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.image, size: 50, color: Colors.grey[400]),
+            ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  item.product.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: themeProvider.themeData.colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Price: ${item.product.price.toStringAsFixed(2)}\ lei',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Quantity: ${item.quantity}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _buildQuantityControls(item),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildQuantityControls(CartItem item) {
+  final themeProvider = Provider.of<ThemeProvider>(context);
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      IconButton(
+        icon: Icon(Icons.remove),
+        color: themeProvider.themeData.colorScheme.primary,
+        onPressed: () {
+          if (item.quantity > 1) {
+            Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity - 1);
+          } else {
+            Provider.of<CartProvider>(context, listen: false).removeProduct(item);
+          }
+        },
+      ),
+      Text(
+        item.quantity.toString(),
+        style: TextStyle(
+          fontSize: 16,
+          color: themeProvider.themeData.colorScheme.onSurface,
         ),
-        Text(item.quantity.toString()),
-        IconButton(
-          icon: Icon(Icons.add),
-          onPressed: () {
-            Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity + 1);
-          },
-        ),
-      ],
-    );
-  }
+      ),
+      IconButton(
+        icon: Icon(Icons.add),
+        color: themeProvider.themeData.colorScheme.primary,
+        onPressed: () {
+          Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity + 1);
+        },
+      ),
+    ],
+  );
+}
+
 
   Widget _buildTotalSection(CartProvider cart, double deliveryFee, double total) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
     return Container(
-      padding: EdgeInsets.only(top: 0, left: 15, right: 15),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       decoration: BoxDecoration(
-        color: themeProvider.themeData.colorScheme.background,
+        color: themeProvider.themeData.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
@@ -317,7 +427,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             if (!_orderFinalized && !cart.items.isEmpty)
               ElevatedButton(
                 onPressed: () {
-                  if (_selectedAddress != null && _selectedPaymentMethod != null) {
+                  if (optionsProvider.selectedAddress != null && optionsProvider.selectedPaymentMethod != null) {
                     finalizeOrder(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -325,7 +435,16 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                     );
                   }
                 },
-                child: Text('FINALIZEAZA COMANDA', style: TextStyle(color: themeProvider.themeData.colorScheme.primary)),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'FINALIZEAZĂ COMANDA',
+                  style: TextStyle(color: themeProvider.themeData.colorScheme.onSurface, fontSize: 16),
+                ),
               ),
             SizedBox(height: 40),
           ],
@@ -341,8 +460,22 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontSize: isTotal ? 18 : 16, color: isTotal ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.primary)),
-          Text(value, style: TextStyle(fontSize: isTotal ? 18 : 16, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 16,
+              color: isTotal ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onSurface,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 16,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              color: themeProvider.themeData.colorScheme.onSurface,
+            ),
+          ),
         ],
       ),
     );

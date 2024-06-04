@@ -9,12 +9,14 @@ class EditRawMaterialPage extends StatefulWidget {
   final String? rawMaterialId;
   final String? currentName;
   final String? currentQuantity;
+  final String? currentUnit;
   final String? currentImageUrl;
 
   EditRawMaterialPage({
     this.rawMaterialId,
     this.currentName,
     this.currentQuantity,
+    this.currentUnit,
     this.currentImageUrl,
   });
 
@@ -28,6 +30,7 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
   final TextEditingController _quantityController = TextEditingController();
   Uint8List? _imageData;
   String? _imageName;
+  String? _selectedUnit;
   bool _isLoading = false;
 
   @override
@@ -39,6 +42,7 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
     if (widget.currentQuantity != null) {
       _quantityController.text = widget.currentQuantity!;
     }
+    _selectedUnit = widget.currentUnit ?? 'kg'; // Default unit
   }
 
   Future<void> _pickImage() async {
@@ -90,6 +94,7 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
         await FirebaseFirestore.instance.collection('rawMaterials').add({
           'name': _nameController.text,
           'quantity': newQuantity,
+          'unit': _selectedUnit,
           'imageUrl': imageUrl,
         });
       } else {
@@ -97,6 +102,7 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
         await FirebaseFirestore.instance.collection('rawMaterials').doc(widget.rawMaterialId).update({
           'name': _nameController.text,
           'quantity': newQuantity,
+          'unit': _selectedUnit,
           'imageUrl': imageUrl,
         });
       }
@@ -114,16 +120,11 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Raw Material'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        backgroundColor: Colors.blueGrey[900],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(32.0),
               child: Form(
                 key: _formKey,
                 child: ListView(
@@ -144,31 +145,71 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
                       },
                     ),
                     SizedBox(height: 16),
-                    TextFormField(
-                      controller: _quantityController,
-                      decoration: InputDecoration(
-                        labelText: 'Raw Material Quantity',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a raw material quantity';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Please enter a valid number';
-                        }
-                        return null;
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quantityController,
+                            decoration: InputDecoration(
+                              labelText: 'Raw Material Quantity',
+                              border: OutlineInputBorder(),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a raw material quantity';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'Please enter a valid number';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        DropdownButton<String>(
+                          value: _selectedUnit,
+                          items: <String>['kg', 'litrii'].map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedUnit = newValue!;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                     SizedBox(height: 16),
                     _imageData != null
-                        ? Image.memory(_imageData!)
+                        ? Image.memory(_imageData!, height: 150)
                         : widget.currentImageUrl != null
-                            ? Image.network(widget.currentImageUrl!)
-                            : Container(height: 200, color: Colors.grey[200], child: Center(child: Text('No Image'))),
+                            ? Image.network(widget.currentImageUrl!, height: 150, errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 150,
+                                  color: Colors.grey[200],
+                                  child: Center(child: Text('Failed to load image')),
+                                );
+                              }, loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              })
+                            : Container(
+                                height: 150,
+                                color: Colors.grey[200],
+                                child: Center(child: Text('No Image')),
+                              ),
                     SizedBox(height: 16),
                     TextButton.icon(
                       onPressed: _pickImage,
@@ -183,7 +224,8 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
                       onPressed: _saveRawMaterial,
                       child: Text('Save Raw Material'),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.green,
+                        foregroundColor: Colors.white, 
+                        backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
                     ),

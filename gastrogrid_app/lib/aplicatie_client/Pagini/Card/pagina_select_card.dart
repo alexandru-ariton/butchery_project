@@ -91,49 +91,91 @@ class _SelectCardPageState extends State<SelectCardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Selectați un card')),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _cards.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot card = _cards[index];
-                String last4 = 'XXXX'; // Default value
-                final Map<String, dynamic> cardData = card.data() as Map<String, dynamic>;
-                if (cardData.containsKey('iv')) {
-                  try {
-                    final encrypter = encrypt.Encrypter(encrypt.AES(_encryptionKey, mode: encrypt.AESMode.cbc));
-                    final iv = encrypt.IV.fromBase64(cardData['iv']);
-                    print('IV used for decryption: ${iv.base64}'); // Debug: print IV
-                    final decryptedCardNumber = encrypter.decrypt64(cardData['cardNumber'], iv: iv);
-                    last4 = decryptedCardNumber.substring(decryptedCardNumber.length - 4);
-                  } catch (e) {
-                    // Handle decryption error, but continue
-                  }
-                }
-                return ListTile(
-                  title: Text('Card ${index + 1}'),
-                  subtitle: Text('Ultimele 4 cifre: $last4'),
-                  trailing: Radio<String>(
-                    value: card.id,
-                    groupValue: _selectedCardId,
-                    onChanged: _selectCard,
-                  ),
-                );
-              },
+      appBar: AppBar(
+        title: Text('Selectați un card'),
+       
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: _cards.isEmpty
+                  ? Center(child: Text('Nu aveți carduri adăugate.'))
+                  : ListView.builder(
+                      itemCount: _cards.length,
+                      itemBuilder: (context, index) {
+                        DocumentSnapshot card = _cards[index];
+                        String last4 = 'XXXX'; // Default value
+                        final Map<String, dynamic> cardData = card.data() as Map<String, dynamic>;
+                        if (cardData.containsKey('iv')) {
+                          try {
+                            final encrypter = encrypt.Encrypter(encrypt.AES(_encryptionKey, mode: encrypt.AESMode.cbc));
+                            final iv = encrypt.IV.fromBase64(cardData['iv']);
+                            print('IV used for decryption: ${iv.base64}'); // Debug: print IV
+                            final decryptedCardNumber = encrypter.decrypt64(cardData['cardNumber'], iv: iv);
+                            last4 = decryptedCardNumber.substring(decryptedCardNumber.length - 4);
+                          } catch (e) {
+                            // Handle decryption error, but continue
+                          }
+                        }
+                        return Card(
+                          elevation: 2,
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            title: Text('Card ${index + 1}'),
+                            subtitle: Text('Ultimele 4 cifre: $last4'),
+                            trailing: Radio<String>(
+                              value: card.id,
+                              groupValue: _selectedCardId,
+                              onChanged: _selectCard,
+                            ),
+                            onTap: () {
+                              _selectCard(card.id);
+                            },
+                          ),
+                        );
+                      },
+                    ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: _addNewCard,
-            child: Text('Adăugați un card nou'),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _confirmSelection,
-            child: Text('Confirmă selecția'),
-          ),
-        ],
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _addNewCard,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add),
+                  SizedBox(width: 10),
+                  Text('Adăugați un card nou'),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _confirmSelection,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check),
+                  SizedBox(width: 10),
+                  Text('Confirmă selecția'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

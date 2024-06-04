@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/Autentificare/pagini/pagina_login.dart';
-import 'package:gastrogrid_app/providers/provider_cart.dart';
-import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
+import 'package:GastroGrid/providers/provider_cart.dart';
+import 'package:GastroGrid/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -33,13 +33,12 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
- Future<void> logout(BuildContext context) async {
+   Future<void> logout(BuildContext context) async {
     await _auth.signOut();
-    resetAppState(context); // Apelăm metoda de resetare la logout
-    notifyListeners();
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => PaginaLogin()),
+      (route) => false,
     );
   }
 

@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_home.dart';
-import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
+import 'package:GastroGrid/aplicatie_admin/Pagini/pagina_home.dart';
+import 'package:GastroGrid/providers/provider_autentificare.dart' as customAuth;
+import 'package:GastroGrid/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
 import 'package:provider/provider.dart';
 import '../componente/my_button.dart';
 import '../componente/my_textfield.dart';
+import 'pagina_inregistrare.dart'; // Make sure to import the registration page
 
 class PaginaLogin extends StatefulWidget {
   final void Function()? onTap;
@@ -87,7 +88,17 @@ class _PaginaLoginState extends State<PaginaLogin> {
                       // Check if the user is an admin
                       bool isAdminUser = await isAdmin(email);
 
-                      if (isAdminUser) {
+                      if (isAdminUser && !kIsWeb) {
+                        // Admin trying to log in on mobile
+                        setState(() {
+                          errorMessage = 'Admin login is not allowed on mobile devices.';
+                        });
+                      } else if (!isAdminUser && kIsWeb) {
+                        // User trying to log in on web
+                        setState(() {
+                          errorMessage = 'User login is not allowed on web.';
+                        });
+                      } else if (isAdminUser) {
                         // Navigate to AdminPage if the user is an admin
                         Navigator.pushReplacement(
                           context,
@@ -117,16 +128,20 @@ class _PaginaLoginState extends State<PaginaLogin> {
                   style: TextStyle(color: Colors.red),
                 ),
                 const SizedBox(height: 25),
-                if (!kIsWeb)
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: Text(
-                      "Nu ai un cont? Înregistrează-te aici",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PaginaInregistrare()),
+                    );
+                  },
+                  child: Text(
+                    "Nu ai un cont? Înregistrează-te aici",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
+                ),
               ],
             ),
           ),

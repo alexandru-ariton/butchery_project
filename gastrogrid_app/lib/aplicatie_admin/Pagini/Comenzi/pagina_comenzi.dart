@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
+import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
 
 class OrderManagement extends StatelessWidget {
   void _deleteOrder(String id) async {
@@ -11,15 +11,6 @@ class OrderManagement extends StatelessWidget {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': newStatus});
 
-      if (newStatus == 'Completed') {
-        // Trimite notificarea doar când statusul este "Completed"
-        await FirebaseFirestore.instance.collection('notifications').add({
-          'userId': userId,
-          'orderId': orderId,
-          'message': 'Your order has been completed. Please rate our services.',
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-      }
     } catch (e) {
       print("Failed to update order status: $e");
     }

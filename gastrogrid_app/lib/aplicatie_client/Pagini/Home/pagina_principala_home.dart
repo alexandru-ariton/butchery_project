@@ -1,12 +1,10 @@
-// ignore_for_file: prefer_final_fields
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/pagina_produs.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/produs.dart';
-import 'package:gastrogrid_app/providers/provider_themes.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Product/pagina_produs.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
+import 'package:GastroGrid/aplicatie_client/clase/produs.dart';
+import 'package:GastroGrid/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,29 +27,49 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 600;
+
     return Scaffold(
       backgroundColor: themeProvider.themeData.colorScheme.background,
       body: CustomScrollView(
         slivers: <Widget>[
-          
           SliverToBoxAdapter(
             child: Container(
               color: Theme.of(context).primaryColor,
-              padding: EdgeInsets.only(top: 50,bottom: 15),
+              padding: EdgeInsets.only(top: isSmallScreen ? 30 : 50, bottom: 23),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: () => _selectAddress(context),
-                    child: Center(
-                         
-                        child:Icon(Icons.pin_drop_outlined, color: Colors.white,size: 40,)
-                      
+                  Padding(
+                    padding: const EdgeInsets.all(19.0),
+                    child: GestureDetector(
+                      onTap: () => _selectAddress(context),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 4,
+                        margin: EdgeInsets.symmetric(horizontal: 16),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.pin_drop_outlined,
+                                color: Theme.of(context).primaryColor,
+                                size: isSmallScreen ? 30 : 40,
+                              ),
+                              
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(height: 20),
                   DeliveryToggleButtons(),
-                  
                 ],
               ),
             ),
@@ -104,10 +122,10 @@ class _HomePageState extends State<HomePage> {
                 padding: EdgeInsets.all(10),
                 sliver: SliverGrid(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
+                    crossAxisCount: isSmallScreen ? 1 : 2,
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 20,
-                    childAspectRatio: 1.5 / 1.2, 
+                    childAspectRatio: isSmallScreen ? 1.5 / 1.2 : 1.0, // Adjust aspect ratio based on screen size
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
@@ -135,40 +153,32 @@ class _HomePageState extends State<HomePage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
                                       image: DecorationImage(
-                                        image: NetworkImage(product.imageUrl), 
+                                        image: NetworkImage(product.imageUrl),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(bottom: 30.0,left: 20, top: 20),
+                                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Center(
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              product.title, 
-                                              style: TextStyle(
-                                                fontSize: 16, 
-                                                fontWeight: FontWeight.bold
-                                                     ),
-                                            ),
-                                            SizedBox(width: 180),
-                                            Text(
-                                              '${product.price} lei', 
-                                              style: TextStyle(
-                                                fontSize: 14, 
-                                                color: Colors.grey[600]
-                                                      )
-                                            )
-                                          ]
-                                        )
+                                      Text(
+                                        product.title,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      
-                                     
+                                      SizedBox(height: 5),
+                                      Text(
+                                        '${product.price} lei',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

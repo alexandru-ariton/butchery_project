@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:gastrogrid_app/aplicatie_admin/pagina_editare_materiiPrime.dart';
+import 'package:GastroGrid/aplicatie_admin/pagina_editare_materiiPrime.dart';
 import 'package:universal_html/html.dart' as html;
 
 class RawMaterialsManagement extends StatelessWidget {
@@ -21,25 +21,24 @@ class RawMaterialsManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       backgroundColor: Colors.grey[200],
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('rawMaterials').snapshots(),
-          builder: (context, snapshot) {
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
             return LayoutBuilder(
               builder: (context, constraints) {
-                int crossAxisCount = (constraints.maxWidth ~/ 200).clamp(2, 6);
-                double fontSize = constraints.maxWidth / 50;
+                int crossAxisCount = (constraints.maxWidth ~/ 250).clamp(2, 6);
+                double fontSize = constraints.maxWidth / 60;
 
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    childAspectRatio: 1 / 1.5,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    childAspectRatio: 2 / 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                   ),
                   itemCount: snapshot.data!.docs.length + 1,
                   itemBuilder: (context, index) {
@@ -60,6 +59,10 @@ class RawMaterialsManagement extends StatelessWidget {
                     }
 
                     var rawMaterial = snapshot.data!.docs[index - 1];
+                    String imageUrl = rawMaterial['imageUrl'];
+                    Map<String, dynamic> data = rawMaterial.data() as Map<String, dynamic>;
+                    String unit = data.containsKey('unit') ? data['unit'] : 'unit';
+
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -78,6 +81,16 @@ class RawMaterialsManagement extends StatelessWidget {
                                 errorBuilder: (context, error, stackTrace) {
                                   return Center(child: Icon(Icons.broken_image, size: fontSize * 2));
                                 },
+                                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -90,7 +103,7 @@ class RawMaterialsManagement extends StatelessWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('Quantity: ${rawMaterial['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
+                            child: Text('Quantity: ${rawMaterial['quantity']} $unit', style: TextStyle(fontSize: fontSize * 0.8)),
                           ),
                           ButtonBar(
                             alignment: MainAxisAlignment.end,
@@ -104,6 +117,7 @@ class RawMaterialsManagement extends StatelessWidget {
                                         rawMaterialId: rawMaterial.id,
                                         currentName: rawMaterial['name'],
                                         currentQuantity: rawMaterial['quantity'].toString(),
+                                        currentUnit: unit,
                                         currentImageUrl: rawMaterial['imageUrl'],
                                       ),
                                     ),

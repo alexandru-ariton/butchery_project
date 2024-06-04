@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_materiiPrime.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/pagina_notificari.dart';
+import 'package:GastroGrid/Autentificare/pagini/pagina_inregistrare.dart';
+import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
+import 'package:GastroGrid/aplicatie_admin/Pagini/pagina_materiiPrime.dart';
+import 'package:GastroGrid/aplicatie_admin/Pagini/pagina_notificari.dart';
 import 'Produs/pagina_produse.dart';
 import 'Comenzi/pagina_comenzi.dart';
 import 'pagina_dashboard.dart';
@@ -22,6 +24,21 @@ class AdminHome extends StatelessWidget {
             ),
           ),
           backgroundColor: Colors.teal,
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (String result) {
+                if (result == 'Logout') {
+                  _logout(context);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'Logout',
+                  child: Text('Logout'),
+                ),
+              ],
+            ),
+          ],
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: Container(
@@ -51,6 +68,13 @@ class AdminHome extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _logout(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => PaginaLogin()), // Navigate to your login page
     );
   }
 }

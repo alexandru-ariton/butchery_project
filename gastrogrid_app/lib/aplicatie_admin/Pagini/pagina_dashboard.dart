@@ -1,11 +1,11 @@
 // ignore_for_file: unused_import, prefer_const_literals_to_create_immutables
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_ComenziPeZile.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_FrecventaComenziUtilizatori.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_HeapMap.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_IncasariLunare.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Grafice/grafic_StatusComenzi.dart';
+import 'package:GastroGrid/aplicatie_admin/Grafice/grafic_ComenziPeZile.dart';
+import 'package:GastroGrid/aplicatie_admin/Grafice/grafic_FrecventaComenziUtilizatori.dart';
+import 'package:GastroGrid/aplicatie_admin/Grafice/grafic_HeapMap.dart';
+import 'package:GastroGrid/aplicatie_admin/Grafice/grafic_IncasariLunare.dart';
+import 'package:GastroGrid/aplicatie_admin/Grafice/grafic_StatusComenzi.dart';
 
 class Dashboard extends StatelessWidget {
   @override
@@ -14,7 +14,7 @@ class Dashboard extends StatelessWidget {
       length: 5,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.teal,
+          backgroundColor: Color.fromARGB(104, 99, 62, 62),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: Container(
@@ -38,7 +38,7 @@ class Dashboard extends StatelessWidget {
           children: [
             DailyOrdersChart(),
             MonthlyRevenueChart(),
-            HeatmapChart(),
+            OrderLineChart(),
             OrderStatusDistributionChart(),
             CustomerOrderFrequencyChart(),
           ],

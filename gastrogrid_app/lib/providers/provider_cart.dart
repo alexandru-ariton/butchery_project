@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_client/clase/cart.dart';
-import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
+import 'package:GastroGrid/aplicatie_client/clase/cart.dart';
+import 'package:GastroGrid/providers/provider_notificareStoc.dart';
 
 class CartProvider with ChangeNotifier {
   final NotificationProviderStoc notificationProviderStoc;

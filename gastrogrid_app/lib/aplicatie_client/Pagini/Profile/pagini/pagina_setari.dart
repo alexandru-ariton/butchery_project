@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/providers/provider_themes.dart';
+import 'package:GastroGrid/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class PaginaSetari extends StatelessWidget {
@@ -11,21 +11,36 @@ class PaginaSetari extends StatelessWidget {
       appBar: AppBar(
         title: Text('Setări Aplicație'),
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SwitchListTile(
-              title: Text('Mod Întunecat', style: TextStyle(fontSize: 16)),
-              value: themeProvider.isDarkMode,
-              onChanged: (value) {
+        children: [
+          Card(
+            elevation: 4.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: ListTile(
+              leading: Icon(
+                themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                color: themeProvider.isDarkMode ? Colors.amber : Colors.blue,
+              ),
+              title: Text(
+                'Mod Întunecat',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              ),
+              trailing: Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (value) {
+                  themeProvider.toggleTheme();
+                },
+              ),
+              onTap: () {
                 themeProvider.toggleTheme();
               },
             ),
-            
-          ],
-        ),
+          ),
+         
+        ],
       ),
     );
   }

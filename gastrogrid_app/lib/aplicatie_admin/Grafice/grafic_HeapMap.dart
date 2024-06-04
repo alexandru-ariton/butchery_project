@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class HeatmapChart extends StatelessWidget {
+class OrderLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -21,7 +21,7 @@ class HeatmapChart extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: AspectRatio(
             aspectRatio: 1.5,
-            child: Heatmap(
+            child: OrderLineChartWidget(
               data: orderCounts,
               startDate: DateTime.now().subtract(Duration(days: 30)),
               endDate: DateTime.now(),
@@ -33,12 +33,12 @@ class HeatmapChart extends StatelessWidget {
   }
 }
 
-class Heatmap extends StatelessWidget {
+class OrderLineChartWidget extends StatelessWidget {
   final Map<String, int> data;
   final DateTime startDate;
   final DateTime endDate;
 
-  Heatmap({
+  OrderLineChartWidget({
     required this.data,
     required this.startDate,
     required this.endDate,
@@ -60,8 +60,9 @@ class Heatmap extends StatelessWidget {
           touchTooltipData: LineTouchTooltipData(
             tooltipPadding: const EdgeInsets.all(8),
             getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
+              final date = startDate.add(Duration(days: spot.x.toInt()));
               return LineTooltipItem(
-                '${spot.x.toInt() + startDate.day}/${startDate.month}: ${spot.y.toInt()} orders',
+                '${date.day}/${date.month}: ${spot.y.toInt()} orders',
                 TextStyle(color: Colors.white),
               );
             }).toList(),

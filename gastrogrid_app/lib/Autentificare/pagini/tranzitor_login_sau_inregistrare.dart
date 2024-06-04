@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/Autentificare/pagini/pagina_inregistrare.dart';
-import 'package:gastrogrid_app/Autentificare/pagini/pagina_login.dart';
+import 'package:GastroGrid/Autentificare/pagini/pagina_inregistrare.dart';
+import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
 
 
 class LoginSauInregistrare extends StatefulWidget {
