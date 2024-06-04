@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "braintree": "^3.23.0",
-    "stripe": "^15.8.0"
+    
   }
 }
