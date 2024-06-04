@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
-import 'package:GastroGrid/providers/provider_cart.dart';
-import 'package:GastroGrid/providers/provider_livrare.dart';
-import 'package:provider/provider.dart';
+
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -42,13 +40,5 @@ class AuthProvider with ChangeNotifier {
     );
   }
 
-   void resetAppState(BuildContext context) {
-    // Exemplu de resetare a coșului de cumpărături
-    Provider.of<CartProvider>(context, listen: false).clear();
-
-    // Exemplu de resetare a informațiilor de livrare
-    Provider.of<DeliveryProvider>(context, listen: false).resetDeliveryInfo();
-
-    // Adăugați aici alte resetări necesare
-  }
+ 
 }

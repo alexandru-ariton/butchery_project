@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Product/pagina_produs.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
-import 'package:GastroGrid/aplicatie_client/clase/produs.dart';
+import 'package:GastroGrid/clase/clasa_produs.dart';
 import 'package:GastroGrid/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 

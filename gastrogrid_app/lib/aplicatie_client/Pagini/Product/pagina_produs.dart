@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/pagina_notificari.dart';
+import 'package:GastroGrid/aplicatie_admin/Pagini/Notificari/pagina_notificari.dart';
 import 'package:GastroGrid/providers/provider_notificareStoc.dart';
 import 'package:provider/provider.dart';
 import 'package:GastroGrid/providers/provider_cart.dart';
-import 'package:GastroGrid/aplicatie_client/clase/cart.dart';
-import 'package:GastroGrid/aplicatie_client/clase/produs.dart';
+import 'package:GastroGrid/clase/clasa_cart.dart';
+import 'package:GastroGrid/clase/clasa_produs.dart';
 
 
 class ProductDetailPage extends StatefulWidget {

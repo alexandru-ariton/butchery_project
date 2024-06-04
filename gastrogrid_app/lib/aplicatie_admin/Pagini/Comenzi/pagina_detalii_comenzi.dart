@@ -9,7 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 // Conditional import
-import 'file_handler.dart' if (dart.library.html) 'chrome_file_handler.dart';
+import 'pdf_helper.dart' if (dart.library.html) 'pdf_helper_web.dart';
 
 void _generateAndViewPDF(BuildContext context, String orderId, Map<String, dynamic> orderData) async {
   final userId = orderData['userId'];

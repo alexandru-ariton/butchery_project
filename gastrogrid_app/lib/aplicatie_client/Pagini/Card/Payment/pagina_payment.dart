@@ -1,12 +1,12 @@
+import 'package:GastroGrid/aplicatie_client/Pagini/Card/Payment/componente_payment/payment_button.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PaymentPage extends StatelessWidget {
   final Map<String, dynamic> cardDetails;
   final double amount;
-  final String orderId; // Adăugăm orderId
+  final String orderId;
 
-  PaymentPage({required this.cardDetails, required this.amount, required this.orderId}); // Modificăm constructorul
+  PaymentPage({required this.cardDetails, required this.amount, required this.orderId});
 
   @override
   Widget build(BuildContext context) {
@@ -44,25 +44,9 @@ class PaymentPage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 40),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Simulează procesul de plată
-                      _processPayment(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.payment),
-                        SizedBox(width: 10),
-                        Text('Confirmă Plată'),
-                      ],
-                    ),
+                  PaymentButton(
+                    amount: amount,
+                    orderId: orderId,
                   ),
                 ],
               ),
@@ -71,18 +55,5 @@ class PaymentPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _processPayment(BuildContext context) async {
-    // Simulează un delay pentru procesarea plății
-    await Future.delayed(Duration(seconds: 3));
-
-    // Actualizează statusul plății în baza de date
-    FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-      'paymentStatus': 'Paid'
-    });
-
-    // După confirmarea plății, întoarce-te și transmite un mesaj de succes
-    Navigator.of(context).pop(true);
   }
 }

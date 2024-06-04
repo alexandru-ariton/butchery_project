@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_editare_adrese.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_editare_adrese.dart';
 import 'package:GastroGrid/providers/provider_livrare.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';

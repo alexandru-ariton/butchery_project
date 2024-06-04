@@ -1,4 +1,4 @@
-import 'package:GastroGrid/aplicatie_client/clase/produs.dart';
+import 'package:GastroGrid/clase/clasa_produs.dart';
 
 
 class CartItem {

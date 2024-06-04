@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/pagina_payment.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Card/Payment/pagina_payment.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Card/pagina_select_card.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
-import 'package:GastroGrid/aplicatie_client/clase/cart.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
+import 'package:GastroGrid/clase/clasa_cart.dart';
 import 'package:provider/provider.dart';
 import 'package:GastroGrid/providers/provider_adresa_plata_cart.dart';
 import 'package:GastroGrid/providers/provider_cart.dart';

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_client/clase/cart.dart';
+import 'package:GastroGrid/clase/clasa_cart.dart';
 
 
 class Order {

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_admin/pagina_editare_materiiPrime.dart';
+import 'package:GastroGrid/aplicatie_admin/Pagini/Materii%20Prime/pagina_editare_materii_prime.dart';
 
 class RawMaterialsManagement extends StatelessWidget {
   void _addRawMaterial(BuildContext context) {
