@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/pagina_card.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/pagina_select_card.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_adrese.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_editare_profil.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';

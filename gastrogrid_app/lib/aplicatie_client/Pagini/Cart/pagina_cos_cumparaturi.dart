@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -307,7 +309,7 @@ Widget _buildCartItem(CartItem item) {
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                item.product.imageUrl!,
+                item.product.imageUrl,
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/Autentificare/pagini/pagina_inregistrare.dart';
 import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
 import 'package:GastroGrid/aplicatie_admin/Pagini/pagina_materiiPrime.dart';
 import 'package:GastroGrid/aplicatie_admin/Pagini/pagina_notificari.dart';

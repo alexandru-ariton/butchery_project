@@ -29,7 +29,6 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   Uint8List? _imageData;
-  String? _imageName;
   String? _selectedUnit;
   bool _isLoading = false;
 
@@ -57,7 +56,6 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
           setState(() {
             final result = reader.result as String;
             _imageData = _base64StringToUint8List(result.split(',').last);
-            _imageName = file.name;
           });
         }
       });

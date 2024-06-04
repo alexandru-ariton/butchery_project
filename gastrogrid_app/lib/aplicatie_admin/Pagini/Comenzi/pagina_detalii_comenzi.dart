@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:io' as io;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
