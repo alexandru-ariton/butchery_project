@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
 import 'encryption_utils.dart';
 import 'firebase_utils.dart';
 
