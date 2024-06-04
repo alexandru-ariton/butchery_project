@@ -24,6 +24,15 @@ class _PaginaLoginState extends State<PaginaLogin> {
 
   String errorMessage = '';
 
+  Future<bool> userExists(String email) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  }
+
   Future<bool> isAdmin(String email) async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('admin_users')
@@ -81,6 +90,14 @@ class _PaginaLoginState extends State<PaginaLogin> {
                     try {
                       String email = emailController.text;
                       String password = passwordController.text;
+
+                      bool exists = await userExists(email);
+                      if (!exists) {
+                        setState(() {
+                          errorMessage = 'Utilizatorul nu există.';
+                        });
+                        return;
+                      }
 
                       await Provider.of<customAuth.AuthProvider>(context, listen: false)
                           .login(email, password);

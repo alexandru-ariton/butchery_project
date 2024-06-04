@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_editare_profil.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/pagina_editare_profil.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
 import 'package:GastroGrid/aplicatie_client/Pagini/Profile/componente/profil.dart';
 import 'package:GastroGrid/providers/provider_autentificare.dart' as customAuth;
@@ -33,7 +33,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(_userId).get();
       setState(() {
-        _username = userDoc['username'];
+        if(userDoc['username'].toString() != null)
+        {
+          _username = userDoc['username'];
+        }else {
+
+          _username = 'N/A';
+
+        }
       });
     }
   }

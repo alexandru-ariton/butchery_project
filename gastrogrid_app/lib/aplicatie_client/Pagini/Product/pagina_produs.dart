@@ -1,12 +1,13 @@
+import 'package:GastroGrid/aplicatie_client/Pagini/Product/componente/quantity_button.dart';
+import 'package:GastroGrid/aplicatie_client/Pagini/Product/componente/stock_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Notificari/pagina_notificari.dart';
+
 import 'package:GastroGrid/providers/provider_notificareStoc.dart';
 import 'package:provider/provider.dart';
 import 'package:GastroGrid/providers/provider_cart.dart';
 import 'package:GastroGrid/clase/clasa_cart.dart';
 import 'package:GastroGrid/clase/clasa_produs.dart';
-
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -40,7 +41,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Stoc Epuizat')),
           );
-          notifyOutOfStock(widget.product);
+          notifyOutOfStock(context, widget.product);
           return;
         }
 
@@ -61,7 +62,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
         if (currentStock - quantity < 3) {
           // Notifică clientul și adminul pentru stoc redus
-          notifyLowStock(widget.product);
+          notifyLowStock(context, widget.product);
         } else {
           // Șterge notificarea dacă stocul este suficient
           Provider.of<NotificationProviderStoc>(context, listen: false).removeNotification(widget.product.id);
@@ -85,44 +86,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         isAddingToCart = false;
       });
     }
-  }
-
-  void notifyLowStock(Product product) {
-    // Notifică clientul
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Stoc redus pentru ${product.title}')),
-    );
-
-    // Notifică adminul - salvați notificarea în Firestore
-    Provider.of<NotificationProviderStoc>(context, listen: false).addNotification(
-      'Stoc redus pentru ${product.title}',
-      product.id,
-    );
-
-    // Navighează la pagina notificărilor de stoc redus
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LowStockNotificationPage()),
-    );
-  }
-
-  void notifyOutOfStock(Product product) {
-    // Notifică clientul
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Stoc Epuizat pentru ${product.title}')),
-    );
-
-    // Notifică adminul - salvați notificarea în Firestore
-    Provider.of<NotificationProviderStoc>(context, listen: false).addNotification(
-      'Stoc Epuizat pentru ${product.title}',
-      product.id,
-    );
-
-    // Navighează la pagina notificărilor de stoc epuizat
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LowStockNotificationPage()),
-    );
   }
 
   @override
@@ -186,11 +149,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 children: <Widget>[
                   Row(
                     children: [
-                      _buildQuantityButton(Icons.remove, () {
-                        setState(() {
-                          if (quantity > 1) quantity--;
-                        });
-                      }),
+                      QuantityButton(
+                        icon: Icons.remove,
+                        onPressed: () {
+                          setState(() {
+                            if (quantity > 1) quantity--;
+                          });
+                        },
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
@@ -198,11 +164,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
-                      _buildQuantityButton(Icons.add, () {
-                        setState(() {
-                          quantity++;
-                        });
-                      }),
+                      QuantityButton(
+                        icon: Icons.add,
+                        onPressed: () {
+                          setState(() {
+                            quantity++;
+                          });
+                        },
+                      ),
                     ],
                   ),
                   Text(
@@ -226,16 +195,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildQuantityButton(IconData icon, VoidCallback onPressed) {
-    return CircleAvatar(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      child: IconButton(
-        icon: Icon(icon, color: Theme.of(context).colorScheme.surface),
-        onPressed: onPressed,
       ),
     );
   }
