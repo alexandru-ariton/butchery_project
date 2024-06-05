@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:GastroGrid/providers/provider_autentificare.dart';
 import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
@@ -20,6 +21,29 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
   final TextEditingController confirmpasswordController = TextEditingController();
 
   String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Verifică dacă utilizatorul este admin și dacă este pe web
+    if (kIsWeb) {
+      checkIfAdmin();
+    }
+  }
+
+  Future<void> checkIfAdmin() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    bool isAdminUser = await authProvider.isUserInCollection(emailController.text, 'admin_users');
+    if (isAdminUser) {
+      setState(() {
+        errorMessage = 'Adminii nu se pot înregistra pe web.';
+      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => PaginaLogin()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +99,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
                     if (passwordController.text == confirmpasswordController.text) {
                       try {
                         await Provider.of<AuthProvider>(context, listen: false)
-                            .signUp(emailController.text, passwordController.text);
+                            .signUp(emailController.text, passwordController.text); // Elimină rolul implicit
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Înregistrare reușită")),
                         );
