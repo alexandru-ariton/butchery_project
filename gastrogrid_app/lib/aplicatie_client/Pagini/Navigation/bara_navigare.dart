@@ -32,7 +32,7 @@ class _BaraNavigareState extends State<BaraNavigare> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: themeProvider.themeData.colorScheme.background,
+      backgroundColor: themeProvider.themeData.colorScheme.surface,
       body: _pages.elementAt(_selectedIndex),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

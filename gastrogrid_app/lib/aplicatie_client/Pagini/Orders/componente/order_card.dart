@@ -7,7 +7,7 @@ import 'reload_order.dart';
 class OrderCard extends StatelessWidget {
   final DocumentSnapshot order;
 
-  OrderCard({required this.order});
+  const OrderCard({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {

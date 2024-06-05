@@ -3,6 +3,8 @@ import 'package:GastroGrid/providers/provider_livrare.dart';
 import 'package:provider/provider.dart';
 
 class DeliveryToggleButtons extends StatefulWidget {
+  const DeliveryToggleButtons({super.key});
+
   @override
   _DeliveryToggleButtonsState createState() => _DeliveryToggleButtonsState();
 }
@@ -97,7 +99,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
       children: [
         Icon(Icons.timelapse_outlined, size: 14, color: Colors.blue),
         SizedBox(width: 4),
-        Text('${deliveryInfo.deliveryTime} minute', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary)),
+        Text('${deliveryInfo.deliveryTime} minute', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary)),
         SizedBox(width: 16),
         Icon(Icons.delivery_dining_outlined, size: 16, color: Colors.blue),
         SizedBox(width: 4),

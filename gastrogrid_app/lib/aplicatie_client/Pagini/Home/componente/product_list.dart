@@ -6,7 +6,7 @@ import 'product_card.dart';
 class ProductList extends StatelessWidget {
   final String searchQuery;
 
-  ProductList({required this.searchQuery});
+  const ProductList({super.key, required this.searchQuery});
 
   @override
   Widget build(BuildContext context) {

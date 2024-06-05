@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:geocoding/geocoding.dart';
 
 class SavedAddressesPage extends StatefulWidget {
+  const SavedAddressesPage({super.key});
+
   @override
   _SavedAddressesPageState createState() => _SavedAddressesPageState();
 }

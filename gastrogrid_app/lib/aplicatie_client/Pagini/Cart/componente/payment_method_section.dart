@@ -7,7 +7,7 @@ class PaymentMethodSection extends StatelessWidget {
   final SelectedOptionsProvider optionsProvider;
   final Function(String?) onSelectPaymentMethod;
 
-  PaymentMethodSection({
+  const PaymentMethodSection({super.key, 
     required this.optionsProvider,
     required this.onSelectPaymentMethod,
   });
@@ -80,22 +80,22 @@ class PaymentMethodSection extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 8),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? themeProvider.themeData.colorScheme.primary.withOpacity(0.1) : themeProvider.themeData.colorScheme.background,
+          color: selected ? themeProvider.themeData.colorScheme.primary.withOpacity(0.1) : themeProvider.themeData.colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onBackground.withOpacity(0.5),
+            color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onSurface.withOpacity(0.5),
             width: 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onBackground),
+            Icon(icon, color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onSurface),
             SizedBox(width: 12),
             Text(
               title,
               style: TextStyle(
                 fontSize: 16,
-                color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onBackground,
+                color: selected ? themeProvider.themeData.colorScheme.primary : themeProvider.themeData.colorScheme.onSurface,
                 fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

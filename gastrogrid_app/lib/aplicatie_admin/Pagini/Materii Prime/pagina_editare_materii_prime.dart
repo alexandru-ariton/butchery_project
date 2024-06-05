@@ -13,7 +13,7 @@ class EditRawMaterialPage extends StatefulWidget {
   final String? currentUnit;
   final String? currentImageUrl;
 
-  EditRawMaterialPage({
+  const EditRawMaterialPage({super.key, 
     this.rawMaterialId,
     this.currentName,
     this.currentQuantity,
@@ -132,12 +132,12 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _saveRawMaterial,
-                      child: Text('Save Raw Material'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white, 
                         backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
+                      child: Text('Save Raw Material'),
                     ),
                   ],
                 ),

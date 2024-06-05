@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
 
 class OrderManagement extends StatelessWidget {
+  const OrderManagement({super.key});
+
   void _deleteOrder(String id) async {
     await FirebaseFirestore.instance.collection('orders').doc(id).delete();
   }
@@ -69,7 +71,7 @@ class OrderManagement extends StatelessWidget {
                         _buildOrderItems(orderData['items'] ?? []),
                       ],
                     ),
-                    trailing: Container(
+                    trailing: SizedBox(
                       width: 300, // Ajustează lățimea pentru a se potrivi conținutului
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

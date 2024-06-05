@@ -4,7 +4,7 @@ import 'package:GastroGrid/clase/clasa_produs.dart';
 class OrderItems extends StatelessWidget {
   final List<dynamic> items;
 
-  OrderItems({required this.items});
+  const OrderItems({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {

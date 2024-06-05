@@ -9,6 +9,8 @@ import 'package:google_place/google_place.dart';
 import 'package:provider/provider.dart';
 
 class AddressSelector extends StatefulWidget {
+  const AddressSelector({super.key});
+
   @override
   _AddressSelectorState createState() => _AddressSelectorState();
 }
@@ -121,7 +123,7 @@ class _AddressSelectorState extends State<AddressSelector> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Alege Adresa'),
-        backgroundColor: themeProvider.themeData.colorScheme.background,
+        backgroundColor: themeProvider.themeData.colorScheme.surface,
         actions: [
           IconButton(
             icon: Icon(Icons.save),

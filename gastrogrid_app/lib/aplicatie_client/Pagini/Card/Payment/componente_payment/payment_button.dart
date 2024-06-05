@@ -5,7 +5,7 @@ class PaymentButton extends StatelessWidget {
   final double amount;
   final String orderId;
 
-  PaymentButton({required this.amount, required this.orderId});
+  const PaymentButton({super.key, required this.amount, required this.orderId});
 
   Future<void> _processPayment(BuildContext context, String orderId) async {
   // Simulează un delay pentru procesarea plății
@@ -35,7 +35,7 @@ class PaymentButton extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: const [
           Icon(Icons.payment),
           SizedBox(width: 10),
           Text('Confirmă Plată'),

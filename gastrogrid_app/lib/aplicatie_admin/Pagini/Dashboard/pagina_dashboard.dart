@@ -8,6 +8,8 @@ import 'package:GastroGrid/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_Incas
 import 'package:GastroGrid/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_StatusComenzi.dart';
 
 class Dashboard extends StatelessWidget {
+  const Dashboard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -18,6 +20,7 @@ class Dashboard extends StatelessWidget {
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: Container(
+              alignment: Alignment.center,
               child: TabBar(
                 indicatorColor: Colors.white,
                 labelColor: Colors.white,
@@ -30,7 +33,6 @@ class Dashboard extends StatelessWidget {
                   Tab(icon: Icon(Icons.people, size: 28), text: 'Customer Orders'),
                 ],
               ),
-              alignment: Alignment.center,
             ),
           ),
         ),

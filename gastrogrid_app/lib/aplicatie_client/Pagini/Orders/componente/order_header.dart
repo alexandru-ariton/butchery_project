@@ -5,7 +5,7 @@ class OrderHeader extends StatelessWidget {
   final String status;
   final double total;
 
-  OrderHeader({required this.orderId, required this.status, required this.total});
+  const OrderHeader({super.key, required this.orderId, required this.status, required this.total});
 
   @override
   Widget build(BuildContext context) {

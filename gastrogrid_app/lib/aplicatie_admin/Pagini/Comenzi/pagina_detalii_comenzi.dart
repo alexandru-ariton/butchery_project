@@ -8,7 +8,7 @@ class OrderDetailsPage extends StatelessWidget {
   final String orderId;
   final Map<String, dynamic> orderData;
 
-  OrderDetailsPage({required this.orderId, required this.orderData});
+  const OrderDetailsPage({super.key, required this.orderId, required this.orderData});
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +41,11 @@ class OrderDetailsPage extends StatelessWidget {
                 Center(
                   child: ElevatedButton(
                     onPressed: () => generateAndViewPDF(context, orderId, orderData),
-                    child: Text('Print Receipt', style: TextStyle(fontSize: 18)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                     ),
+                    child: Text('Print Receipt', style: TextStyle(fontSize: 18)),
                   ),
                 ),
               ],

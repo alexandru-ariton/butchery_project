@@ -13,7 +13,7 @@ class SearchWidget extends StatelessWidget {
   final Function(String) onSearchChanged;
   final Function(LatLng, String) onPredictionSelected;
 
-  SearchWidget({
+  const SearchWidget({super.key, 
     required this.googlePlace,
     required this.searchController,
     required this.manualAddressController,

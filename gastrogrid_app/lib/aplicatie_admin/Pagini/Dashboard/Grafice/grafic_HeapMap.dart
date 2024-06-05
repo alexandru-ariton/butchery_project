@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class OrderLineChart extends StatelessWidget {
+  const OrderLineChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -38,7 +40,7 @@ class OrderLineChartWidget extends StatelessWidget {
   final DateTime startDate;
   final DateTime endDate;
 
-  OrderLineChartWidget({
+  const OrderLineChartWidget({super.key, 
     required this.data,
     required this.startDate,
     required this.endDate,

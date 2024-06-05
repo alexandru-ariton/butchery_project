@@ -5,7 +5,7 @@ import 'package:GastroGrid/aplicatie_client/Pagini/Product/pagina_produs.dart';
 class ProductCard extends StatelessWidget {
   final Product product;
 
-  ProductCard({required this.product});
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {

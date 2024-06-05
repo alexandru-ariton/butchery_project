@@ -4,6 +4,8 @@ import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/pagina_editare_produs.d
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ProductManagement extends StatelessWidget {
+  const ProductManagement({super.key});
+
   void _addProduct(BuildContext context) {
     Navigator.push(
       context,

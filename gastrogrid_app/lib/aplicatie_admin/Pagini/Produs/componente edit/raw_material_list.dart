@@ -5,7 +5,7 @@ class RawMaterialList extends StatefulWidget {
   final Map<String, TextEditingController> rawMaterialControllers;
   final Map<String, int> selectedRawMaterials;
 
-  RawMaterialList({
+  const RawMaterialList({super.key, 
     required this.rawMaterialControllers,
     required this.selectedRawMaterials,
   });

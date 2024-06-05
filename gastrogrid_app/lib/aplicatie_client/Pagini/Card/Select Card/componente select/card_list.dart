@@ -8,7 +8,7 @@ class CardList extends StatelessWidget {
   final String? selectedCardId;
   final Function(String?) onSelectCard;
 
-  CardList({
+  const CardList({super.key, 
     required this.cards,
     required this.encryptionKey,
     required this.selectedCardId,

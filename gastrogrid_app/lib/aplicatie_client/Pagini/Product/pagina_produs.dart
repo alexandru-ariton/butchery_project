@@ -11,7 +11,7 @@ import 'package:GastroGrid/clase/clasa_produs.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
-  ProductDetailPage({required this.product});
+  const ProductDetailPage({super.key, required this.product});
 
   @override
   _ProductDetailPageState createState() => _ProductDetailPageState();
@@ -127,7 +127,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 widget.product.title,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
               ),
             ),
@@ -137,7 +137,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Text(
                 widget.product.description,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
               ),
             ),
@@ -175,7 +175,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ],
                   ),
                   Text(
-                    '${widget.product.price.toStringAsFixed(2)}\ lei',
+                    '${widget.product.price.toStringAsFixed(2)} lei',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                         ),

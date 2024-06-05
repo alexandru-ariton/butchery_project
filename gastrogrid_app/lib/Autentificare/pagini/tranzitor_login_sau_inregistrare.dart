@@ -4,6 +4,8 @@ import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
 
 
 class LoginSauInregistrare extends StatefulWidget {
+  const LoginSauInregistrare({super.key});
+
   @override
   State<LoginSauInregistrare> createState() => _LoginSauInregistrareState();
 }

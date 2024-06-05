@@ -9,7 +9,7 @@ class DeliveryInfoSection extends StatelessWidget {
   final SelectedOptionsProvider optionsProvider;
   final VoidCallback onSelectDeliveryAddress;
 
-  DeliveryInfoSection({
+  const DeliveryInfoSection({super.key, 
     required this.deliveryInfo,
     required this.optionsProvider,
     required this.onSelectDeliveryAddress,

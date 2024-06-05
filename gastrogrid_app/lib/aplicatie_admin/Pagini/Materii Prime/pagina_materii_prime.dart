@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:GastroGrid/aplicatie_admin/Pagini/Materii%20Prime/pagina_editare_materii_prime.dart';
 
 class RawMaterialsManagement extends StatelessWidget {
+  const RawMaterialsManagement({super.key});
+
   void _addRawMaterial(BuildContext context) {
     Navigator.push(
       context,

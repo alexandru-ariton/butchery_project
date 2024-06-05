@@ -9,7 +9,7 @@ import 'package:GastroGrid/providers/provider_themes.dart';
 class CartItemWidget extends StatelessWidget {
   final CartItem item;
 
-  CartItemWidget({required this.item});
+  const CartItemWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {

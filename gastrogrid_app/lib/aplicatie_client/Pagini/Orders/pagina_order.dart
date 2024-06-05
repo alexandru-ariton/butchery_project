@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 
 class PaginaOrder extends StatelessWidget {
+  const PaginaOrder({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

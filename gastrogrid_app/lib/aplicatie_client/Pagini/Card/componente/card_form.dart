@@ -5,6 +5,8 @@ import 'encryption_utils.dart';
 import 'firebase_utils.dart';
 
 class CardForm extends StatefulWidget {
+  const CardForm({super.key});
+
   @override
   _CardFormState createState() => _CardFormState();
 }
@@ -106,7 +108,7 @@ class _CardFormState extends State<CardForm> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: const [
                 Icon(Icons.save),
                 SizedBox(width: 10),
                 Text('Salvează detaliile cardului'),

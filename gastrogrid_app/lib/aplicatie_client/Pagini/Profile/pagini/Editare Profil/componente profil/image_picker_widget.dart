@@ -7,7 +7,7 @@ class ImagePickerWidget extends StatelessWidget {
   final String? photoUrl;
   final Function(XFile?) onImagePicked;
 
-  ImagePickerWidget({this.image, this.photoUrl, required this.onImagePicked});
+  const ImagePickerWidget({super.key, this.image, this.photoUrl, required this.onImagePicked});
 
   @override
   Widget build(BuildContext context) {

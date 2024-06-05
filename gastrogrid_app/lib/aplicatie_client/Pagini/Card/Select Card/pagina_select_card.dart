@@ -7,6 +7,8 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import '../pagina_card.dart'; // Asigurați-vă că ați creat această pagină pentru introducerea datelor cardului
 
 class SelectCardPage extends StatefulWidget {
+  const SelectCardPage({super.key});
+
   @override
   _SelectCardPageState createState() => _SelectCardPageState();
 }
@@ -101,7 +103,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(Icons.add),
                   SizedBox(width: 10),
                   Text('Adăugați un card nou'),
@@ -119,7 +121,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(Icons.check),
                   SizedBox(width: 10),
                   Text('Confirmă selecția'),

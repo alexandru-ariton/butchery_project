@@ -7,7 +7,7 @@ class ProfileOption extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
 
-  ProfileOption({
+  const ProfileOption({super.key, 
     required this.icon,
     required this.text,
     required this.onTap,

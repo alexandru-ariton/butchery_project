@@ -12,6 +12,8 @@ import 'package:GastroGrid/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -51,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: themeProvider.themeData.colorScheme.background,
+      backgroundColor: themeProvider.themeData.colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -70,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: themeProvider.themeData.colorScheme.onBackground,
+                color: themeProvider.themeData.colorScheme.onSurface,
               ),
             ),
             SizedBox(height: 20),

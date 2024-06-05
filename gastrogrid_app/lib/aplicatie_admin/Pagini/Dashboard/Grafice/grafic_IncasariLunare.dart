@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 class MonthlyRevenueChart extends StatelessWidget {
+  const MonthlyRevenueChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -24,7 +26,7 @@ class MonthlyRevenueChart extends StatelessWidget {
             measureFn: (MapEntry<String, double> entry, _) => entry.value,
             data: monthlyRevenue.entries.toList(),
             colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-            labelAccessorFn: (MapEntry<String, double> entry, _) => '${entry.value.toStringAsFixed(2)}',
+            labelAccessorFn: (MapEntry<String, double> entry, _) => entry.value.toStringAsFixed(2),
           )
         ];
 

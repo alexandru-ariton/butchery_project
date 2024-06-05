@@ -12,7 +12,7 @@ import '../Adrese/pagina_adrese.dart';
 class EditProfilePage extends StatefulWidget {
   final String userId;
 
-  EditProfilePage({required this.userId});
+  const EditProfilePage({super.key, required this.userId});
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -119,11 +119,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   _image,
                   _photoUrl,
                 ),
-                child: Text('Save Changes'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   minimumSize: Size(double.infinity, 50),
                 ),
+                child: Text('Save Changes'),
               ),
             ],
           ),
@@ -139,10 +139,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       firstDate: DateTime(1900),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != DateTime.now())
+    if (picked != null && picked != DateTime.now()) {
       setState(() {
         _dobController.text = "${picked.toLocal()}".split(' ')[0];
       });
+    }
   }
 
   Future<void> _selectAddress(BuildContext context) async {

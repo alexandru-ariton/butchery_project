@@ -7,12 +7,14 @@ import 'package:GastroGrid/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   void _selectAddress(BuildContext context) {
@@ -30,7 +32,7 @@ class _HomePageState extends State<HomePage> {
     final isSmallScreen = screenSize.width < 600;
 
     return Scaffold(
-      backgroundColor: themeProvider.themeData.colorScheme.background,
+      backgroundColor: themeProvider.themeData.colorScheme.surface,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverToBoxAdapter(

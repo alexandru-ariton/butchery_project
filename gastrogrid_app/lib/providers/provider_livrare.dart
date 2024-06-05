@@ -5,12 +5,12 @@ import 'package:geolocator/geolocator.dart';
 class DeliveryProvider with ChangeNotifier {
   bool _isDelivery = true;
   double _deliveryFee = 5.0;
-  String _defaultAddress = "Adresa Default";
-  LatLng _defaultLocation = LatLng(44.416686, 26.101286); // Default location (e.g., New York)
+  final String _defaultAddress = "Adresa Default";
+  final LatLng _defaultLocation = LatLng(44.416686, 26.101286); // Default location (e.g., New York)
   String? _selectedAddress;
   LatLng? _selectedLocation;
   int _deliveryTime = 60; // Default delivery time in minutes
-  int _pickupTime = 20; // Default pickup time in minutes
+  final int _pickupTime = 20; // Default pickup time in minutes
 
   bool get isDelivery => _isDelivery;
   double get deliveryFee => _deliveryFee;

@@ -4,7 +4,7 @@ class ExpandableSection extends StatelessWidget {
   final String title;
   final Widget content;
 
-  ExpandableSection({required this.title, required this.content});
+  const ExpandableSection({super.key, required this.title, required this.content});
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ class MapWidget extends StatelessWidget {
   final Function(LatLng) onMapTapped;
   final LatLng? selectedLocation;
 
-  MapWidget({
+  const MapWidget({super.key, 
     required this.onMapCreated,
     required this.onMapTapped,
     required this.selectedLocation,

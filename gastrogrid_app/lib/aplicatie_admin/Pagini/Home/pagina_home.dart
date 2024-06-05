@@ -7,6 +7,8 @@ import '../Comenzi/pagina_comenzi.dart';
 import '../Dashboard/pagina_dashboard.dart';
 
 class AdminHome extends StatelessWidget {
+  const AdminHome({super.key});
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -46,7 +48,7 @@ class AdminHome extends StatelessWidget {
                 indicatorColor: Colors.white,
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white70,
-                tabs: [
+                tabs: const [
                   Tab(icon: Icon(Icons.dashboard, size: 28), text: 'Dashboard'),
                   Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Products'),
                   Tab(icon: Icon(Icons.receipt, size: 28), text: 'Orders'),
@@ -58,7 +60,7 @@ class AdminHome extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: [
+          children: const [
             Dashboard(),
             ProductManagement(),
             OrderManagement(),

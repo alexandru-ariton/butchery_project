@@ -3,6 +3,8 @@ import 'package:GastroGrid/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class PaginaSetari extends StatelessWidget {
+  const PaginaSetari({super.key});
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);

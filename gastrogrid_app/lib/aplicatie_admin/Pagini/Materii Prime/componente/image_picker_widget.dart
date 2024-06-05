@@ -6,7 +6,7 @@ class ImagePickerWidget extends StatelessWidget {
   final String? imageUrl;
   final VoidCallback onImagePicked;
 
-  ImagePickerWidget({this.imageData, this.imageUrl, required this.onImagePicked});
+  const ImagePickerWidget({super.key, this.imageData, this.imageUrl, required this.onImagePicked});
 
   @override
   Widget build(BuildContext context) {

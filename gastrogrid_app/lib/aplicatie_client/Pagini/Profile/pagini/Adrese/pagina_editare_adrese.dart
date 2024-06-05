@@ -9,7 +9,7 @@ class EditAddressPage extends StatefulWidget {
   final String state;
   final String zipCode;
 
-  EditAddressPage({
+  const EditAddressPage({super.key, 
     required this.addressId,
     required this.street,
     required this.city,
@@ -154,8 +154,8 @@ class _EditAddressPageState extends State<EditAddressPage> {
                 ),
                 ElevatedButton(
                   onPressed: _removeAddress,
-                  child: Text('Șterge'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: Text('Șterge'),
                 ),
               ],
             ),

@@ -16,6 +16,8 @@ import 'package:GastroGrid/providers/provider_livrare.dart';
 import 'package:GastroGrid/providers/provider_themes.dart';
 
 class ShoppingCartPage extends StatefulWidget {
+  const ShoppingCartPage({super.key});
+
   @override
   _ShoppingCartPageState createState() => _ShoppingCartPageState();
 }
@@ -145,7 +147,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      backgroundColor: themeProvider.themeData.colorScheme.background,
+      backgroundColor: themeProvider.themeData.colorScheme.surface,
       appBar: AppBar(
         title: Center(child: Text('Shopping Cart')),
       ),

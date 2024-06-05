@@ -4,7 +4,7 @@ class QuantityButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  QuantityButton({required this.icon, required this.onPressed});
+  const QuantityButton({super.key, required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

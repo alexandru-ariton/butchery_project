@@ -48,7 +48,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
     final isSmallScreen = screenSize.width < 600;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: SingleChildScrollView(
           child: Container(

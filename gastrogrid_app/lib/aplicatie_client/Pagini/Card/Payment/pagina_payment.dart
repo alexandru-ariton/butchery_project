@@ -6,7 +6,7 @@ class PaymentPage extends StatelessWidget {
   final double amount;
   final String orderId;
 
-  PaymentPage({required this.cardDetails, required this.amount, required this.orderId});
+  const PaymentPage({super.key, required this.cardDetails, required this.amount, required this.orderId});
 
   @override
   Widget build(BuildContext context) {

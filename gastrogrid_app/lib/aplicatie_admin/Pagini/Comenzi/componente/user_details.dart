@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserDetails extends StatelessWidget {
   final String userId;
 
-  UserDetails({required this.userId});
+  const UserDetails({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {

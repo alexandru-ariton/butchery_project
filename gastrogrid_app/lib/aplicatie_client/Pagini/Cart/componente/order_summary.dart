@@ -9,7 +9,7 @@ class OrderSummary extends StatelessWidget {
   final double total;
   final VoidCallback onFinalizeOrder;
 
-  OrderSummary({
+  const OrderSummary({super.key, 
     required this.cart,
     required this.deliveryFee,
     required this.total,
@@ -43,7 +43,7 @@ class OrderSummary extends StatelessWidget {
             Divider(),
             _buildSummaryLine(context, 'Total:', '${total.toStringAsFixed(2)} lei', isTotal: true),
             SizedBox(height: 20),
-            if (!cart.items.isEmpty)
+            if (cart.items.isNotEmpty)
               ElevatedButton(
                 onPressed: onFinalizeOrder,
                 style: ElevatedButton.styleFrom(

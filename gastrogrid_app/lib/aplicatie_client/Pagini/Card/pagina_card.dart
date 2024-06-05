@@ -2,6 +2,8 @@ import 'package:GastroGrid/aplicatie_client/Pagini/Card/componente/card_form.dar
 import 'package:flutter/material.dart';
 
 class CardDetailsPage extends StatefulWidget {
+  const CardDetailsPage({super.key});
+
   @override
   _CardDetailsPageState createState() => _CardDetailsPageState();
 }

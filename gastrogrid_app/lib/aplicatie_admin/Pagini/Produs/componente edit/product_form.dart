@@ -6,7 +6,7 @@ class ProductForm extends StatelessWidget {
   final TextEditingController descriptionController;
   final TextEditingController quantityController;
 
-  ProductForm({
+  const ProductForm({super.key, 
     required this.titleController,
     required this.priceController,
     required this.descriptionController,

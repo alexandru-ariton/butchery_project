@@ -6,7 +6,7 @@ class RawMaterialForm extends StatelessWidget {
   final String? selectedUnit;
   final ValueChanged<String?> onUnitChanged;
 
-  RawMaterialForm({
+  const RawMaterialForm({super.key, 
     required this.nameController,
     required this.quantityController,
     required this.selectedUnit,

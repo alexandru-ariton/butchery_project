@@ -18,7 +18,7 @@ class EditProductPage extends StatefulWidget {
   final String? currentImageUrl;
   final String? currentQuantity;
 
-  EditProductPage({
+  const EditProductPage({super.key, 
     this.productId,
     this.currentTitle,
     this.currentPrice,
@@ -157,11 +157,11 @@ class _EditProductPageState extends State<EditProductPage> {
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _saveProduct,
-                      child: Text('Save Product'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white, backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
+                      child: Text('Save Product'),
                     ),
                   ],
                 ),
