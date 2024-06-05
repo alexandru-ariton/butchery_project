@@ -39,7 +39,9 @@ Future<void> login(String email, String password) async {
 
     // Check if the user is already logged in on another device
     bool isLoggedIn = await isUserLoggedIn(email, collection);
-    if (isLoggedIn) {
+
+    // Apply restriction only for non-admin users
+    if (isLoggedIn && collection == 'users') {
       throw 'Utilizatorul este deja autentificat pe alt dispozitiv.';
     }
 
@@ -65,6 +67,7 @@ Future<void> login(String email, String password) async {
     throw e.message!;
   }
 }
+
 
 Future<void> logout(BuildContext context) async {
   // Update the isLoggedIn field to false before signing out
