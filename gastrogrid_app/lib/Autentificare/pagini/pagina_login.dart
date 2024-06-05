@@ -7,7 +7,7 @@ import 'package:GastroGrid/aplicatie_client/Pagini/Navigation/bara_navigare.dart
 import 'package:provider/provider.dart';
 import '../componente/my_button.dart';
 import '../componente/my_textfield.dart';
-import 'pagina_inregistrare.dart'; // Make sure to import the registration page
+import 'pagina_inregistrare.dart';
 
 class PaginaLogin extends StatefulWidget {
   final void Function()? onTap;

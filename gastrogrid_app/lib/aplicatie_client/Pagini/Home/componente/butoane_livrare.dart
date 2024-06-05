@@ -99,11 +99,11 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
       children: [
         Icon(Icons.timelapse_outlined, size: 14, color: Colors.blue),
         SizedBox(width: 4),
-        Text('${deliveryInfo.deliveryTime} minute', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary)),
+        Text('${deliveryInfo.deliveryTime} minute', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.inversePrimary)),
         SizedBox(width: 16),
         Icon(Icons.delivery_dining_outlined, size: 16, color: Colors.blue),
         SizedBox(width: 4),
-        Text('${deliveryInfo.deliveryFee} lei', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary)),
+        Text('${deliveryInfo.deliveryFee} lei', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.inversePrimary)),
       ],
     );
   }
@@ -114,7 +114,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
       children: [
         Icon(Icons.timelapse_outlined, size: 14, color: Colors.blue),
         SizedBox(width: 4),
-        Text('${deliveryInfo.deliveryTime} minute', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary)),
+        Text('${deliveryInfo.deliveryTime} minute', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.inversePrimary)),
       ],
     );
   }
