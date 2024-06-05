@@ -25,21 +25,17 @@ class _PaginaLoginState extends State<PaginaLogin> {
   String errorMessage = '';
 
   Future<bool> userExists(String email) async {
-    final querySnapshot = await FirebaseFirestore.instance
+    final userQuerySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
         .get();
 
-    return querySnapshot.docs.isNotEmpty;
-  }
-
-  Future<bool> isAdmin(String email) async {
-    final querySnapshot = await FirebaseFirestore.instance
+    final adminQuerySnapshot = await FirebaseFirestore.instance
         .collection('admin_users')
         .where('email', isEqualTo: email)
         .get();
 
-    return querySnapshot.docs.isNotEmpty;
+    return userQuerySnapshot.docs.isNotEmpty || adminQuerySnapshot.docs.isNotEmpty;
   }
 
   @override
@@ -102,8 +98,8 @@ class _PaginaLoginState extends State<PaginaLogin> {
                       await Provider.of<customAuth.AuthProvider>(context, listen: false)
                           .login(email, password);
 
-                      // Check if the user is an admin
-                      bool isAdminUser = await isAdmin(email);
+                      bool isAdminUser = await Provider.of<customAuth.AuthProvider>(context, listen: false)
+                          .isUserInCollection(email, 'admin_users');
 
                       if (isAdminUser && !kIsWeb) {
                         // Admin trying to log in on mobile
@@ -147,13 +143,16 @@ class _PaginaLoginState extends State<PaginaLogin> {
                 const SizedBox(height: 25),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PaginaInregistrare()),
-                    );
+                    // Do not show registration page link for admin
+                    if (!kIsWeb) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PaginaInregistrare()),
+                      );
+                    }
                   },
                   child: Text(
-                    "Nu ai un cont? Înregistrează-te aici",
+                    kIsWeb ? "" : "Nu ai un cont? Înregistrează-te aici",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
