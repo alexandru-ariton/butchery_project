@@ -95,22 +95,24 @@ class _PaginaLoginState extends State<PaginaLogin> {
                         return;
                       }
 
-                      await Provider.of<customAuth.AuthProvider>(context, listen: false)
-                          .login(email, password);
-
                       bool isAdminUser = await Provider.of<customAuth.AuthProvider>(context, listen: false)
                           .isUserInCollection(email, 'admin_users');
+
+                      await Provider.of<customAuth.AuthProvider>(context, listen: false)
+                          .login(email, password);
 
                       if (isAdminUser && !kIsWeb) {
                         // Admin trying to log in on mobile
                         setState(() {
                           errorMessage = 'Admin login is not allowed on mobile devices.';
                         });
+                        await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
                       } else if (!isAdminUser && kIsWeb) {
                         // User trying to log in on web
                         setState(() {
                           errorMessage = 'User login is not allowed on web.';
                         });
+                        await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
                       } else if (isAdminUser) {
                         // Navigate to AdminPage if the user is an admin
                         Navigator.pushReplacement(

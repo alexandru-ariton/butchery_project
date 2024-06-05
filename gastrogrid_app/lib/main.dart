@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, unused_import
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,33 @@ import 'package:GastroGrid/Autentificare/pagini/tranzitor_login_sau_inregistrare
 import 'package:GastroGrid/providers/provider_livrare.dart';
 import 'package:GastroGrid/providers/provider_themes.dart';
 import 'firebase_options.dart';
+
+
+Future<void> initializeUserDocuments() async {
+  final firestore = FirebaseFirestore.instance;
+
+  // Actualizează documentele din colecția 'users'
+  final userDocuments = await firestore.collection('users').get();
+  for (var doc in userDocuments.docs) {
+    try {
+      if (!doc.exists || doc.data().containsKey('isLoggedIn')) continue;
+      await doc.reference.update({'isLoggedIn': false});
+    } catch (e) {
+      print('Eroare la actualizarea documentului din users: ${doc.id}, eroare: $e');
+    }
+  }
+
+  // Actualizează documentele din colecția 'admin_users'
+  final adminDocuments = await firestore.collection('admin_users').get();
+  for (var doc in adminDocuments.docs) {
+    try {
+      if (!doc.exists || doc.data().containsKey('isLoggedIn')) continue;
+      await doc.reference.update({'isLoggedIn': false});
+    } catch (e) {
+      print('Eroare la actualizarea documentului din admin_users: ${doc.id}, eroare: $e');
+    }
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
