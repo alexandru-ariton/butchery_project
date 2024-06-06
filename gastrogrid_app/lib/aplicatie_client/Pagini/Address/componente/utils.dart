@@ -41,11 +41,11 @@ Future<void> saveAddress(String address, BuildContext context) async {
         .doc();
     await docRef.set({'address': address});
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Address saved successfully")),
+      SnackBar(content: Text("Adresa salvata")),
     );
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("User not found")),
+      SnackBar(content: Text("User-ul nu a fost gasit")),
     );
   }
   Navigator.pop(context, true);

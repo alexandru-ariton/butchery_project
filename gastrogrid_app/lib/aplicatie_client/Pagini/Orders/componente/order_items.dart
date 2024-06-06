@@ -12,7 +12,7 @@ class OrderItems extends StatelessWidget {
       children: items.map<Widget>((item) {
         var productData = item['product'];
         if (productData == null) {
-          return Text('Unknown product');
+          return Text('-');
         }
         var product = Product.fromMap(productData, productData['id'] ?? 'unknown');
         return Padding(

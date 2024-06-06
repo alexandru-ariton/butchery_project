@@ -15,15 +15,7 @@ class AdminHome extends StatelessWidget {
       length: 5,
       child: Scaffold(
         appBar: AppBar(
-          title: Center(
-            child: Text(
-              'Admin Dashboard',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-          ),
+          
           backgroundColor: Colors.teal,
           actions: [
             PopupMenuButton<String>(
@@ -50,17 +42,17 @@ class AdminHome extends StatelessWidget {
                 unselectedLabelColor: Colors.white70,
                 tabs: const [
                   Tab(icon: Icon(Icons.dashboard, size: 28), text: 'Dashboard'),
-                  Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Products'),
-                  Tab(icon: Icon(Icons.receipt, size: 28), text: 'Orders'),
-                  Tab(icon: Icon(Icons.notifications, size: 28), text: 'Notifications'),
+                  Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Produse'),
+                  Tab(icon: Icon(Icons.receipt, size: 28), text: 'Comenzi'),
+                  Tab(icon: Icon(Icons.notifications, size: 28), text: 'Notificari'),
                   Tab(icon: Icon(Icons.check_box_outline_blank_rounded, size: 28), text: 'Materii Prime'),
                 ],
               ),
             ),
           ),
         ),
-        body: TabBarView(
-          children: const [
+        body: const TabBarView(
+          children: [
             Dashboard(),
             ProductManagement(),
             OrderManagement(),

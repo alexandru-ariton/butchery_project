@@ -78,7 +78,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selectați un card'),
+        title: Text('Selecteaza un card'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -106,7 +106,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
                 children: const [
                   Icon(Icons.add),
                   SizedBox(width: 10),
-                  Text('Adăugați un card nou'),
+                  Text('Adauga un card nou'),
                 ],
               ),
             ),
@@ -124,7 +124,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
                 children: const [
                   Icon(Icons.check),
                   SizedBox(width: 10),
-                  Text('Confirmă selecția'),
+                  Text('Confirma selectia'),
                 ],
               ),
             ),

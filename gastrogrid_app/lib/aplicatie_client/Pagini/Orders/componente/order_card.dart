@@ -34,7 +34,7 @@ class OrderCard extends StatelessWidget {
                   reloadOrder(context, orderData['items']);
                 },
                 icon: Icon(Icons.add_shopping_cart),
-                label: Text('Adaugă în coș'),
+                label: Text('Adaugă în cos'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(

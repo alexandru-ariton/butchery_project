@@ -27,44 +27,44 @@ class ProfileForm extends StatelessWidget {
       children: [
         TextFormField(
           controller: nameController,
-          decoration: InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person)),
-          validator: (value) => value!.isEmpty ? 'Please enter the name' : null,
+          decoration: InputDecoration(labelText: 'Nume', prefixIcon: Icon(Icons.person)),
+          validator: (value) => value!.isEmpty ? 'Introdu numele' : null,
         ),
         SizedBox(height: 16),
         TextFormField(
           controller: phoneController,
-          decoration: InputDecoration(labelText: 'Phone Number', prefixIcon: Icon(Icons.phone)),
+          decoration: InputDecoration(labelText: 'Telefon', prefixIcon: Icon(Icons.phone)),
           keyboardType: TextInputType.phone,
-          validator: (value) => value!.isEmpty ? 'Please enter the phone number' : null,
+          validator: (value) => value!.isEmpty ? 'Introdu numarul de telefon' : null,
         ),
         SizedBox(height: 16),
         TextFormField(
           controller: addressController,
-          decoration: InputDecoration(labelText: 'Address', prefixIcon: Icon(Icons.home)),
+          decoration: InputDecoration(labelText: 'Adresa', prefixIcon: Icon(Icons.home)),
           readOnly: true,
           onTap: onSelectAddress,
-          validator: (value) => value!.isEmpty ? 'Please select an address' : null,
+          validator: (value) => value!.isEmpty ? 'Selecteaza o adresa' : null,
         ),
         SizedBox(height: 16),
         TextFormField(
           controller: dobController,
-          decoration: InputDecoration(labelText: 'Date of Birth', prefixIcon: Icon(Icons.calendar_today)),
+          decoration: InputDecoration(labelText: 'Data nasterii', prefixIcon: Icon(Icons.calendar_today)),
           readOnly: true,
           onTap: onSelectDate,
-          validator: (value) => value!.isEmpty ? 'Please select your date of birth' : null,
+          validator: (value) => value!.isEmpty ? 'Selecteaza data' : null,
         ),
         SizedBox(height: 16),
         DropdownButtonFormField<String>(
           value: gender,
-          decoration: InputDecoration(labelText: 'Gender', prefixIcon: Icon(Icons.person_outline)),
-          items: ['Male', 'Female', 'Other'].map((String value) {
+          decoration: InputDecoration(labelText: 'Gen', prefixIcon: Icon(Icons.person_outline)),
+          items: ['Masculin', 'Feminin', 'Neutru'].map((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(value),
             );
           }).toList(),
           onChanged: onGenderChanged,
-          validator: (value) => value == null ? 'Please select your gender' : null,
+          validator: (value) => value == null ? 'Selecteaza un gen' : null,
         ),
       ],
     );

@@ -72,7 +72,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: Text('Editeaza Profil'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -123,7 +123,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   backgroundColor: Colors.green,
                   minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text('Save Changes'),
+                child: Text('Salveaza'),
               ),
             ],
           ),

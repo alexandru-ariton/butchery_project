@@ -26,13 +26,13 @@ class DeliveryInfoSection extends StatelessWidget {
       ),
       child: deliveryInfo.isDelivery
           ? ListTile(
-              title: Text('Adresa selectată'),
-              subtitle: Text(optionsProvider.selectedAddress ?? 'Nu a fost selectată nicio adresă'),
+              title: Text('Adresa selectata'),
+              subtitle: Text(optionsProvider.selectedAddress ?? 'Nu a fost selectata nicio adresa'),
               trailing: Icon(Icons.keyboard_arrow_right),
               onTap: onSelectDeliveryAddress,
             )
           : ListTile(
-              title: Text('Ridicare personală activată'),
+              title: Text('Ridicare personală activata'),
               subtitle: Text('Produsele vor fi ridicate de la magazin'),
             ),
     );

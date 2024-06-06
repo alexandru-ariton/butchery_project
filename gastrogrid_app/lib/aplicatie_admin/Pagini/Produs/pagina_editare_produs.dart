@@ -40,8 +40,12 @@ class _EditProductPageState extends State<EditProductPage> {
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
-  final Map<String, int> _selectedRawMaterials = {};
+  final Map<String, Map<String, dynamic>> _selectedRawMaterials = {};
+
   final Map<String, TextEditingController> _rawMaterialControllers = {};
+
+    late Map<String, int> processedRawMaterials;
+
 
   @override
   void initState() {
@@ -58,6 +62,8 @@ class _EditProductPageState extends State<EditProductPage> {
     if (widget.currentQuantity != null) {
       _quantityController.text = widget.currentQuantity!;
     }
+
+    
   }
 
   Future<void> _pickImage() async {
@@ -83,18 +89,17 @@ class _EditProductPageState extends State<EditProductPage> {
     return Uint8List.fromList(base64.decode(base64String));
   }
 
-  void _saveProduct() async {
+ void _saveProduct() async {
     if (_formKey.currentState!.validate() && _selectedRawMaterials.isNotEmpty) {
       setState(() {
         _isLoading = true;
       });
 
-      bool insufficientMaterials = await checkRawMaterials(_selectedRawMaterials);
+      bool insufficientMaterials = await checkRawMaterials(context, _selectedRawMaterials);
       if (insufficientMaterials) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Insufficient raw materials')));
         return;
       }
 
@@ -112,6 +117,7 @@ class _EditProductPageState extends State<EditProductPage> {
       );
 
       await saveRawMaterials(productRef, _selectedRawMaterials);
+      await updateRawMaterials(_selectedRawMaterials);
 
       setState(() {
         _isLoading = false;
@@ -123,11 +129,21 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Product'),
+        title: Text('Editeaza'),
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -161,7 +177,7 @@ class _EditProductPageState extends State<EditProductPage> {
                         foregroundColor: Colors.white, backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
-                      child: Text('Save Product'),
+                      child: Text('Salveaza'),
                     ),
                   ],
                 ),

@@ -36,7 +36,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
     bool isAdminUser = await authProvider.isUserInCollection(emailController.text, 'admin_users');
     if (isAdminUser) {
       setState(() {
-        errorMessage = 'Adminii nu se pot înregistra pe web.';
+        errorMessage = 'Adminii nu se pot inregistra pe web.';
       });
       Navigator.pushReplacement(
         context,
@@ -101,7 +101,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
                         await Provider.of<AuthProvider>(context, listen: false)
                             .signUp(emailController.text, passwordController.text); // Elimină rolul implicit
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Înregistrare reușită")),
+                          SnackBar(content: Text("Inregistrare reusita")),
                         );
                         Navigator.pushReplacement(
                           context,
@@ -118,7 +118,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
                       });
                     }
                   },
-                  text: "Înregistrare",
+                  text: "Inregistrare",
                 ),
                 const SizedBox(height: 15),
                 Text(
@@ -134,7 +134,7 @@ class _PaginaInregistrareState extends State<PaginaInregistrare> {
                     );
                   },
                   child: Text(
-                    "Ai deja un cont? Autentifică-te aici",
+                    "Ai deja un cont? Autentifica-te aici",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),

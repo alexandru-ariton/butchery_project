@@ -47,7 +47,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
         if (quantity > currentStock) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Cantitate indisponibilă')),
+            SnackBar(content: Text('Cantitate indisponibila')),
           );
           return;
         }
@@ -69,7 +69,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Added ${widget.product.title} to cart')),
+          SnackBar(content: Text('Produsul ${widget.product.title} a fost adaugat in cos')),
         );
 
         // Resetăm quantity după ce am făcut toate operațiunile
@@ -78,7 +78,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Produsul nu există')),
+          SnackBar(content: Text('Produsul nu exista')),
         );
       }
     } finally {
@@ -189,7 +189,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: SizedBox(
                 child: ElevatedButton(
                   onPressed: addToCart,
-                  child: Text('Add to Cart', style: TextStyle(fontSize: 16)),
+                  child: Text('Adauga in Cos', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ),

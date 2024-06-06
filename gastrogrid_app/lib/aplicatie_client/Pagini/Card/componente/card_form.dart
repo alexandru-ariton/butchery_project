@@ -49,7 +49,7 @@ class _CardFormState extends State<CardForm> {
           });
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to save card details: $e")),
+            SnackBar(content: Text("Savarea datelor esuata: $e")),
           );
         }
       }
@@ -65,22 +65,22 @@ class _CardFormState extends State<CardForm> {
         children: [
           _buildTextField(
             controller: _cardNumberController,
-            labelText: 'Numărul cardului',
+            labelText: 'Numarul cardului',
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Introduceți numărul cardului';
+                return 'Introdu numarul cardului';
               }
               return null;
             },
           ),
           _buildTextField(
             controller: _expiryDateController,
-            labelText: 'Data expirării (MM/YY)',
+            labelText: 'Data expirarii (MM/YY)',
             keyboardType: TextInputType.datetime,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Introduceți data expirării';
+                return 'Introdu data expirarii';
               }
               return null;
             },
@@ -92,7 +92,7 @@ class _CardFormState extends State<CardForm> {
             obscureText: true,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Introduceți CVV';
+                return 'Introdu CVV';
               }
               return null;
             },
@@ -111,7 +111,7 @@ class _CardFormState extends State<CardForm> {
               children: const [
                 Icon(Icons.save),
                 SizedBox(width: 10),
-                Text('Salvează detaliile cardului'),
+                Text('Salveaza detaliile cardului'),
               ],
             ),
           ),

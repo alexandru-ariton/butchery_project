@@ -22,7 +22,7 @@ class ImagePickerWidget extends StatelessWidget {
                       return Container(
                         height: 150,
                         color: Colors.grey[200],
-                        child: Center(child: Text('Failed to load image')),
+                        child: Center(child: Text('-')),
                       );
                     },
                     loadingBuilder: (context, child, loadingProgress) {
@@ -39,13 +39,13 @@ class ImagePickerWidget extends StatelessWidget {
                 : Container(
                     height: 150,
                     color: Colors.grey[200],
-                    child: Center(child: Text('No Image')),
+                    child: Center(child: Text('-')),
                   ),
         SizedBox(height: 16),
         TextButton.icon(
           onPressed: onImagePicked,
           icon: Icon(Icons.image),
-          label: Text('Change Image'),
+          label: Text('Schimba Imaginea'),
           style: TextButton.styleFrom(
             foregroundColor: Colors.blueGrey[900],
           ),

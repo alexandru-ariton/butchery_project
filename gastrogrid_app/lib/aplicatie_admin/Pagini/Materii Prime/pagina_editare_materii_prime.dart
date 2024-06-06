@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:GastroGrid/aplicatie_admin/Pagini/Materii%20Prime/componente/image_picker_widget.dart';
 import 'package:GastroGrid/aplicatie_admin/Pagini/Materii%20Prime/componente/raw_material_actions.dart';
@@ -13,7 +14,8 @@ class EditRawMaterialPage extends StatefulWidget {
   final String? currentUnit;
   final String? currentImageUrl;
 
-  const EditRawMaterialPage({super.key, 
+  const EditRawMaterialPage({
+    super.key,
     this.rawMaterialId,
     this.currentName,
     this.currentQuantity,
@@ -45,49 +47,42 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
     _selectedUnit = widget.currentUnit ?? 'kg'; // Default unit
   }
 
-  Future<void> _pickImage() async {
-    final html.FileUploadInputElement input = html.FileUploadInputElement()..accept = 'image/*';
-    input.click();
-    input.onChange.listen((event) {
-      final file = input.files!.first;
-      final reader = html.FileReader();
-      reader.readAsDataUrl(file);
-      reader.onLoadEnd.listen((event) {
-        if (reader.result is String) {
-          setState(() {
-            final result = reader.result as String;
-            _imageData = base64StringToUint8List(result.split(',').last);
-          });
-        }
-      });
-    });
-  }
-
-  void _saveRawMaterial() async {
+  Future<void> _saveRawMaterial() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      String imageUrl = await uploadImage(widget.rawMaterialId ?? '', _imageData, widget.currentImageUrl);
+      double newQuantity = double.parse(_quantityController.text);
+      double updatedQuantity = newQuantity;
 
-      int newQuantity = int.parse(_quantityController.text);
+      if (widget.rawMaterialId != null) {
+        // Fetch the existing raw material to get its current quantity
+        DocumentSnapshot existingRawMaterial = await FirebaseFirestore.instance
+            .collection('rawMaterials')
+            .doc(widget.rawMaterialId)
+            .get();
+        if (existingRawMaterial.exists) {
+          double currentQuantity = existingRawMaterial['quantity'];
+          updatedQuantity += currentQuantity; // Add new quantity to the existing quantity
+        }
+      }
+
+      String imageUrl = await uploadImage(widget.rawMaterialId ?? '', _imageData, widget.currentImageUrl);
 
       if (widget.rawMaterialId == null) {
         // Add new raw material
         await FirebaseFirestore.instance.collection('rawMaterials').add({
           'name': _nameController.text,
-          'quantity': newQuantity,
+          'quantity': updatedQuantity,
           'unit': _selectedUnit,
-          'imageUrl': imageUrl,
         });
       } else {
         // Update existing raw material
         await FirebaseFirestore.instance.collection('rawMaterials').doc(widget.rawMaterialId).update({
           'name': _nameController.text,
-          'quantity': newQuantity,
+          'quantity': updatedQuantity,
           'unit': _selectedUnit,
-          'imageUrl': imageUrl,
         });
       }
 
@@ -103,45 +98,57 @@ class _EditRawMaterialPageState extends State<EditRawMaterialPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Raw Material'),
+        title: Text('Editeaza'),
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    RawMaterialForm(
-                      nameController: _nameController,
-                      quantityController: _quantityController,
-                      selectedUnit: _selectedUnit,
-                      onUnitChanged: (newValue) {
-                        setState(() {
-                          _selectedUnit = newValue!;
-                        });
-                      },
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(32.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                    SizedBox(height: 16),
-                    ImagePickerWidget(
-                      imageData: _imageData,
-                      imageUrl: widget.currentImageUrl,
-                      onImagePicked: _pickImage,
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _saveRawMaterial,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, 
-                        backgroundColor: Colors.green,
-                        minimumSize: Size(double.infinity, 50),
+                    child: Form(
+                      key: _formKey,
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            RawMaterialForm(
+                              nameController: _nameController,
+                              quantityController: _quantityController,
+                              selectedUnit: _selectedUnit,
+                              onUnitChanged: (newValue) {
+                                setState(() {
+                                  _selectedUnit = newValue!;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _saveRawMaterial,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.green,
+                                minimumSize: Size(double.infinity, 50),
+                              ),
+                              child: Text('Salveaza'),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Text('Save Raw Material'),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
     );
   }

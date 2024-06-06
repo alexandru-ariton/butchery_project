@@ -13,7 +13,7 @@ class PaymentButton extends StatelessWidget {
 
   // Actualizează statusul plății în baza de date
   await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-    'paymentStatus': 'Paid'
+    'paymentStatus': 'Platit'
   });
 
   // După confirmarea plății, întoarce-te și transmite un mesaj de succes
@@ -38,7 +38,7 @@ class PaymentButton extends StatelessWidget {
         children: const [
           Icon(Icons.payment),
           SizedBox(width: 10),
-          Text('Confirmă Plată'),
+          Text('Confirma Plata'),
         ],
       ),
     );

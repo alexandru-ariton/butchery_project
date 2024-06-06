@@ -59,7 +59,7 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Price: ${item.product.price.toStringAsFixed(2)} lei',
+                    'Pret: ${item.product.price.toStringAsFixed(2)} lei',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -67,7 +67,7 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Quantity: ${item.quantity}',
+                    'Cantitate: ${item.quantity}',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],

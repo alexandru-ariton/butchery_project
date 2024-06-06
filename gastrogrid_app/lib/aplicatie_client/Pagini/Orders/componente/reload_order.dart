@@ -18,6 +18,6 @@ void reloadOrder(BuildContext context, List<dynamic> items) {
     }
   }
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Produsele au fost adăugate în coș')),
+    SnackBar(content: Text('Produsele au fost adaugate în cos')),
   );
 }

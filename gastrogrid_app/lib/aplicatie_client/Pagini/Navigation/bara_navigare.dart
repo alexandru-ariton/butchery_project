@@ -49,7 +49,7 @@ class _BaraNavigareState extends State<BaraNavigare> {
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home, size: 30),
-              label: 'Acasă',
+              label: 'Acasa',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt, size: 30),
@@ -57,7 +57,7 @@ class _BaraNavigareState extends State<BaraNavigare> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.shopping_cart, size: 30),
-              label: 'Coș',
+              label: 'Cos',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person, size: 30),

@@ -39,7 +39,7 @@ class LowStockNotificationPage extends StatelessWidget {
           }).toList();
 
           if (notifications.isEmpty) {
-            return Center(child: Text('No low stock notifications', style: TextStyle(fontSize: 18)));
+            return Center(child: Text('-', style: TextStyle(fontSize: 18)));
           }
 
           return ListView(children: notifications);

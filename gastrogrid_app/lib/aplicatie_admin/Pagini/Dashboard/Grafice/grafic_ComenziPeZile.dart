@@ -21,7 +21,7 @@ class DailyOrdersChart extends StatelessWidget {
 
         var series = [
           charts.Series<MapEntry<DateTime, int>, DateTime>(
-            id: 'DailyOrders',
+            id: 'Comenzi pe Zile',
             domainFn: (MapEntry<DateTime, int> entry, _) => entry.key,
             measureFn: (MapEntry<DateTime, int> entry, _) => entry.value,
             data: dailyOrders.entries.toList(),
@@ -40,7 +40,7 @@ class DailyOrdersChart extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Daily Orders',
+                    'Comenzi pe Zile',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
@@ -51,12 +51,12 @@ class DailyOrdersChart extends StatelessWidget {
                       dateTimeFactory: const charts.LocalDateTimeFactory(),
                       behaviors: [
                         charts.ChartTitle(
-                          'Date',
+                          'Data',
                           behaviorPosition: charts.BehaviorPosition.bottom,
                           titleOutsideJustification: charts.OutsideJustification.middleDrawArea,
                         ),
                         charts.ChartTitle(
-                          'Number of Orders',
+                          'Numar Comenzi',
                           behaviorPosition: charts.BehaviorPosition.start,
                           titleOutsideJustification: charts.OutsideJustification.middleDrawArea,
                         ),

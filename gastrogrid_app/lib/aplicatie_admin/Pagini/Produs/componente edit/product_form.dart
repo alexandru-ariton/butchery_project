@@ -20,14 +20,14 @@ class ProductForm extends StatelessWidget {
         TextFormField(
           controller: titleController,
           decoration: InputDecoration(
-            labelText: 'Product Title',
+            labelText: 'Denumire Produs',
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Colors.grey[200],
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a product title';
+              return 'Introdu denumirea produsului';
             }
             return null;
           },
@@ -36,7 +36,7 @@ class ProductForm extends StatelessWidget {
         TextFormField(
           controller: priceController,
           decoration: InputDecoration(
-            labelText: 'Product Price',
+            labelText: 'Pret',
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Colors.grey[200],
@@ -44,10 +44,10 @@ class ProductForm extends StatelessWidget {
           keyboardType: TextInputType.number,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a product price';
+              return 'Introdu pretul';
             }
             if (double.tryParse(value) == null) {
-              return 'Please enter a valid number';
+              return 'Valoare invalida';
             }
             return null;
           },
@@ -56,7 +56,7 @@ class ProductForm extends StatelessWidget {
         TextFormField(
           controller: descriptionController,
           decoration: InputDecoration(
-            labelText: 'Product Description',
+            labelText: 'Descriere',
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Colors.grey[200],
@@ -64,7 +64,7 @@ class ProductForm extends StatelessWidget {
           maxLines: 4,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a product description';
+              return 'Introdu o descriere';
             }
             return null;
           },
@@ -73,7 +73,7 @@ class ProductForm extends StatelessWidget {
         TextFormField(
           controller: quantityController,
           decoration: InputDecoration(
-            labelText: 'Product Quantity',
+            labelText: 'Cantitate',
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Colors.grey[200],
@@ -81,10 +81,10 @@ class ProductForm extends StatelessWidget {
           keyboardType: TextInputType.number,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a product quantity';
+              return 'Introdu cantitatea';
             }
             if (int.tryParse(value) == null) {
-              return 'Please enter a valid number';
+              return 'Valoare invalida';
             }
             return null;
           },

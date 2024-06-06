@@ -12,7 +12,7 @@ class PaymentPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Plată'),
+        title: Text('Plata'),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
@@ -29,7 +29,7 @@ class PaymentPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Text(
-                    'Plătește ${amount.toStringAsFixed(2)} lei cu cardul',
+                    'Plateste ${amount.toStringAsFixed(2)} lei cu cardul',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

@@ -29,7 +29,7 @@ Future<void> login(String email, String password) async {
     bool adminExists = await isUserInCollection(email, 'admin_users');
     
     if (!userExists && !adminExists) {
-      throw 'Utilizatorul nu există.';
+      throw 'Utilizatorul nu exista.';
     }
 
     String collection = userExists ? 'users' : 'admin_users';

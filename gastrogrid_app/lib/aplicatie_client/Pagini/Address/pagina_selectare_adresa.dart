@@ -134,7 +134,7 @@ class _AddressSelectorState extends State<AddressSelector> {
                 saveAddress(manualAddressController.text, context);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Please enter an address")),
+                  SnackBar(content: Text("Introdu adresa")),
                 );
               }
             },

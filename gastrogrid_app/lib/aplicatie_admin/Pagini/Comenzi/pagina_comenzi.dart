@@ -9,12 +9,11 @@ class OrderManagement extends StatelessWidget {
     await FirebaseFirestore.instance.collection('orders').doc(id).delete();
   }
 
-  void _updateOrderStatus(String orderId, String newStatus, String userId) async {
+  void _updateOrderStatus(String orderId, String newStatus) async {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': newStatus});
-
     } catch (e) {
-      print("Failed to update order status: $e");
+      print("Nu s-a putut incarca status-ul comenzii: $e");
     }
   }
 
@@ -22,13 +21,15 @@ class OrderManagement extends StatelessWidget {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'paymentStatus': newStatus});
     } catch (e) {
-      print("Failed to update payment status: $e");
+      print("Nu s-a putut incarca status-ul platii: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+     
+      backgroundColor: Colors.grey[200],
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('orders').snapshots(),
         builder: (context, snapshot) {
@@ -46,76 +47,113 @@ class OrderManagement extends StatelessWidget {
                 var orderId = order.id;
                 var orderData = order.data() as Map<String, dynamic>;
 
-                String currentOrderStatus = orderData['status'] ?? 'Pending';
-                String currentPaymentStatus = orderData['paymentStatus'] ?? 'Unpaid';
-                String userId = orderData['userId'] ?? ''; // Asumând că userId este stocat în orderData
+                String currentOrderStatus = orderData['status'] ?? 'In asteptare';
+                String currentPaymentStatus = orderData['paymentStatus'] ?? 'Neplatit';
 
-                if (!['Pending', 'In Progress', 'Completed'].contains(currentOrderStatus)) {
-                  currentOrderStatus = 'Pending'; // Setează valoarea implicită
+                if (!['In asteptare', 'In curs de procesare', 'Finalizata'].contains(currentOrderStatus)) {
+                  currentOrderStatus = 'In asteptare';
                 }
 
-                if (!['Paid', 'Unpaid'].contains(currentPaymentStatus)) {
-                  currentPaymentStatus = 'Unpaid'; // Setează valoarea implicită
+                if (!['Platit', 'Neplatit'].contains(currentPaymentStatus)) {
+                  currentPaymentStatus = 'Neplatit';
                 }
 
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    title: Text('Order $orderId', style: TextStyle(fontSize: 18)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Status: $currentOrderStatus', style: TextStyle(fontSize: 16)),
-                        Text('Payment Status: $currentPaymentStatus', style: TextStyle(fontSize: 16)),
-                        Text('Total: ${orderData['total'] ?? 'Unknown'} lei', style: TextStyle(fontSize: 16)),
-                        _buildOrderItems(orderData['items'] ?? []),
-                      ],
-                    ),
-                    trailing: SizedBox(
-                      width: 300, // Ajustează lățimea pentru a se potrivi conținutului
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          DropdownButton<String>(
-                            value: currentOrderStatus,
-                            items: ['Pending', 'In Progress', 'Completed']
-                                .map((status) => DropdownMenuItem(
-                                      value: status,
-                                      child: Text(status, style: TextStyle(fontSize: 16)),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                _updateOrderStatus(orderId, value, userId);
-                              }
-                            },
-                          ),
-                          DropdownButton<String>(
-                            value: currentPaymentStatus,
-                            items: ['Paid', 'Unpaid']
-                                .map((status) => DropdownMenuItem(
-                                      value: status,
-                                      child: Text(status, style: TextStyle(fontSize: 16)),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                _updatePaymentStatus(orderId, value);
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete, size: 24),
-                            onPressed: () => _deleteOrder(orderId),
-                          ),
-                        ],
-                      ),
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 5,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(15),
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => OrderDetailsPage(orderId: orderId, orderData: orderData),
                       ));
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Comanda $orderId',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Status: $currentOrderStatus',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            'Status plata: $currentPaymentStatus',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: currentOrderStatus,
+                                  decoration: InputDecoration(
+                                    labelText: 'Status schimbat',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                  items: ['In asteptare', 'In curs de procesare', 'Finalizata']
+                                      .map((status) => DropdownMenuItem(
+                                            value: status,
+                                            child: Text(status, style: TextStyle(fontSize: 16)),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      _updateOrderStatus(orderId, value);
+                                    }
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: currentPaymentStatus,
+                                  decoration: InputDecoration(
+                                    labelText: 'Status plata schimbat',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                  items: ['Platit', 'Neplatit']
+                                      .map((status) => DropdownMenuItem(
+                                            value: status,
+                                            child: Text(status, style: TextStyle(fontSize: 16)),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      _updatePaymentStatus(orderId, value);
+                                    }
+                                  },
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, size: 24, color: Colors.red),
+                                onPressed: () => _deleteOrder(orderId),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },
@@ -123,22 +161,6 @@ class OrderManagement extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildOrderItems(List<dynamic> items) {
-    if (items.isEmpty) {
-      return Text('No items found.', style: TextStyle(fontSize: 16));
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: items.map((item) {
-        var productData = item['product'] ?? {};
-        var productName = productData['title'] ?? 'Unknown Product';
-        var quantity = item['quantity'] ?? 'Unknown Quantity';
-        return Text('$productName x $quantity', style: TextStyle(fontSize: 16));
-      }).toList(),
     );
   }
 }

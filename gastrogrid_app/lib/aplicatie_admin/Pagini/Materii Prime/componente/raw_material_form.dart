@@ -6,7 +6,8 @@ class RawMaterialForm extends StatelessWidget {
   final String? selectedUnit;
   final ValueChanged<String?> onUnitChanged;
 
-  const RawMaterialForm({super.key, 
+  const RawMaterialForm({
+    super.key,
     required this.nameController,
     required this.quantityController,
     required this.selectedUnit,
@@ -20,14 +21,14 @@ class RawMaterialForm extends StatelessWidget {
         TextFormField(
           controller: nameController,
           decoration: InputDecoration(
-            labelText: 'Raw Material Name',
+            labelText: 'Denumire',
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Colors.grey[200],
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a raw material name';
+              return 'Introdu denumirea';
             }
             return null;
           },
@@ -39,7 +40,7 @@ class RawMaterialForm extends StatelessWidget {
               child: TextFormField(
                 controller: quantityController,
                 decoration: InputDecoration(
-                  labelText: 'Raw Material Quantity',
+                  labelText: 'Cantitate',
                   border: OutlineInputBorder(),
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -47,25 +48,33 @@ class RawMaterialForm extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a raw material quantity';
+                    return 'Introdu cantitatea';
                   }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
+                  if (double.tryParse(value) == null) {
+                    return 'Numarul nu este valid';
                   }
                   return null;
                 },
               ),
             ),
             SizedBox(width: 16),
-            DropdownButton<String>(
-              value: selectedUnit,
-              items: <String>['kg', 'litrii'].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: onUnitChanged,
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: selectedUnit,
+                decoration: InputDecoration(
+                  labelText: 'Unitate de Masura',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                ),
+                items: <String>['kg', 'l'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: onUnitChanged,
+              ),
             ),
           ],
         ),

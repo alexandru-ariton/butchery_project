@@ -12,21 +12,21 @@ class UserDetails extends StatelessWidget {
       future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Text('Loading user details...', style: TextStyle(fontSize: 16));
+          return Text('Incarca detaliile client-ului...', style: TextStyle(fontSize: 16));
         }
 
         var userData = snapshot.data!.data() as Map<String, dynamic>?;
         if (userData == null) {
-          return Text('No user details available.', style: TextStyle(fontSize: 16));
+          return Text('Detaliile clientului nu au putut fi gasite.', style: TextStyle(fontSize: 16));
         }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildOrderDetailRow('Name:', userData['username'] ?? 'Unknown'),
-            _buildOrderDetailRow('Email:', userData['email'] ?? 'Unknown'),
-            _buildOrderDetailRow('Phone:', userData['phoneNumber'] ?? 'Unknown'),
-            _buildOrderDetailRow('Address:', userData['address'] ?? 'Unknown'),
+            _buildOrderDetailRow('Nume:', userData['username'] ?? '-'),
+            _buildOrderDetailRow('Email:', userData['email'] ?? '-'),
+            _buildOrderDetailRow('Telefon:', userData['phoneNumber'] ?? '-'),
+            _buildOrderDetailRow('Adresa:', userData['address'] ?? '-'),
           ],
         );
       },

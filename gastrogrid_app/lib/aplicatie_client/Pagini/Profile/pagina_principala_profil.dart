@@ -42,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _username = userDoc['username'];
         }else {
 
-          _username = 'N/A';
+          _username = '-';
 
         }
       });
@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             SizedBox(height: 10),
             Text(
-              _username ?? 'N/A',
+              _username ?? '-',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -96,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('User ID not found'),
+                          content: Text('User ID nu a putut fi gasit'),
                         ));
                       }
                     },

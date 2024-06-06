@@ -18,7 +18,7 @@ class CardList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return cards.isEmpty
-        ? Center(child: Text('Nu aveți carduri adăugate.'))
+        ? Center(child: Text('Nu ai carduri adaugate.'))
         : ListView.builder(
             itemCount: cards.length,
             itemBuilder: (context, index) {

@@ -13,7 +13,15 @@ class OrderDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Order Details')),
+      appBar: AppBar(
+        title: Text('Detalii Comanda'),
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            Navigator.pop(context);
+            },
+          ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Card(
@@ -25,27 +33,24 @@ class OrderDetailsPage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ListView(
               children: [
-                _buildOrderDetailRow('Order ID:', orderId),
+                _buildOrderDetailRow('ID Comanda:', orderId),
                 _buildOrderDetailRow('Status:', orderData['status'] ?? 'Unknown'),
                 _buildOrderDetailRow('Total:', '${orderData['total'] ?? 'Unknown'} lei'),
                 SizedBox(height: 16),
-                Text('Items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Produse:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 OrderItems(orderItems: orderData['items'] ?? []),
                 SizedBox(height: 16),
-                _buildOrderDetailRow('Address:', orderData['address'] ?? 'No address provided'),
-                _buildOrderDetailRow('Payment Method:', orderData['paymentMethod'] ?? 'Unknown'),
+                _buildOrderDetailRow('Adresa:', orderData['address'] ?? 'No address provided'),
+                _buildOrderDetailRow('Modalitatea de plata:', orderData['paymentMethod'] ?? 'Unknown'),
                 SizedBox(height: 16),
-                Text('User Details:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Detalii Client:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 UserDetails(userId: orderData['userId']),
                 SizedBox(height: 16),
                 Center(
                   child: ElevatedButton(
                     onPressed: () => generateAndViewPDF(context, orderId, orderData),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    ),
-                    child: Text('Print Receipt', style: TextStyle(fontSize: 18)),
+                   
+                    child: Text('Printeaza Chitanta', style: TextStyle(fontSize: 18)),
                   ),
                 ),
               ],

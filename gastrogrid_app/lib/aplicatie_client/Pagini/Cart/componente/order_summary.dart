@@ -37,7 +37,7 @@ class OrderSummary extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildSummaryLine(context, 'Produse în coș:', '${cart.totalItemsQuantity}'),
+            _buildSummaryLine(context, 'Produse în cos:', '${cart.totalItemsQuantity}'),
             _buildSummaryLine(context, 'Subtotal:', '${cart.total.toStringAsFixed(2)} lei'),
             _buildSummaryLine(context, 'Livrare:', cart.items.isEmpty ? '0 lei' : '${deliveryFee.toStringAsFixed(2)} lei'),
             Divider(),
@@ -53,7 +53,7 @@ class OrderSummary extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'FINALIZEAZĂ COMANDA',
+                  'FINALIZEAZA COMANDA',
                   style: TextStyle(color: themeProvider.themeData.colorScheme.onSurface, fontSize: 16),
                 ),
               ),

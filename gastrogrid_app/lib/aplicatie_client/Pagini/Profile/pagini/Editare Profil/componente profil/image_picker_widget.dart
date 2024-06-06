@@ -27,7 +27,7 @@ class ImagePickerWidget extends StatelessWidget {
             final pickedFile = await picker.pickImage(source: ImageSource.gallery);
             onImagePicked(pickedFile);
           },
-          child: Text('Change Image'),
+          child: Text('Schimba Imaginea'),
         ),
       ],
     );

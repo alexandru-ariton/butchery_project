@@ -27,7 +27,7 @@ class PaginaSetari extends StatelessWidget {
                 color: themeProvider.isDarkMode ? Colors.amber : Colors.blue,
               ),
               title: Text(
-                'Mod Întunecat',
+                'Mod Intunecat',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
               trailing: Switch(

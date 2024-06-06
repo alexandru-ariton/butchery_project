@@ -21,7 +21,7 @@ class MonthlyRevenueChart extends StatelessWidget {
 
         var series = [
           charts.Series<MapEntry<String, double>, String>(
-            id: 'MonthlyRevenue',
+            id: 'Incasari Lunare',
             domainFn: (MapEntry<String, double> entry, _) => entry.key,
             measureFn: (MapEntry<String, double> entry, _) => entry.value,
             data: monthlyRevenue.entries.toList(),
@@ -40,7 +40,7 @@ class MonthlyRevenueChart extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Monthly Revenue',
+                    'Incasari Lunare',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
@@ -56,14 +56,14 @@ class MonthlyRevenueChart extends StatelessWidget {
                       ),
                       behaviors: [
                         charts.ChartTitle(
-                          'Month',
+                          'Luna',
                           behaviorPosition: charts.BehaviorPosition.bottom,
                           titleOutsideJustification: charts.OutsideJustification.middleDrawArea,
                           innerPadding: 16,
                           titleStyleSpec: charts.TextStyleSpec(fontSize: 14),
                         ),
                         charts.ChartTitle(
-                          'Revenue',
+                          'Total Incasari',
                           behaviorPosition: charts.BehaviorPosition.start,
                           titleOutsideJustification: charts.OutsideJustification.middleDrawArea,
                           innerPadding: 16,

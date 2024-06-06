@@ -40,13 +40,13 @@ Future<void> saveProfile(
       }, SetOptions(merge: true));
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully!')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profil editat')));
       });
 
       Navigator.pop(context, true);
     } catch (e) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Eroare: $e')));
       });
     }
   }
@@ -64,7 +64,7 @@ Future<String?> uploadImage(BuildContext context, String userId, File? image, St
     return existingPhotoUrl;
   } catch (e) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Eroare imagine: $e')));
     });
     return null;
   }

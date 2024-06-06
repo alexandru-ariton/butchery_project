@@ -10,7 +10,17 @@ class OrderLineChart extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('orders').snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Eroare'));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text('-'));
+        }
 
         Map<String, int> orderCounts = {};
         for (var doc in snapshot.data!.docs) {
@@ -25,7 +35,7 @@ class OrderLineChart extends StatelessWidget {
             aspectRatio: 1.5,
             child: OrderLineChartWidget(
               data: orderCounts,
-              startDate: DateTime.now().subtract(Duration(days: 30)),
+              startDate: DateTime.now().subtract(Duration(days: 7)),
               endDate: DateTime.now(),
             ),
           ),
@@ -40,7 +50,8 @@ class OrderLineChartWidget extends StatelessWidget {
   final DateTime startDate;
   final DateTime endDate;
 
-  const OrderLineChartWidget({super.key, 
+  const OrderLineChartWidget({
+    super.key,
     required this.data,
     required this.startDate,
     required this.endDate,
@@ -64,8 +75,8 @@ class OrderLineChartWidget extends StatelessWidget {
             getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
               final date = startDate.add(Duration(days: spot.x.toInt()));
               return LineTooltipItem(
-                '${date.day}/${date.month}: ${spot.y.toInt()} orders',
-                TextStyle(color: Colors.white),
+                '${date.day}/${date.month}: ${spot.y.toInt()} comenzi',
+                TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
               );
             }).toList(),
           ),
@@ -83,6 +94,7 @@ class OrderLineChartWidget extends StatelessWidget {
         titlesData: FlTitlesData(
           show: true,
           bottomTitles: AxisTitles(
+            axisNameWidget: Text('Data', style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
@@ -90,33 +102,53 @@ class OrderLineChartWidget extends StatelessWidget {
               getTitlesWidget: (value, meta) {
                 final date = startDate.add(Duration(days: value.toInt()));
                 return Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: Text('${date.day}/${date.month}', style: TextStyle(color: Colors.black, fontSize: 10)),
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text('${date.day}/${date.month}', style: TextStyle(color: Colors.black, fontSize: 12)),
                 );
               },
             ),
           ),
           leftTitles: AxisTitles(
+            axisNameWidget: Text('Comenzi', style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
             sideTitles: SideTitles(
               showTitles: true,
+              reservedSize: 40,
+              interval: 1,
               getTitlesWidget: (value, meta) {
-                return Text('${value.toInt()}', style: TextStyle(color: Colors.black, fontSize: 10));
+                return Padding(
+                  padding: const EdgeInsets.only(right: 5.0),
+                  child: Text('${value.toInt()}', style: TextStyle(color: Colors.black, fontSize: 12)),
+                );
               },
             ),
           ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
-        borderData: FlBorderData(show: true),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(color: Colors.black, width: 1),
+        ),
         minX: 0,
         maxX: endDate.difference(startDate).inDays.toDouble(),
         minY: 0,
-        maxY: data.values.reduce((a, b) => a > b ? a : b).toDouble() + 1,
+        maxY: (data.values.isNotEmpty ? data.values.reduce((a, b) => a > b ? a : b).toDouble() : 0) + 1,
         lineBarsData: [
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            color: Colors.blue,
-            barWidth: 4,
-            belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
+            color: Colors.blueAccent,
+            barWidth: 3,
+            belowBarData: BarAreaData(show: true, color: Colors.blueAccent.withOpacity(0.2)),
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) =>
+                  FlDotCirclePainter(radius: 3, color: Colors.blue, strokeWidth: 2, strokeColor: Colors.black),
+            ),
           ),
         ],
       ),

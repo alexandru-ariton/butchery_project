@@ -90,7 +90,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
                       bool exists = await userExists(email);
                       if (!exists) {
                         setState(() {
-                          errorMessage = 'Utilizatorul nu există.';
+                          errorMessage = 'Utilizatorul nu exista.';
                         });
                         return;
                       }
@@ -104,13 +104,13 @@ class _PaginaLoginState extends State<PaginaLogin> {
                       if (isAdminUser && !kIsWeb) {
                         // Admin trying to log in on mobile
                         setState(() {
-                          errorMessage = 'Admin login is not allowed on mobile devices.';
+                          errorMessage = 'Adminii nu se pot inregistra pe telefon.';
                         });
                         await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
                       } else if (!isAdminUser && kIsWeb) {
                         // User trying to log in on web
                         setState(() {
-                          errorMessage = 'User login is not allowed on web.';
+                          errorMessage = 'Userii nu se pot inregistra pe web.';
                         });
                         await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
                       } else if (isAdminUser) {
@@ -122,7 +122,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
                       } else {
                         // Regular user login
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Autentificare reușită")),
+                          SnackBar(content: Text("Autentificare reusita")),
                         );
                         Navigator.pushReplacement(
                           context,
@@ -154,7 +154,7 @@ class _PaginaLoginState extends State<PaginaLogin> {
                     }
                   },
                   child: Text(
-                    kIsWeb ? "" : "Nu ai un cont? Înregistrează-te aici",
+                    kIsWeb ? "" : "Nu ai un cont? Inregistreaza-te aici",
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),

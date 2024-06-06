@@ -66,7 +66,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
           'zipCode': _zipCodeController.text,
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Adresa a fost salvată cu succes!')),
+          SnackBar(content: Text('Adresa a fost salvata')),
         );
         Navigator.pop(context, true);
       } catch (e) {
@@ -76,7 +76,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User ID sau Address ID lipsește')),
+        SnackBar(content: Text('User ID sau Address ID lipseste')),
       );
     }
   }
@@ -91,17 +91,17 @@ class _EditAddressPageState extends State<EditAddressPage> {
             .doc(widget.addressId);
         await docRef.delete();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Adresa a fost ștearsă cu succes!')),
+          SnackBar(content: Text('Adresa a fost stearsă')),
         );
         Navigator.pop(context, true);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Eroare la ștergerea adresei: $e')),
+          SnackBar(content: Text('Eroare la stergerea adresei: $e')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User ID sau Address ID lipsește')),
+        SnackBar(content: Text('User ID sau Address ID lipseste')),
       );
     }
   }
@@ -119,7 +119,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editează Adresa'),
+        title: Text('Editeaza Adresa'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -132,17 +132,17 @@ class _EditAddressPageState extends State<EditAddressPage> {
             SizedBox(height: 10),
             TextField(
               controller: _cityController,
-              decoration: InputDecoration(labelText: 'Oraș'),
+              decoration: InputDecoration(labelText: 'Oras'),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _stateController,
-              decoration: InputDecoration(labelText: 'Județ'),
+              decoration: InputDecoration(labelText: 'Judet'),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _zipCodeController,
-              decoration: InputDecoration(labelText: 'Cod poștal'),
+              decoration: InputDecoration(labelText: 'Cod postal'),
             ),
             SizedBox(height: 20),
             Row(
@@ -150,12 +150,12 @@ class _EditAddressPageState extends State<EditAddressPage> {
               children: [
                 ElevatedButton(
                   onPressed: _saveAddress,
-                  child: Text('Salvează'),
+                  child: Text('Salveaza'),
                 ),
                 ElevatedButton(
                   onPressed: _removeAddress,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: Text('Șterge'),
+                  child: Text('Sterge'),
                 ),
               ],
             ),

@@ -65,7 +65,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
 
     if (optionsProvider.selectedAddress == null || optionsProvider.selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select an address and a payment method")),
+        SnackBar(content: Text("Selecteaza ori o adresa ori o modalitate de plata")),
       );
       return;
     }
@@ -105,7 +105,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             if (paymentSuccess == true) {
               await orderRef.update({'status': 'Paid'});
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Plata a fost efectuată cu succes")),
+                SnackBar(content: Text("Plata a fost efectuata cu succes")),
               );
               cart.clear();
               optionsProvider.clear();
@@ -114,25 +114,25 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               });
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Plata a eșuat")),
+                SnackBar(content: Text("Plata a esuat")),
               );
             }
           });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Order finalized successfully")),
+            SnackBar(content: Text("Comanda Finalizata")),
           );
           cart.clear();
           optionsProvider.clear();
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to finalize order: $e")),
+          SnackBar(content: Text("Eroare la finalizarea comenzii: $e")),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("You must be logged in to finalize an order")),
+        SnackBar(content: Text("-")),
       );
     }
   }
@@ -149,7 +149,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     return Scaffold(
       backgroundColor: themeProvider.themeData.colorScheme.surface,
       appBar: AppBar(
-        title: Center(child: Text('Shopping Cart')),
+        title: Center(child: Text('Cart')),
       ),
       body: Column(
         children: [
@@ -160,7 +160,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             ),
           ),
           ExpandableSection(
-            title: 'Selectați adresa de livrare',
+            title: 'Selecteaza adresa de livrare',
             content: DeliveryInfoSection(
               deliveryInfo: deliveryInfo,
               optionsProvider: optionsProvider,
@@ -168,7 +168,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             ),
           ),
           ExpandableSection(
-            title: 'Selectați metoda de plată',
+            title: 'Selecteaza metoda de plata',
             content: PaymentMethodSection(
               optionsProvider: optionsProvider,
               onSelectPaymentMethod: (method) => _selectPaymentMethod(context, method),
@@ -184,7 +184,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                   finalizeOrder(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please select an address and a payment method")),
+                    SnackBar(content: Text("Selecteeaza o adresa si o modalitate de plata")),
                   );
                 }
               },

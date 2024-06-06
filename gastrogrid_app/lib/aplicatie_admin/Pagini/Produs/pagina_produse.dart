@@ -123,7 +123,7 @@ class ProductManagement extends StatelessWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('Quantity: ${product['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
+                            child: Text('Cantitate: ${product['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
                           ),
                           ButtonBar(
                             alignment: MainAxisAlignment.end,
@@ -144,11 +144,11 @@ class ProductManagement extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                child: Text('Edit', style: TextStyle(fontSize: fontSize * 0.8)),
+                                child: Text('Editeaza', style: TextStyle(fontSize: fontSize * 0.8)),
                               ),
                               TextButton(
                                 onPressed: () => _deleteProduct(product.id),
-                                child: Text('Delete', style: TextStyle(fontSize: fontSize * 0.8)),
+                                child: Text('Sterge', style: TextStyle(fontSize: fontSize * 0.8)),
                               ),
                             ],
                           ),

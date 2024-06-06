@@ -155,7 +155,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
       body: savedAddresses.isEmpty
           ? Center(
               child: Text(
-                'Nu aveți adrese salvate.',
+                'Nu ai adrese salvate',
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
             )

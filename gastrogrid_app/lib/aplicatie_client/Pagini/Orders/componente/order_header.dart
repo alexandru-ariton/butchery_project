@@ -13,7 +13,7 @@ class OrderHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Comandă #$orderId',
+          'Comanda #$orderId',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

@@ -37,7 +37,7 @@ class SearchWidget extends StatelessWidget {
             child: TextFormField(
               controller: searchController,
               decoration: InputDecoration(
-                hintText: 'Search by street, city, or state',
+                hintText: 'Cauta adresa',
                 prefixIcon: Icon(Icons.search, color: themeProvider.themeData.colorScheme.primary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
