@@ -10,7 +10,8 @@ class ProfileForm extends StatelessWidget {
   final VoidCallback onSelectAddress;
   final VoidCallback onSelectDate;
 
-  const ProfileForm({super.key, 
+  const ProfileForm({
+    super.key,
     required this.nameController,
     required this.phoneController,
     required this.addressController,
@@ -55,7 +56,7 @@ class ProfileForm extends StatelessWidget {
         ),
         SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: gender,
+          value: gender != null && ['Masculin', 'Feminin', 'Neutru'].contains(gender) ? gender : null,
           decoration: InputDecoration(labelText: 'Gen', prefixIcon: Icon(Icons.person_outline)),
           items: ['Masculin', 'Feminin', 'Neutru'].map((String value) {
             return DropdownMenuItem<String>(

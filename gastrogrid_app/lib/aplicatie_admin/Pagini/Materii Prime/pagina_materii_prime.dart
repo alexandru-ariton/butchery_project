@@ -25,7 +25,6 @@ class RawMaterialsManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -76,37 +75,41 @@ class RawMaterialsManagement extends StatelessWidget {
                                 fontSize: fontSize * 0.8,
                               ),
                             ),
-                            Spacer(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditRawMaterialPage(
-                                          rawMaterialId: rawMaterial.id,
-                                          currentName: data['name'],
-                                          currentQuantity: data['quantity'].toString(),
-                                          currentUnit: unit,
-                                        ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditRawMaterialPage(
+                                              rawMaterialId: rawMaterial.id,
+                                              currentName: data['name'],
+                                              currentQuantity: data['quantity'].toString(),
+                                              currentUnit: unit,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Editeaza',
+                                        style: TextStyle(fontSize: fontSize * 0.8),
                                       ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'Editeaza',
-                                    style: TextStyle(fontSize: fontSize * 0.8),
-                                  ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => _deleteRawMaterial(rawMaterial.id),
+                                      child: Text(
+                                        'Sterge',
+                                        style: TextStyle(fontSize: fontSize * 0.8),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                TextButton(
-                                  onPressed: () => _deleteRawMaterial(rawMaterial.id),
-                                  child: Text(
-                                    'Sterge',
-                                    style: TextStyle(fontSize: fontSize * 0.8),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
@@ -125,6 +128,5 @@ class RawMaterialsManagement extends StatelessWidget {
         child: Icon(Icons.add, color: Colors.white),
       ),
     );
-    
   }
 }

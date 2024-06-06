@@ -4,7 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'helper/pdf_helper.dart' if (dart.library.html) 'pdf_helper_web.dart';
+import 'pdf_helper.dart' if (dart.library.html) 'pdf_helper_web.dart';
 
 Future<void> generateAndViewPDF(BuildContext context, String orderId, Map<String, dynamic> orderData) async {
   final userId = orderData['userId'];
