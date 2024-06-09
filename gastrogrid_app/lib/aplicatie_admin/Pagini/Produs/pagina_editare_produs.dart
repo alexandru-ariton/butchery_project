@@ -1,14 +1,12 @@
-// ignore_for_file: unused_field
-
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/product_actions.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/product_form.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Produs/componente%20edit/raw_material_list.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/lista_furnizori.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/product_form.dart';
 
 class EditProductPage extends StatefulWidget {
   final String? productId;
@@ -18,7 +16,8 @@ class EditProductPage extends StatefulWidget {
   final String? currentImageUrl;
   final String? currentQuantity;
 
-  const EditProductPage({super.key, 
+  const EditProductPage({
+    super.key,
     this.productId,
     this.currentTitle,
     this.currentPrice,
@@ -40,12 +39,8 @@ class _EditProductPageState extends State<EditProductPage> {
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
-  final Map<String, Map<String, dynamic>> _selectedRawMaterials = {};
-
-  final Map<String, TextEditingController> _rawMaterialControllers = {};
-
-    late Map<String, int> processedRawMaterials;
-
+  final Map<String, Map<String, dynamic>> _selectedSuppliers = {}; // Map pentru furnizori
+  final Map<String, TextEditingController> _supplierControllers = {}; // Controllere pentru furnizori
 
   @override
   void initState() {
@@ -62,8 +57,22 @@ class _EditProductPageState extends State<EditProductPage> {
     if (widget.currentQuantity != null) {
       _quantityController.text = widget.currentQuantity!;
     }
+    _loadSelectedSuppliers();
+  }
 
-    
+  Future<void> _loadSelectedSuppliers() async {
+    if (widget.productId != null) {
+      var suppliersSnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.productId)
+          .collection('suppliers')
+          .get();
+
+      for (var doc in suppliersSnapshot.docs) {
+        _selectedSuppliers[doc.id] = doc.data();
+        _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller'] ?? '');
+      }
+    }
   }
 
   Future<void> _pickImage() async {
@@ -89,35 +98,93 @@ class _EditProductPageState extends State<EditProductPage> {
     return Uint8List.fromList(base64.decode(base64String));
   }
 
- void _saveProduct() async {
-    if (_formKey.currentState!.validate() && _selectedRawMaterials.isNotEmpty) {
+  Future<String> uploadImage(String productId, Uint8List? imageData, String? currentImageUrl) async {
+    if (imageData == null) {
+      return currentImageUrl ?? '';
+    }
+    // Logica de încărcare a imaginii în cloud storage și returnarea URL-ului
+    return 'new_image_url'; // Înlocuiește cu URL-ul real
+  }
+
+  Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, BuildContext context) async {
+    if (productId == null) {
+      // Adaugă un produs nou
+      DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
+        'title': title,
+        'price': price,
+        'description': description,
+        'imageUrl': imageUrl,
+        'quantity': quantity,
+      });
+      return newProductRef;
+    } else {
+      // Actualizează produsul existent
+      DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
+
+      // Obține cantitatea curentă din Firestore
+      DocumentSnapshot productSnapshot = await productRef.get();
+      int currentQuantity = productSnapshot['quantity'];
+
+      // Adaugă cantitatea nouă la cea existentă
+      int newQuantity = currentQuantity + quantity;
+
+      await productRef.update({
+        'title': title,
+        'price': price,
+        'description': description,
+        'imageUrl': imageUrl,
+        'quantity': newQuantity,
+      });
+
+      // Verifică dacă trebuie să adaugi sau să elimini notificarea
+      if (newQuantity < 4) {
+        var supplierData = _selectedSuppliers.values.first; // Presupunem că există cel puțin un furnizor selectat
+        NotificationProviderStoc().addNotification(
+          'Produsul ${_titleController.text} este sub pragul minim de stoc!',
+          productRef.id,
+          supplierData['email'],
+          _titleController.text,
+        );
+      } else {
+        NotificationProviderStoc().removeNotification(productRef.id);
+      }
+
+      return productRef;
+    }
+  }
+
+  Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
+    // Șterge furnizorii existenți și adaugă pe cei noi
+    var existingSuppliers = await productRef.collection('suppliers').get();
+    for (var doc in existingSuppliers.docs) {
+      await doc.reference.delete();
+    }
+
+    for (String supplierId in selectedSuppliers.keys) {
+      await productRef.collection('suppliers').doc(supplierId).set(selectedSuppliers[supplierId]!);
+    }
+  }
+
+  void _saveProduct() async {
+    if (_formKey.currentState!.validate() && _selectedSuppliers.isNotEmpty) { // Verifică dacă sunt selectați furnizori
       setState(() {
         _isLoading = true;
       });
 
-      bool insufficientMaterials = await checkRawMaterials(context, _selectedRawMaterials);
-      if (insufficientMaterials) {
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
       String imageUrl = await uploadImage(widget.productId ?? '', _imageData, widget.currentImageUrl);
 
-      int newQuantity = int.parse(_quantityController.text);
+      int newQuantity = int.parse(_quantityController.text); // Setăm cantitatea nouă
       DocumentReference productRef = await saveOrUpdateProduct(
         widget.productId,
         _titleController.text,
         double.parse(_priceController.text),
         _descriptionController.text,
         imageUrl,
-        newQuantity,
+        newQuantity, // Transmitem cantitatea nouă care trebuie adăugată la cea existentă
         context,
       );
 
-      await saveRawMaterials(productRef, _selectedRawMaterials);
-      await updateRawMaterials(_selectedRawMaterials);
+      await _saveSuppliers(productRef, _selectedSuppliers); // Salvează furnizorii selectați
 
       setState(() {
         _isLoading = false;
@@ -125,13 +192,9 @@ class _EditProductPageState extends State<EditProductPage> {
 
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select at least one raw material')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select at least one supplier')));
     }
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +229,9 @@ class _EditProductPageState extends State<EditProductPage> {
                       onImagePicked: _pickImage,
                     ),
                     SizedBox(height: 16),
-                    RawMaterialList(
-                      rawMaterialControllers: _rawMaterialControllers,
-                      selectedRawMaterials: _selectedRawMaterials,
+                    SupplierList(
+                      supplierControllers: _supplierControllers,
+                      selectedSuppliers: _selectedSuppliers,
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(

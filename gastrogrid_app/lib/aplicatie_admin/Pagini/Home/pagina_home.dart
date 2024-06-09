@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Materii%20Prime/pagina_materii_prime.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Notificari/pagina_notificari.dart';
+import 'package:gastrogrid_app/Autentificare/pagini/pagina_login.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Furnizori/pagina_furnizori.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Notificari/pagina_notificari.dart';
 import '../Produs/pagina_produse.dart';
 import '../Comenzi/pagina_comenzi.dart';
 import '../Dashboard/pagina_dashboard.dart';
@@ -57,7 +57,7 @@ class AdminHome extends StatelessWidget {
             ProductManagement(),
             OrderManagement(),
             LowStockNotificationPage(),
-            RawMaterialsManagement(),
+            SupplierManagementPage(),
           ],
         ),
       ),

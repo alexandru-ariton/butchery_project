@@ -1,5 +1,5 @@
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/Select%20Card/componente%20select/card_details.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/Select%20Card/componente%20select/card_list.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/Select%20Card/componente%20select/card_details.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/Select%20Card/componente%20select/card_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

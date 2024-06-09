@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:GastroGrid/providers/provider_adresa_plata_cart.dart';
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/providers/provider_adresa_plata_cart.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 
 class PaymentMethodSection extends StatelessWidget {
   final SelectedOptionsProvider optionsProvider;

@@ -1,13 +1,13 @@
-import 'package:GastroGrid/aplicatie_client/Pagini/Product/componente/quantity_button.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Product/componente/stock_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:GastroGrid/providers/provider_notificareStoc.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/quantity_button.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/stock_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:GastroGrid/providers/provider_cart.dart';
-import 'package:GastroGrid/clase/clasa_cart.dart';
-import 'package:GastroGrid/clase/clasa_produs.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
+import 'package:gastrogrid_app/providers/provider_cart.dart';
+import 'package:gastrogrid_app/clase/clasa_cart.dart';
+import 'package:gastrogrid_app/clase/clasa_produs.dart';
+
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -38,10 +38,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         int currentStock = productSnapshot['quantity'];
 
         if (currentStock == 0) {
+          await notifyOutOfStock(context, widget.product);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Stoc Epuizat')),
           );
-          notifyOutOfStock(context, widget.product);
           return;
         }
 
@@ -58,11 +58,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         );
 
         // Add the product to the cart
-        await Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem);
+        await Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem, context);
 
         if (currentStock - quantity < 3) {
-          // Notifică clientul și adminul pentru stoc redus
-          notifyLowStock(context, widget.product);
+          // Notifică adminul pentru stoc redus
+          await notifyLowStock(context, widget.product);
         } else {
           // Șterge notificarea dacă stocul este suficient
           Provider.of<NotificationProviderStoc>(context, listen: false).removeNotification(widget.product.id);

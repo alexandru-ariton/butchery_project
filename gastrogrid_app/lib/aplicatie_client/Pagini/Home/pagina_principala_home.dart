@@ -1,9 +1,9 @@
-import 'package:GastroGrid/aplicatie_client/Pagini/Home/componente/product_list.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Home/componente/sliver_app_bar_delegate.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/product_list.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/sliver_app_bar_delegate.dart';
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/butoane_livrare.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/pagina_selectare_adresa.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {

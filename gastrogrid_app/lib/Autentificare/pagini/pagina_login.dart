@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Home/pagina_home.dart';
-import 'package:GastroGrid/providers/provider_autentificare.dart' as customAuth;
-import 'package:GastroGrid/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Home/pagina_home.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Navigation/bara_navigare.dart';
 import 'package:provider/provider.dart';
 import '../componente/my_button.dart';
 import '../componente/my_textfield.dart';

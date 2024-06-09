@@ -3,12 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/pagina_editare_profil.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/componente/profil.dart';
-import 'package:GastroGrid/providers/provider_autentificare.dart' as customAuth;
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/pagina_editare_profil.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/componente/profil.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart' as customAuth;
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {

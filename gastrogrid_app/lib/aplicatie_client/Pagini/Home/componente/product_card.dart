@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/clase/clasa_produs.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Product/pagina_produs.dart';
+import 'package:gastrogrid_app/clase/clasa_produs.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/pagina_produs.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;

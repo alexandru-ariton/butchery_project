@@ -1,19 +1,19 @@
-import 'package:GastroGrid/aplicatie_client/Pagini/Cart/componente/cart_item.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Cart/componente/delivery_info_section.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Cart/componente/expandable_section.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Cart/componente/order_summary.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Cart/componente/payment_method_section.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/cart_item.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/delivery_info_section.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/expandable_section.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/order_summary.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/payment_method_section.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/Payment/pagina_payment.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/Select%20Card/pagina_select_card.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
-import 'package:GastroGrid/providers/provider_adresa_plata_cart.dart';
-import 'package:GastroGrid/providers/provider_cart.dart';
-import 'package:GastroGrid/providers/provider_livrare.dart';
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/Payment/pagina_payment.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/Select%20Card/pagina_select_card.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
+import 'package:gastrogrid_app/providers/provider_adresa_plata_cart.dart';
+import 'package:gastrogrid_app/providers/provider_cart.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 
 class ShoppingCartPage extends StatefulWidget {
   const ShoppingCartPage({super.key});

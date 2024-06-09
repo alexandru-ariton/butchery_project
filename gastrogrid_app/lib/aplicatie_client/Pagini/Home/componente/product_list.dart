@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/clase/clasa_produs.dart';
+import 'package:gastrogrid_app/clase/clasa_produs.dart';
 import 'product_card.dart';
 
 class ProductList extends StatelessWidget {

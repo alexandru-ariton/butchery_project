@@ -1,4 +1,4 @@
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/Payment/componente_payment/payment_button.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/Payment/componente_payment/payment_button.dart';
 import 'package:flutter/material.dart';
 
 class PaymentPage extends StatelessWidget {

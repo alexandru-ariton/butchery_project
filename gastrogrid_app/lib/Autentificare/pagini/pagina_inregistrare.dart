@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/providers/provider_autentificare.dart';
-import 'package:GastroGrid/Autentificare/pagini/pagina_login.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart';
+import 'package:gastrogrid_app/Autentificare/pagini/pagina_login.dart';
 import 'package:provider/provider.dart';
 import '../componente/my_button.dart';
 import '../componente/my_textfield.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
 
 class OrderManagement extends StatelessWidget {
   const OrderManagement({super.key});

@@ -1,6 +1,6 @@
-import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/componente/order_items.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/componente/pdf_generator.dart';
-import 'package:GastroGrid/aplicatie_admin/Pagini/Comenzi/componente/user_details.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/componente/order_items.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/componente/pdf_generator.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/componente/user_details.dart';
 import 'package:flutter/material.dart';
 
 

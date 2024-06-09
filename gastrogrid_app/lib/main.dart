@@ -4,15 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/providers/provider_adresa_plata_cart.dart';
-import 'package:GastroGrid/providers/provider_comenzi.dart';
-import 'package:GastroGrid/providers/provider_notificareStoc.dart';
+import 'package:gastrogrid_app/providers/provider_adresa_plata_cart.dart';
+import 'package:gastrogrid_app/providers/provider_comenzi.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:provider/provider.dart';
-import 'package:GastroGrid/providers/provider_autentificare.dart' as local;
-import 'package:GastroGrid/providers/provider_cart.dart';
-import 'package:GastroGrid/Autentificare/pagini/tranzitor_login_sau_inregistrare.dart';
-import 'package:GastroGrid/providers/provider_livrare.dart';
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/providers/provider_autentificare.dart' as local;
+import 'package:gastrogrid_app/providers/provider_cart.dart';
+import 'package:gastrogrid_app/Autentificare/pagini/tranzitor_login_sau_inregistrare.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'firebase_options.dart';
 
 

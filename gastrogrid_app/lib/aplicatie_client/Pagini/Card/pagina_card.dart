@@ -1,4 +1,4 @@
-import 'package:GastroGrid/aplicatie_client/Pagini/Card/componente/card_form.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/componente/card_form.dart';
 import 'package:flutter/material.dart';
 
 class CardDetailsPage extends StatefulWidget {

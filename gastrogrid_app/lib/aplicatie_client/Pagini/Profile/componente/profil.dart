@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
 class ProfileOption extends StatelessWidget {

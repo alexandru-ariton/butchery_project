@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:GastroGrid/clase/clasa_cart.dart';
-import 'package:GastroGrid/clase/clasa_produs.dart';
-import 'package:GastroGrid/providers/provider_cart.dart';
+import 'package:gastrogrid_app/clase/clasa_cart.dart';
+import 'package:gastrogrid_app/clase/clasa_produs.dart';
+import 'package:gastrogrid_app/providers/provider_cart.dart';
 
 void reloadOrder(BuildContext context, List<dynamic> items) {
   final cartProvider = Provider.of<CartProvider>(context, listen: false);
@@ -14,7 +14,7 @@ void reloadOrder(BuildContext context, List<dynamic> items) {
         product: product,
         quantity: item['quantity'],
       );
-      cartProvider.addProductToCart(cartItem);
+      cartProvider.addProductToCart(cartItem, context);
     }
   }
   ScaffoldMessenger.of(context).showSnackBar(

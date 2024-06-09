@@ -1,4 +1,4 @@
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_place/google_place.dart';
 import 'package:provider/provider.dart';

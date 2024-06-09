@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:GastroGrid/aplicatie_client/Pagini/Address/componente/utils.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Address/componente/widget_mapa.dart';
-import 'package:GastroGrid/aplicatie_client/Pagini/Address/componente/widget_search.dart';
-import 'package:GastroGrid/providers/provider_themes.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/componente/utils.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/componente/widget_mapa.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/componente/widget_search.dart';
+import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';

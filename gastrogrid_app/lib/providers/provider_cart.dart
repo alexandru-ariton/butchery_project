@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_final_fields
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:GastroGrid/clase/clasa_cart.dart';
-import 'package:GastroGrid/providers/provider_notificareStoc.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/stock_notifications.dart';
+import 'package:gastrogrid_app/clase/clasa_cart.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 
 class CartProvider with ChangeNotifier {
   final NotificationProviderStoc notificationProviderStoc;
@@ -13,7 +12,15 @@ class CartProvider with ChangeNotifier {
 
   List<CartItem> get items => _items;
 
-  Future<void> addProductToCart(CartItem cartItem) async {
+  Future<void> addProductToCart(CartItem cartItem, BuildContext context) async {
+    DocumentSnapshot productSnapshot = await FirebaseFirestore.instance.collection('products').doc(cartItem.product.id).get();
+    int currentStock = productSnapshot['quantity'];
+
+    if (currentStock < cartItem.quantity) {
+      notifyOutOfStock(context, cartItem.product);
+      return;
+    }
+
     final existingCartItem = _items.firstWhere(
       (item) => item.product.id == cartItem.product.id,
       orElse: () => CartItem(product: cartItem.product, quantity: 0),
@@ -27,8 +34,13 @@ class CartProvider with ChangeNotifier {
 
     await _updateProductStock(cartItem.product.id, -cartItem.quantity);
 
-    if (cartItem.product.quantity < 3) {
-      notificationProviderStoc.addNotification('Stoc redus pentru ${cartItem.product.title}', cartItem.product.id);
+    if (currentStock - cartItem.quantity < 3) {
+      notificationProviderStoc.addNotification(
+        'Stoc redus pentru ${cartItem.product.title}',
+        cartItem.product.id,
+        cartItem.product.supplierId,
+        cartItem.product.title,
+      );
     }
 
     notifyListeners();
