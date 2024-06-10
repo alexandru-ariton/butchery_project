@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gastrogrid_app/providers/helper_notificari.dart';
 import 'package:gastrogrid_app/providers/provider_adresa_plata_cart.dart';
 import 'package:gastrogrid_app/providers/provider_comenzi.dart';
 import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
@@ -14,6 +15,7 @@ import 'package:gastrogrid_app/Autentificare/pagini/tranzitor_login_sau_inregist
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'firebase_options.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 Future<void> initializeUserDocuments() async {
@@ -44,11 +46,11 @@ Future<void> initializeUserDocuments() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  NotificationHelper.initialize();
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),

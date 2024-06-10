@@ -30,10 +30,7 @@ class _SupplierManagementPageState extends State<SupplierManagementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Manage Suppliers'),
-        backgroundColor: Colors.green,
-      ),
+      
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

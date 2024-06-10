@@ -23,9 +23,7 @@ class LowStockNotificationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Low Stock Notifications'),
-      ),
+      
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('notifications').snapshots(),
         builder: (context, snapshot) {

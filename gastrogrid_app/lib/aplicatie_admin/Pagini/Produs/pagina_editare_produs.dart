@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/lista_furnizori.dart';
@@ -70,7 +71,7 @@ class _EditProductPageState extends State<EditProductPage> {
 
       for (var doc in suppliersSnapshot.docs) {
         _selectedSuppliers[doc.id] = doc.data();
-        _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller'] ?? '');
+        _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller']);
       }
     }
   }
@@ -98,68 +99,61 @@ class _EditProductPageState extends State<EditProductPage> {
     return Uint8List.fromList(base64.decode(base64String));
   }
 
-  Future<String> uploadImage(String productId, Uint8List? imageData, String? currentImageUrl) async {
-    if (imageData == null) {
-      return currentImageUrl ?? '';
-    }
-    // Logica de încărcare a imaginii în cloud storage și returnarea URL-ului
-    return 'new_image_url'; // Înlocuiește cu URL-ul real
+ Future<String> uploadImage(String productId, Uint8List? imageData, String? currentImageUrl) async {
+  if (imageData == null) {
+    return currentImageUrl ?? '';
   }
+  
+  // Create a reference to the location you want to upload the image to
+  final storageRef = FirebaseStorage.instance.ref().child('product_images/$productId.jpg');
 
-  Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, BuildContext context) async {
-    if (productId == null) {
-      // Adaugă un produs nou
-      DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
-        'title': title,
-        'price': price,
-        'description': description,
-        'imageUrl': imageUrl,
-        'quantity': quantity,
-      });
-      return newProductRef;
-    } else {
-      // Actualizează produsul existent
-      DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
+  // Upload the file to Firebase Storage
+  UploadTask uploadTask = storageRef.putData(imageData);
 
-      // Obține cantitatea curentă din Firestore
-      DocumentSnapshot productSnapshot = await productRef.get();
-      int currentQuantity = productSnapshot['quantity'];
+  // Wait for the upload to complete
+  TaskSnapshot snapshot = await uploadTask;
 
-      // Adaugă cantitatea nouă la cea existentă
-      int newQuantity = currentQuantity + quantity;
+  // Get the download URL of the uploaded image
+  String downloadUrl = await snapshot.ref.getDownloadURL();
 
-      await productRef.update({
-        'title': title,
-        'price': price,
-        'description': description,
-        'imageUrl': imageUrl,
-        'quantity': newQuantity,
-      });
+  return downloadUrl;
+}
 
-      // Verifică dacă trebuie să adaugi sau să elimini notificarea
-      if (newQuantity < 4) {
-        var supplierData = _selectedSuppliers.values.first; // Presupunem că există cel puțin un furnizor selectat
-        NotificationProviderStoc().addNotification(
-          'Produsul ${_titleController.text} este sub pragul minim de stoc!',
-          productRef.id,
-          supplierData['email'],
-          _titleController.text,
-        );
-      } else {
-        NotificationProviderStoc().removeNotification(productRef.id);
-      }
+ Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, BuildContext context) async {
+  if (productId == null) {
+    // Add a new product
+    DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
+      'title': title,
+      'price': price,
+      'description': description,
+      'imageUrl': imageUrl,
+      'quantity': quantity,
+    });
+    return newProductRef;
+  } else {
+    // Update the existing product
+    DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
 
-      return productRef;
-    }
+    // Get the current quantity from Firestore
+    DocumentSnapshot productSnapshot = await productRef.get();
+    int currentQuantity = productSnapshot['quantity'];
+
+    // Add the new quantity to the existing one
+    int newQuantity = currentQuantity + quantity;
+
+    await productRef.update({
+      'title': title,
+      'price': price,
+      'description': description,
+      'imageUrl': imageUrl,
+      'quantity': newQuantity,
+    });
+    return productRef;
   }
+}
+
 
   Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
-    // Șterge furnizorii existenți și adaugă pe cei noi
-    var existingSuppliers = await productRef.collection('suppliers').get();
-    for (var doc in existingSuppliers.docs) {
-      await doc.reference.delete();
-    }
-
     for (String supplierId in selectedSuppliers.keys) {
       await productRef.collection('suppliers').doc(supplierId).set(selectedSuppliers[supplierId]!);
     }
@@ -185,6 +179,18 @@ class _EditProductPageState extends State<EditProductPage> {
       );
 
       await _saveSuppliers(productRef, _selectedSuppliers); // Salvează furnizorii selectați
+
+      if (newQuantity < 4) {
+        var supplierData = _selectedSuppliers.values.first; // Presupunem că există cel puțin un furnizor selectat
+        NotificationProviderStoc().addNotification(
+          'Produsul ${_titleController.text} este sub pragul minim de stoc!',
+          productRef.id,
+          supplierData['email'],
+          _titleController.text,
+        );
+      } else {
+        NotificationProviderStoc().removeNotification(productRef.id);
+      }
 
       setState(() {
         _isLoading = false;

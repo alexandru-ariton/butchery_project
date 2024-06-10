@@ -14,6 +14,7 @@ class PaymentPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Plata'),
         backgroundColor: Colors.teal,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

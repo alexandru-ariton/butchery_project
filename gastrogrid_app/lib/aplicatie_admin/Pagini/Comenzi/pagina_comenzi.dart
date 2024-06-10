@@ -1,3 +1,4 @@
+import 'package:gastrogrid_app/providers/helper_notificari.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
@@ -12,6 +13,7 @@ class OrderManagement extends StatelessWidget {
   void _updateOrderStatus(String orderId, String newStatus) async {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': newStatus});
+      NotificationHelper.showNotification('Order Status Updated', 'Order $orderId status is now $newStatus');
     } catch (e) {
       print("Nu s-a putut incarca status-ul comenzii: $e");
     }
@@ -20,6 +22,7 @@ class OrderManagement extends StatelessWidget {
   void _updatePaymentStatus(String orderId, String newStatus) async {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'paymentStatus': newStatus});
+      NotificationHelper.showNotification('Payment Status Updated', 'Order $orderId payment status is now $newStatus');
     } catch (e) {
       print("Nu s-a putut incarca status-ul platii: $e");
     }
@@ -28,7 +31,6 @@ class OrderManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       backgroundColor: Colors.grey[200],
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('orders').snapshots(),
@@ -100,7 +102,7 @@ class OrderManagement extends StatelessWidget {
                                 child: DropdownButtonFormField<String>(
                                   value: currentOrderStatus,
                                   decoration: InputDecoration(
-                                    labelText: 'Status schimbat',
+                                    labelText: 'Status',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -125,7 +127,7 @@ class OrderManagement extends StatelessWidget {
                                 child: DropdownButtonFormField<String>(
                                   value: currentPaymentStatus,
                                   decoration: InputDecoration(
-                                    labelText: 'Status plata schimbat',
+                                    labelText: 'Status plata',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
