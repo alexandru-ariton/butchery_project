@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -40,8 +42,8 @@ class _EditProductPageState extends State<EditProductPage> {
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
-  final Map<String, Map<String, dynamic>> _selectedSuppliers = {}; // Map pentru furnizori
-  final Map<String, TextEditingController> _supplierControllers = {}; // Controllere pentru furnizori
+  final Map<String, Map<String, dynamic>> _selectedSuppliers = {}; 
+  final Map<String, TextEditingController> _supplierControllers = {}; 
 
   @override
   void initState() {
