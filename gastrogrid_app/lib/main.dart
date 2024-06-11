@@ -21,7 +21,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 Future<void> initializeUserDocuments() async {
   final firestore = FirebaseFirestore.instance;
 
-  // Actualizează documentele din colecția 'users'
   final userDocuments = await firestore.collection('users').get();
   for (var doc in userDocuments.docs) {
     try {
@@ -32,7 +31,7 @@ Future<void> initializeUserDocuments() async {
     }
   }
 
-  // Actualizează documentele din colecția 'admin_users'
+
   final adminDocuments = await firestore.collection('admin_users').get();
   for (var doc in adminDocuments.docs) {
     try {
