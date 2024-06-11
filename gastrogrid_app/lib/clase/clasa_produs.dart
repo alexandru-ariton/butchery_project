@@ -5,7 +5,7 @@ class Product {
   final double price;
   final String imageUrl;
   int quantity;
-  final String supplierId; // Adăugat câmpul supplierId
+  final String supplierId; 
 
   Product({
     required this.id,
@@ -14,7 +14,7 @@ class Product {
     required this.price,
     required this.imageUrl,
     this.quantity = 0,
-    required this.supplierId, // Adăugat în constructor
+    required this.supplierId, 
   });
 
   factory Product.fromMap(Map<String, dynamic> data, String id) {
@@ -25,7 +25,7 @@ class Product {
       price: (data['price'] as num).toDouble(),
       imageUrl: data['imageUrl'] ?? '',
       quantity: data['quantity'] ?? 0,
-      supplierId: data['supplierId'] ?? '', // Inițializat câmpul supplierId
+      supplierId: data['supplierId'] ?? '', 
     );
   }
 
@@ -36,7 +36,7 @@ class Product {
       'price': price,
       'imageUrl': imageUrl,
       'quantity': quantity,
-      'supplierId': supplierId, // Adăugat câmpul supplierId
+      'supplierId': supplierId, 
     };
   }
 }

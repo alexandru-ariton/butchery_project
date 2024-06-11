@@ -53,7 +53,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
   void _handleAddressTap1(String address) async {
     LatLng? location = await _getLocationFromAddress(address);
     Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address, location);
-    Navigator.pop(context, address); // Go back
+    Navigator.pop(context, address); 
   }
 
   void loadSavedAddresses() async {

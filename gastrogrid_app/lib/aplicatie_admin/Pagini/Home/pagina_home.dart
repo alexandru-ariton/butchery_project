@@ -45,7 +45,7 @@ class AdminHome extends StatelessWidget {
                   Tab(icon: Icon(Icons.shopping_bag, size: 28), text: 'Produse'),
                   Tab(icon: Icon(Icons.receipt, size: 28), text: 'Comenzi'),
                   Tab(icon: Icon(Icons.notifications, size: 28), text: 'Notificari'),
-                  Tab(icon: Icon(Icons.check_box_outline_blank_rounded, size: 28), text: 'Materii Prime'),
+                  Tab(icon: Icon(Icons.public_rounded, size: 28), text: 'Furnizori'),
                 ],
               ),
             ),
@@ -67,7 +67,7 @@ class AdminHome extends StatelessWidget {
   void _logout(BuildContext context) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => PaginaLogin()), // Navigate to your login page
+      MaterialPageRoute(builder: (context) => PaginaLogin()),
     );
   }
 }
