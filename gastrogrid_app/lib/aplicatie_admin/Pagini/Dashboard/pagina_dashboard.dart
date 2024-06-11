@@ -1,11 +1,11 @@
 // ignore_for_file: unused_import, prefer_const_literals_to_create_immutables
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_ComenziPeZile.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_ComenziPeZi.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_FrecventaComenziUtilizatori.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_HeapMap.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_ComenziZilnice.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_IncasariLunare.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_StatusComenzi.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Dashboard/Grafice/grafic_ProduseSiFurnizori.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -29,7 +29,7 @@ class Dashboard extends StatelessWidget {
                   Tab(icon: Icon(Icons.bar_chart, size: 28), text: 'Comenzi pe Zile'),
                   Tab(icon: Icon(Icons.show_chart, size: 28), text: 'Incasari Lunare'),
                   Tab(icon: Icon(Icons.pie_chart, size: 28), text: 'Numar Comenzi'),
-                  Tab(icon: Icon(Icons.check_box_outline_blank_outlined, size: 28), text: 'Produse si Materii Prime'),
+                  Tab(icon: Icon(Icons.check_box_outline_blank_outlined, size: 28), text: 'Produse si Furnizori'),
                   Tab(icon: Icon(Icons.people, size: 28), text: 'Comenzi Clienti'),
                 ],
               ),
@@ -41,7 +41,7 @@ class Dashboard extends StatelessWidget {
             DailyOrdersChart(),
             MonthlyRevenueChart(),
             OrderLineChart(),
-            RawMaterialsAndProductsChart(),
+            ProductsAndSuppliersChart(),
             CustomerOrderFrequencyChart(),
           ],
         ),
