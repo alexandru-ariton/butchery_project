@@ -10,6 +10,7 @@ import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/product_form.dart';
+import 'package:intl/intl.dart'; 
 
 class EditProductPage extends StatefulWidget {
   final String? productId;
@@ -18,6 +19,7 @@ class EditProductPage extends StatefulWidget {
   final String? currentDescription;
   final String? currentImageUrl;
   final String? currentQuantity;
+  final Timestamp? currentExpiryDate;
 
   const EditProductPage({
     super.key,
@@ -27,6 +29,7 @@ class EditProductPage extends StatefulWidget {
     this.currentDescription,
     this.currentImageUrl,
     this.currentQuantity,
+    this.currentExpiryDate,
   });
 
   @override
@@ -39,6 +42,8 @@ class _EditProductPageState extends State<EditProductPage> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  DateTime? _selectedExpiryDate;
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
@@ -60,7 +65,26 @@ class _EditProductPageState extends State<EditProductPage> {
     if (widget.currentQuantity != null) {
       _quantityController.text = widget.currentQuantity!;
     }
+     if (widget.currentExpiryDate != null) {
+      _selectedExpiryDate = widget.currentExpiryDate!.toDate();
+      _expiryDateController.text = DateFormat('yyyy-MM-dd').format(_selectedExpiryDate!);
+    }
     _loadSelectedSuppliers();
+  }
+
+   Future<void> _selectExpiryDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedExpiryDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != _selectedExpiryDate) {
+      setState(() {
+        _selectedExpiryDate = pickedDate;
+        _expiryDateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
   }
 
   Future<void> _loadSelectedSuppliers() async {
@@ -121,38 +145,40 @@ class _EditProductPageState extends State<EditProductPage> {
   return downloadUrl;
 }
 
- Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, BuildContext context) async {
-  if (productId == null) {
-    // Add a new product
-    DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
-      'title': title,
-      'price': price,
-      'description': description,
-      'imageUrl': imageUrl,
-      'quantity': quantity,
-    });
-    return newProductRef;
-  } else {
-    // Update the existing product
-    DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
+ Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, DateTime expiryDate, BuildContext context) async {
+    if (productId == null) {
+      // Adaugă un produs nou
+      DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
+        'title': title,
+        'price': price,
+        'description': description,
+        'imageUrl': imageUrl,
+        'quantity': quantity,
+        'expiryDate': expiryDate,
+      });
+      return newProductRef;
+    } else {
+      // Actualizează produsul existent
+      DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
 
-    // Get the current quantity from Firestore
-    DocumentSnapshot productSnapshot = await productRef.get();
-    int currentQuantity = productSnapshot['quantity'];
+      // Obține cantitatea curentă din Firestore
+      DocumentSnapshot productSnapshot = await productRef.get();
+      int currentQuantity = productSnapshot['quantity'];
 
-    // Add the new quantity to the existing one
-    int newQuantity = currentQuantity + quantity;
+      // Adaugă noua cantitate la cea existentă
+      int newQuantity = currentQuantity + quantity;
 
-    await productRef.update({
-      'title': title,
-      'price': price,
-      'description': description,
-      'imageUrl': imageUrl,
-      'quantity': newQuantity,
-    });
-    return productRef;
+      await productRef.update({
+        'title': title,
+        'price': price,
+        'description': description,
+        'imageUrl': imageUrl,
+        'quantity': newQuantity,
+        'expiryDate': expiryDate,
+      });
+      return productRef;
+    }
   }
-}
 
 
   Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
@@ -161,38 +187,28 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
-  void _saveProduct() async {
-    if (_formKey.currentState!.validate() && _selectedSuppliers.isNotEmpty) { // Verifică dacă sunt selectați furnizori
+ void _saveProduct() async {
+    if (_formKey.currentState!.validate() && _selectedSuppliers.isNotEmpty) {
       setState(() {
         _isLoading = true;
       });
 
       String imageUrl = await uploadImage(widget.productId ?? '', _imageData, widget.currentImageUrl);
+      int newQuantity = int.parse(_quantityController.text);
+      DateTime expiryDate = _selectedExpiryDate!;
 
-      int newQuantity = int.parse(_quantityController.text); // Setăm cantitatea nouă
       DocumentReference productRef = await saveOrUpdateProduct(
         widget.productId,
         _titleController.text,
         double.parse(_priceController.text),
         _descriptionController.text,
         imageUrl,
-        newQuantity, // Transmitem cantitatea nouă care trebuie adăugată la cea existentă
+        newQuantity,
+        expiryDate,
         context,
       );
 
-      await _saveSuppliers(productRef, _selectedSuppliers); // Salvează furnizorii selectați
-
-      if (newQuantity < 4) {
-        var supplierData = _selectedSuppliers.values.first; // Presupunem că există cel puțin un furnizor selectat
-        NotificationProviderStoc().addNotification(
-          'Produsul ${_titleController.text} este sub pragul minim de stoc!',
-          productRef.id,
-          supplierData['email'],
-          _titleController.text,
-        );
-      } else {
-        NotificationProviderStoc().removeNotification(productRef.id);
-      }
+      await _saveSuppliers(productRef, _selectedSuppliers);
 
       setState(() {
         _isLoading = false;
@@ -229,6 +245,23 @@ class _EditProductPageState extends State<EditProductPage> {
                       priceController: _priceController,
                       descriptionController: _descriptionController,
                       quantityController: _quantityController,
+                    ),
+                    TextFormField(
+                      controller: _expiryDateController,
+                      decoration: InputDecoration(
+                        labelText: 'Data expirare (YYYY-MM-DD)',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.calendar_today),
+                          onPressed: () => _selectExpiryDate(context),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the expiry date';
+                        }
+                        return null;
+                      },
+                      readOnly: true,
                     ),
                     SizedBox(height: 16),
                     ImagePickerWidget(

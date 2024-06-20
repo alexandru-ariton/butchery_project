@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String id;
   final String title;
@@ -5,7 +7,9 @@ class Product {
   final double price;
   final String imageUrl;
   int quantity;
-  final String supplierId; 
+  final String supplierId;
+  final DateTime? expiryDate; 
+  
 
   Product({
     required this.id,
@@ -15,6 +19,7 @@ class Product {
     required this.imageUrl,
     this.quantity = 0,
     required this.supplierId, 
+    required this.expiryDate,
   });
 
   factory Product.fromMap(Map<String, dynamic> data, String id) {
@@ -26,6 +31,7 @@ class Product {
       imageUrl: data['imageUrl'] ?? '',
       quantity: data['quantity'] ?? 0,
       supplierId: data['supplierId'] ?? '', 
+       expiryDate: data['expiryDate'] != null ? (data['expiryDate'] as Timestamp).toDate() : null,
     );
   }
 
@@ -37,6 +43,7 @@ class Product {
       'imageUrl': imageUrl,
       'quantity': quantity,
       'supplierId': supplierId, 
+       if (expiryDate != null) 'expiryDate': expiryDate,
     };
   }
 }

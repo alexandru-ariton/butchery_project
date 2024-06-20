@@ -7,7 +7,7 @@ import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/clase/clasa_cart.dart';
 import 'package:gastrogrid_app/clase/clasa_produs.dart';
-
+import 'package:intl/intl.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -22,13 +22,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool isAddingToCart = false;
 
   Future<void> addToCart() async {
-    if (isAddingToCart) return; // Prevent multiple rapid clicks
+    if (isAddingToCart) return;
     setState(() {
       isAddingToCart = true;
     });
 
     try {
-      // Verifică cantitatea actuală din Firestore
       DocumentSnapshot productSnapshot = await FirebaseFirestore.instance
           .collection('products')
           .doc(widget.product.id)
@@ -36,11 +35,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
       if (productSnapshot.exists) {
         int currentStock = productSnapshot['quantity'];
+        Timestamp? expiryTimestamp = productSnapshot['expiryDate'];
+        DateTime? expiryDate = expiryTimestamp?.toDate();
 
         if (currentStock == 0) {
           await notifyOutOfStock(context, widget.product);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Stoc Epuizat')),
+            SnackBar(content: Text('Produsul este epuizat')),
+          );
+          return;
+        }
+
+        if (expiryDate != null && DateTime.now().isAfter(expiryDate)) {
+          await notifyExpired(context, widget.product);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Produsul a expirat')),
           );
           return;
         }
@@ -57,22 +66,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           quantity: quantity,
         );
 
-        // Add the product to the cart
         await Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem, context);
 
         if (currentStock - quantity < 3) {
-          // Notifică adminul pentru stoc redus
           await notifyLowStock(context, widget.product);
         } else {
-          // Șterge notificarea dacă stocul este suficient
-          Provider.of<NotificationProviderStoc>(context, listen: false).removeNotification(widget.product.id);
+          await Provider.of<NotificationProviderStoc>(context, listen: false)
+              .removeNotification(widget.product.id);
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Produsul ${widget.product.title} a fost adaugat in cos')),
         );
 
-        // Resetăm quantity după ce am făcut toate operațiunile
         setState(() {
           quantity = 1;
         });
@@ -141,6 +147,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
               ),
             ),
+            SizedBox(height: 10),
+            if (widget.product.expiryDate != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Data expirare: ${DateFormat('yyyy-MM-dd').format(widget.product.expiryDate!)}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.red,
+                      ),
+                ),
+              ),
             SizedBox(height: 80),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 23.0),
