@@ -5,10 +5,13 @@ class ProfileForm extends StatelessWidget {
   final TextEditingController phoneController;
   final TextEditingController addressController;
   final TextEditingController dobController;
+  final TextEditingController passwordController;
   final String? gender;
   final Function(String?) onGenderChanged;
   final VoidCallback onSelectAddress;
   final VoidCallback onSelectDate;
+  final String selectedPrefix;
+  final Function(String?) onPrefixChanged;
 
   const ProfileForm({
     super.key,
@@ -16,10 +19,13 @@ class ProfileForm extends StatelessWidget {
     required this.phoneController,
     required this.addressController,
     required this.dobController,
+    required this.passwordController,
     required this.gender,
     required this.onGenderChanged,
     required this.onSelectAddress,
     required this.onSelectDate,
+    required this.selectedPrefix,
+    required this.onPrefixChanged,
   });
 
   @override
@@ -32,11 +38,27 @@ class ProfileForm extends StatelessWidget {
           validator: (value) => value!.isEmpty ? 'Introdu numele' : null,
         ),
         SizedBox(height: 16),
-        TextFormField(
-          controller: phoneController,
-          decoration: InputDecoration(labelText: 'Telefon', prefixIcon: Icon(Icons.phone)),
-          keyboardType: TextInputType.phone,
-          validator: (value) => value!.isEmpty ? 'Introdu numarul de telefon' : null,
+        Row(
+          children: [
+            DropdownButton<String>(
+              value: selectedPrefix,
+              onChanged: onPrefixChanged,
+              items: <String>['+40', '+1', '+44', '+49'].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            Expanded(
+              child: TextFormField(
+                controller: phoneController,
+                decoration: InputDecoration(labelText: 'Telefon', prefixIcon: Icon(Icons.phone)),
+                keyboardType: TextInputType.phone,
+                validator: (value) => value!.isEmpty ? 'Introdu numarul de telefon' : null,
+              ),
+            ),
+          ],
         ),
         SizedBox(height: 16),
         TextFormField(
@@ -66,6 +88,13 @@ class ProfileForm extends StatelessWidget {
           }).toList(),
           onChanged: onGenderChanged,
           validator: (value) => value == null ? 'Selecteaza un gen' : null,
+        ),
+        SizedBox(height: 16),
+        TextFormField(
+          controller: passwordController,
+          decoration: InputDecoration(labelText: 'Parola', prefixIcon: Icon(Icons.lock)),
+          obscureText: true,
+          validator: (value) => value!.isEmpty ? 'Introdu parola' : null,
         ),
       ],
     );

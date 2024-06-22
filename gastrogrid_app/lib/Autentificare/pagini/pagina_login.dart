@@ -24,6 +24,19 @@ class _PaginaLoginState extends State<PaginaLogin> {
 
   String errorMessage = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _checkIfLoggedIn();
+  }
+
+  Future<void> _checkIfLoggedIn() async {
+    bool isLoggedIn = await Provider.of<customAuth.AuthProvider>(context, listen: false).isLoggedIn();
+    if (isLoggedIn) {
+      await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
+    }
+  }
+
   Future<bool> userExists(String email) async {
     final userQuerySnapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -102,25 +115,21 @@ class _PaginaLoginState extends State<PaginaLogin> {
                           .login(email, password);
 
                       if (isAdminUser && !kIsWeb) {
-                        // Admin trying to log in on mobile
                         setState(() {
                           errorMessage = 'Adminii nu se pot inregistra pe telefon.';
                         });
                         await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
                       } else if (!isAdminUser && kIsWeb) {
-                        // User trying to log in on web
                         setState(() {
                           errorMessage = 'Userii nu se pot inregistra pe web.';
                         });
                         await Provider.of<customAuth.AuthProvider>(context, listen: false).logout(context);
                       } else if (isAdminUser) {
-                        // Navigate to AdminPage if the user is an admin
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => AdminHome()),
                         );
                       } else {
-                        // Regular user login
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Autentificare reusita")),
                         );
@@ -145,7 +154,6 @@ class _PaginaLoginState extends State<PaginaLogin> {
                 const SizedBox(height: 25),
                 GestureDetector(
                   onTap: () {
-                    // Do not show registration page link for admin
                     if (!kIsWeb) {
                       Navigator.push(
                         context,

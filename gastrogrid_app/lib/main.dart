@@ -1,10 +1,10 @@
 // ignore_for_file: prefer_const_constructors, unused_import
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:gastrogrid_app/providers/helper_notificari.dart';
 import 'package:gastrogrid_app/providers/provider_adresa_plata_cart.dart';
 import 'package:gastrogrid_app/providers/provider_comenzi.dart';
 import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
@@ -49,7 +49,11 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  NotificationHelper.initialize();
+   FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
+  await firebaseAppCheck.activate(
+    //webRecaptchaSiteKey: 'YOUR_RECAPTCHA_SITE_KEY',
+    androidProvider: AndroidProvider.playIntegrity,
+  );
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),

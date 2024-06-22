@@ -9,7 +9,7 @@ class LowStockNotificationPage extends StatelessWidget {
     final Uri params = Uri(
       scheme: 'mailto',
       path: emails.join(','),
-      query: 'subject=Restock Request&body=Please restock the product: $productName', // Customize as needed
+      query: 'subject=Restock Request&body=Please restock the product: $productName', 
     );
 
     var url = params.toString();
@@ -118,7 +118,7 @@ class LowStockNotificationPage extends StatelessWidget {
                     ? IconButton(
                         icon: const Icon(Icons.email),
                         onPressed: () async {
-                          // Fetch all suppliers for the product
+                          
                           QuerySnapshot supplierSnapshot = await FirebaseFirestore.instance
                               .collection('products')
                               .doc(productId)
@@ -133,7 +133,7 @@ class LowStockNotificationPage extends StatelessWidget {
                             };
                           }).toList();
 
-                          // Show dialog to select suppliers
+                          
                           await _showEmailDialog(context, suppliers, productName);
                         },
                       )

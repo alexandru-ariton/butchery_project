@@ -1,4 +1,4 @@
-import 'package:gastrogrid_app/providers/helper_notificari.dart';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
@@ -10,23 +10,7 @@ class OrderManagement extends StatelessWidget {
     await FirebaseFirestore.instance.collection('orders').doc(id).delete();
   }
 
-  void _updateOrderStatus(String orderId, String newStatus) async {
-    try {
-      await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': newStatus});
-      NotificationHelper.showNotification('Order Status Updated', 'Order $orderId status is now $newStatus');
-    } catch (e) {
-      print("Nu s-a putut incarca status-ul comenzii: $e");
-    }
-  }
-
-  void _updatePaymentStatus(String orderId, String newStatus) async {
-    try {
-      await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'paymentStatus': newStatus});
-      NotificationHelper.showNotification('Payment Status Updated', 'Order $orderId payment status is now $newStatus');
-    } catch (e) {
-      print("Nu s-a putut incarca status-ul platii: $e");
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +98,8 @@ class OrderManagement extends StatelessWidget {
                                             value: status,
                                             child: Text(status, style: TextStyle(fontSize: 16)),
                                           ))
-                                      .toList(),
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      _updateOrderStatus(orderId, value);
-                                    }
-                                  },
+                                      .toList(), onChanged: (String? value) {  },
+
                                 ),
                               ),
                               SizedBox(width: 8),
@@ -141,9 +121,7 @@ class OrderManagement extends StatelessWidget {
                                           ))
                                       .toList(),
                                   onChanged: (value) {
-                                    if (value != null) {
-                                      _updatePaymentStatus(orderId, value);
-                                    }
+                                   
                                   },
                                 ),
                               ),

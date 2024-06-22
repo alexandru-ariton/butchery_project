@@ -130,24 +130,16 @@ class _EditProductPageState extends State<EditProductPage> {
     return currentImageUrl ?? '';
   }
   
-  // Create a reference to the location you want to upload the image to
   final storageRef = FirebaseStorage.instance.ref().child('product_images/$productId.jpg');
-
-  // Upload the file to Firebase Storage
   UploadTask uploadTask = storageRef.putData(imageData);
-
-  // Wait for the upload to complete
   TaskSnapshot snapshot = await uploadTask;
-
-  // Get the download URL of the uploaded image
   String downloadUrl = await snapshot.ref.getDownloadURL();
-
   return downloadUrl;
 }
 
  Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, DateTime expiryDate, BuildContext context) async {
     if (productId == null) {
-      // Adaugă un produs nou
+      
       DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
         'title': title,
         'price': price,
@@ -158,14 +150,12 @@ class _EditProductPageState extends State<EditProductPage> {
       });
       return newProductRef;
     } else {
-      // Actualizează produsul existent
+     
       DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
 
-      // Obține cantitatea curentă din Firestore
       DocumentSnapshot productSnapshot = await productRef.get();
       int currentQuantity = productSnapshot['quantity'];
 
-      // Adaugă noua cantitate la cea existentă
       int newQuantity = currentQuantity + quantity;
 
       await productRef.update({

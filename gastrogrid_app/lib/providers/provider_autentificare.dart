@@ -14,7 +14,7 @@ class AuthProvider with ChangeNotifier {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': email,
-        'isLoggedIn': false, // Initialize the isLoggedIn field
+        'isLoggedIn': false, 
       });
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -22,79 +22,60 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-Future<void> login(String email, String password) async {
-  try {
-    // Check if the user exists in the users or admin_users collection
-    bool userExists = await isUserInCollection(email, 'users');
-    bool adminExists = await isUserInCollection(email, 'admin_users');
-    
-    if (!userExists && !adminExists) {
-      throw 'Utilizatorul nu exista.';
-    }
+  Future<void> login(String email, String password) async {
+    try {
+      bool userExists = await isUserInCollection(email, 'users');
+      bool adminExists = await isUserInCollection(email, 'admin_users');
 
-    String collection = userExists ? 'users' : 'admin_users';
+      if (!userExists && !adminExists) {
+        throw 'Utilizatorul nu exista.';
+      }
 
-    // Ensure the document has the 'isLoggedIn' field
-    await ensureIsLoggedInFieldExists(email, collection);
+      String collection = userExists ? 'users' : 'admin_users';
 
-    // Check if the user is already logged in on another device
-    bool isLoggedIn = await isUserLoggedIn(email, collection);
+      await ensureIsLoggedInFieldExists(email, collection);
 
-    // Apply restriction only for non-admin users
-    if (isLoggedIn && collection == 'users') {
-      throw 'Utilizatorul este deja autentificat pe alt dispozitiv.';
-    }
+      bool isLoggedIn = await isUserLoggedIn(email, collection);
 
-    UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      if (isLoggedIn && collection == 'users') {
+        throw 'Utilizatorul este deja autentificat pe alt dispozitiv.';
+      }
 
-    // Check if the document exists before updating
-    DocumentSnapshot docSnapshot = await _firestore.collection(collection).doc(userCredential.user!.uid).get();
-    if (!docSnapshot.exists) {
-      // If the document does not exist, create it first
-      await _firestore.collection(collection).doc(userCredential.user!.uid).set({
-        'email': email,
-        'isLoggedIn': true,
-      });
-    } else {
-      // Update the isLoggedIn field to true
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+
       await _firestore.collection(collection).doc(userCredential.user!.uid).update({
         'isLoggedIn': true,
       });
-    }
 
-    notifyListeners();
-  } on FirebaseAuthException catch (e) {
-    throw e.message!;
-  }
-}
-
-
-Future<void> logout(BuildContext context) async {
-  // Update the isLoggedIn field to false before signing out
-  if (currentUser != null) {
-    String email = currentUser!.email!;
-    bool userExists = await isUserInCollection(email, 'users');
-    String collection = userExists ? 'users' : 'admin_users';
-
-    DocumentSnapshot docSnapshot = await _firestore.collection(collection).doc(currentUser!.uid).get();
-    if (docSnapshot.exists) {
-      await _firestore.collection(collection).doc(currentUser!.uid).update({
-        'isLoggedIn': false,
-      });
-    } else {
-      // Handle the case where the document does not exist, which shouldn't happen in normal flow
-      print('Document not found. Cannot update non-existent document.');
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      throw e.message!;
     }
   }
 
-  await _auth.signOut();
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(builder: (context) => PaginaLogin()),
-    (route) => false,
-  );
-}
+  Future<void> logout(BuildContext context) async {
+    if (currentUser != null) {
+      String email = currentUser!.email!;
+      bool userExists = await isUserInCollection(email, 'users');
+      String collection = userExists ? 'users' : 'admin_users';
 
+      DocumentSnapshot docSnapshot = await _firestore.collection(collection).doc(currentUser!.uid).get();
+      if (docSnapshot.exists) {
+        await _firestore.collection(collection).doc(currentUser!.uid).update({
+          'isLoggedIn': false,
+        });
+      } else {
+        print('Document not found. Cannot update non-existent document.');
+      }
+    }
+
+    await _auth.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => PaginaLogin()),
+      (route) => false,
+    );
+  }
 
   Future<bool> isUserInCollection(String email, String collection) async {
     final querySnapshot = await _firestore
@@ -117,6 +98,20 @@ Future<void> logout(BuildContext context) async {
       return querySnapshot.docs.first.get('isLoggedIn') ?? false;
     }
 
+    return false;
+  }
+
+  Future<bool> isLoggedIn() async {
+    if (currentUser != null) {
+      String email = currentUser!.email!;
+      bool userExists = await isUserInCollection(email, 'users');
+      bool adminExists = await isUserInCollection(email, 'admin_users');
+      String collection = userExists ? 'users' : (adminExists ? 'admin_users' : '');
+
+      if (collection.isNotEmpty) {
+        return await isUserLoggedIn(email, collection);
+      }
+    }
     return false;
   }
 

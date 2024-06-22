@@ -13,7 +13,9 @@ Future<void> saveProfile(
   TextEditingController phoneController,
   TextEditingController addressController,
   TextEditingController dobController,
+  TextEditingController passwordController,
   String? gender,
+  String selectedPrefix,
   File? image,
   String? photoUrl,
 ) async {
@@ -30,9 +32,17 @@ Future<void> saveProfile(
         photoUrl = newPhotoUrl;
       }
 
+      String newPhoneNumber = '$selectedPrefix ${phoneController.text}';
+
+
+      // Update password
+      if (passwordController.text.isNotEmpty) {
+        await user.updatePassword(passwordController.text);
+      }
+
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'username': nameController.text,
-        'phoneNumber': phoneController.text,
+        'phoneNumber': newPhoneNumber,
         'address': addressController.text,
         'dateOfBirth': dobController.text,
         'gender': gender,
@@ -40,17 +50,30 @@ Future<void> saveProfile(
       }, SetOptions(merge: true));
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profil editat')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
       });
 
       Navigator.pop(context, true);
     } catch (e) {
+      String errorMessage;
+      if (e is FirebaseAuthException && e.code == 'too-many-requests') {
+        errorMessage = 'Too many requests. Please try again later.';
+      } else if (e is FirebaseAuthException && e.code == 'operation-not-allowed') {
+        errorMessage = 'Operation not allowed. Check your Firebase console settings.';
+      } else {
+        errorMessage = 'Error: $e';
+      }
+
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Eroare: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
       });
     }
   }
 }
+
+
+
+
 
 Future<String?> uploadImage(BuildContext context, String userId, File? image, String? existingPhotoUrl) async {
   try {

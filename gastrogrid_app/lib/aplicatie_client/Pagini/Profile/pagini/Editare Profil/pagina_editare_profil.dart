@@ -24,7 +24,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   late TextEditingController _dobController;
+  late TextEditingController _passwordController;
   String? _gender;
+  String _selectedPrefix = '+40';
   File? _image;
   String? _photoUrl;
   final picker = ImagePicker();
@@ -36,6 +38,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
     _dobController = TextEditingController();
+    _passwordController = TextEditingController();
     _loadUserProfile();
   }
 
@@ -45,6 +48,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _phoneController.dispose();
     _addressController.dispose();
     _dobController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -59,6 +63,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _dobController.text = userDoc['dateOfBirth'] ?? '';
           _gender = userDoc['gender'];
           _photoUrl = userDoc['photoUrl'];
+
+          // Extract prefix and phone number
+          if (_phoneController.text.isNotEmpty) {
+            var phoneParts = _phoneController.text.split(' ');
+            if (phoneParts.length > 1) {
+              _selectedPrefix = phoneParts[0];
+              _phoneController.text = phoneParts.sublist(1).join(' ');
+            }
+          }
         });
       }
     } catch (e) {
@@ -96,10 +109,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 phoneController: _phoneController,
                 addressController: _addressController,
                 dobController: _dobController,
+                passwordController: _passwordController,
                 gender: _gender,
+                selectedPrefix: _selectedPrefix,
                 onGenderChanged: (newGender) {
                   setState(() {
                     _gender = newGender;
+                  });
+                },
+                onPrefixChanged: (newPrefix) {
+                  setState(() {
+                    _selectedPrefix = newPrefix!;
                   });
                 },
                 onSelectAddress: () => _selectAddress(context),
@@ -115,7 +135,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   _phoneController,
                   _addressController,
                   _dobController,
+                  _passwordController,
                   _gender,
+                  _selectedPrefix,
                   _image,
                   _photoUrl,
                 ),

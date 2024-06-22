@@ -35,14 +35,7 @@ class _AddressSelectorState extends State<AddressSelector> {
     });
   }
 
-  @override
-  void dispose() {
-    mapController?.dispose();
-    searchController.dispose();
-    manualAddressController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
+ 
 
   void _onMapCreated(GoogleMapController controller) {
     if (mapController != null) {
@@ -72,6 +65,16 @@ class _AddressSelectorState extends State<AddressSelector> {
       }
     );
   }
+  
+
+ @override
+  void dispose() {
+    mapController?.dispose();
+    searchController.dispose();
+    manualAddressController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   void setSelectedLocation(LatLng position) {
     setState(() {
@@ -81,6 +84,7 @@ class _AddressSelectorState extends State<AddressSelector> {
       mapController!.animateCamera(CameraUpdate.newLatLng(position));
     }
   }
+
 
   void autoCompleteSearch(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
