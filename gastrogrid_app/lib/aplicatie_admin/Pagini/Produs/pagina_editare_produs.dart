@@ -137,7 +137,8 @@ class _EditProductPageState extends State<EditProductPage> {
   return downloadUrl;
 }
 
- Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, String description, String imageUrl, int quantity, DateTime expiryDate, BuildContext context) async {
+ Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, 
+ String description, String imageUrl, int quantity, DateTime expiryDate, BuildContext context) async {
     if (productId == null) {
       
       DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
@@ -206,7 +207,7 @@ class _EditProductPageState extends State<EditProductPage> {
 
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select at least one supplier')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Selecteaza cel putin un furnizor')));
     }
   }
 

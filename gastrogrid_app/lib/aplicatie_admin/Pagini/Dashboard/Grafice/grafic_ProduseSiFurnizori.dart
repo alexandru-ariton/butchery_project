@@ -236,8 +236,8 @@ class ProductsAndSuppliersChart extends StatelessWidget {
                               final selectedDatum = model.selectedDatum[0];
                               final supplierName = selectedDatum.datum.key;
                               final products = suppliersData[supplierName]!;
-                              // Use this to show products in a tooltip or a dialog
-                              print('Selected supplier: $supplierName, Products: $products');
+                              
+                              print('Furnizorul selectat: $supplierName, Produsele: $products');
                             }
                           },
                         ),
