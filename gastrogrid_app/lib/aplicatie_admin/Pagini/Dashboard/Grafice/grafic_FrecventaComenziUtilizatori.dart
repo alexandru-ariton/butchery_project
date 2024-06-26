@@ -63,7 +63,7 @@ class CustomerOrderFrequencyChart extends StatelessWidget {
                       series,
                       animate: true,
                       animationDuration: Duration(seconds: 1),
-                      vertical: true, // Set to true for vertical bars, false for horizontal bars
+                      vertical: true, 
                       barRendererDecorator: charts.BarLabelDecorator<String>(
                         insideLabelStyleSpec: charts.TextStyleSpec(
                             fontSize: 14, color: charts.MaterialPalette.white),
