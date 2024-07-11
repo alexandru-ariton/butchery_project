@@ -74,7 +74,10 @@ class ProductManagement extends StatelessWidget {
                     }
 
                     var product = snapshot.data!.docs[index - 1];
-                    String imageUrl = product['imageUrl'];
+                    Map<String, dynamic> productData = product.data() as Map<String, dynamic>;
+                    String imageUrl = productData['imageUrl'];
+                    String unit = productData.containsKey('unit') ? productData['unit'] : 'unitate'; // Verifică dacă unitatea există
+                    double quantity = productData['quantity'].toDouble();
 
                     return Card(
                       shape: RoundedRectangleBorder(
@@ -88,15 +91,12 @@ class ProductManagement extends StatelessWidget {
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               child: Image.network(
-                                product['imageUrl'],
+                                imageUrl,
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 errorBuilder: (context, error, stackTrace) {
-                                 return Center(child: Icon(Icons.broken_image, size: fontSize * 2));
-                                  
-                                
+                                  return Center(child: Icon(Icons.broken_image, size: fontSize * 2));
                                 },
-                                
                                 loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(
@@ -113,17 +113,20 @@ class ProductManagement extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                             child: Text(
-                              product['title'],
+                              productData['title'],
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('${product['price']} lei', style: TextStyle(fontSize: fontSize * 0.8)),
+                            child: Text('${productData['price']} lei', style: TextStyle(fontSize: fontSize * 0.8)),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('Cantitate: ${product['quantity']}', style: TextStyle(fontSize: fontSize * 0.8)),
+                            child: Text(
+                              'Cantitate: ${quantity.toStringAsFixed(3)} $unit',
+                              style: TextStyle(fontSize: fontSize * 0.8),
+                            ),
                           ),
                           ButtonBar(
                             alignment: MainAxisAlignment.end,
@@ -135,11 +138,13 @@ class ProductManagement extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (context) => EditProductPage(
                                         productId: product.id,
-                                        currentTitle: product['title'],
-                                        currentPrice: product['price'].toString(),
-                                        currentDescription: product['description'],
+                                        currentTitle: productData['title'],
+                                        currentPrice: productData['price'].toString(),
+                                        currentDescription: productData['description'],
                                         currentImageUrl: imageUrl,
-                                        currentQuantity: product['quantity'].toString(),
+                                        currentQuantity: quantity.toStringAsFixed(3),
+                                        currentUnit: unit,
+                                        currentExpiryDate: productData['expiryDate'],
                                       ),
                                     ),
                                   );

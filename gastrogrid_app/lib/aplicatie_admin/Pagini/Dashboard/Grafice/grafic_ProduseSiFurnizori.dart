@@ -9,9 +9,7 @@ class ProductsAndSuppliersChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Products and Suppliers Chart'),
-      ),
+      
       body: Column(
         children: [
           Expanded(
@@ -66,7 +64,7 @@ class ProductsAndSuppliersChart extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Product Quantities',
+                    'Cantitatea produselor',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: Colors.greenAccent,
                           fontWeight: FontWeight.bold,
@@ -176,7 +174,7 @@ class ProductsAndSuppliersChart extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Products Provided by Suppliers',
+                    'Furnizorii produselor',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: Colors.blueAccent,
                           fontWeight: FontWeight.bold,

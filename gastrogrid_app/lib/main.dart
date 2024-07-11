@@ -49,11 +49,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
-  await firebaseAppCheck.activate(
-    //webRecaptchaSiteKey: 'YOUR_RECAPTCHA_SITE_KEY',
-    androidProvider: AndroidProvider.playIntegrity,
-  );
+ 
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),

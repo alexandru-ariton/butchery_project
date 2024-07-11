@@ -14,6 +14,13 @@ class CartProvider with ChangeNotifier {
 
   Future<void> addProductToCart(CartItem cartItem, BuildContext context) async {
     DocumentSnapshot productSnapshot = await FirebaseFirestore.instance.collection('products').doc(cartItem.product.id).get();
+     if (!productSnapshot.exists) {
+     
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Product does not exist in the database.')),
+      );
+      return;
+    }
     int currentStock = productSnapshot['quantity'];
 
     if (currentStock < cartItem.quantity) {

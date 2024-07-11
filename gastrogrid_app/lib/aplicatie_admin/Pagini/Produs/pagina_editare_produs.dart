@@ -1,5 +1,3 @@
-// ignore_for_file: unused_field
-
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,7 +8,7 @@ import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/product_form.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class EditProductPage extends StatefulWidget {
   final String? productId;
@@ -19,6 +17,7 @@ class EditProductPage extends StatefulWidget {
   final String? currentDescription;
   final String? currentImageUrl;
   final String? currentQuantity;
+  final String? currentUnit;
   final Timestamp? currentExpiryDate;
 
   const EditProductPage({
@@ -29,6 +28,7 @@ class EditProductPage extends StatefulWidget {
     this.currentDescription,
     this.currentImageUrl,
     this.currentQuantity,
+    this.currentUnit,
     this.currentExpiryDate,
   });
 
@@ -47,8 +47,10 @@ class _EditProductPageState extends State<EditProductPage> {
   Uint8List? _imageData;
   String? _imageName;
   bool _isLoading = false;
-  final Map<String, Map<String, dynamic>> _selectedSuppliers = {}; 
-  final Map<String, TextEditingController> _supplierControllers = {}; 
+  final Map<String, Map<String, dynamic>> _selectedSuppliers = {};
+  final Map<String, TextEditingController> _supplierControllers = {};
+  String _selectedUnit = 'kilograme'; // Adăugat pentru a selecta unitatea
+  final List<String> _units = ['grame', 'kilograme'];
 
   @override
   void initState() {
@@ -65,14 +67,17 @@ class _EditProductPageState extends State<EditProductPage> {
     if (widget.currentQuantity != null) {
       _quantityController.text = widget.currentQuantity!;
     }
-     if (widget.currentExpiryDate != null) {
+    if (widget.currentExpiryDate != null) {
       _selectedExpiryDate = widget.currentExpiryDate!.toDate();
       _expiryDateController.text = DateFormat('yyyy-MM-dd').format(_selectedExpiryDate!);
+    }
+    if (widget.currentUnit != null) {
+      _selectedUnit = widget.currentUnit!;
     }
     _loadSelectedSuppliers();
   }
 
-   Future<void> _selectExpiryDate(BuildContext context) async {
+  Future<void> _selectExpiryDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedExpiryDate ?? DateTime.now(),
@@ -125,39 +130,46 @@ class _EditProductPageState extends State<EditProductPage> {
     return Uint8List.fromList(base64.decode(base64String));
   }
 
- Future<String> uploadImage(String productId, Uint8List? imageData, String? currentImageUrl) async {
-  if (imageData == null) {
-    return currentImageUrl ?? '';
-  }
-  
-  final storageRef = FirebaseStorage.instance.ref().child('product_images/$productId.jpg');
-  UploadTask uploadTask = storageRef.putData(imageData);
-  TaskSnapshot snapshot = await uploadTask;
-  String downloadUrl = await snapshot.ref.getDownloadURL();
-  return downloadUrl;
-}
+  Future<String> uploadImage(String productId, Uint8List? imageData, String? currentImageUrl) async {
+    if (imageData == null) {
+      return currentImageUrl ?? '';
+    }
 
- Future<DocumentReference> saveOrUpdateProduct(String? productId, String title, double price, 
- String description, String imageUrl, int quantity, DateTime expiryDate, BuildContext context) async {
+    final storageRef = FirebaseStorage.instance.ref().child('product_images/$productId.jpg');
+    UploadTask uploadTask = storageRef.putData(imageData);
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+  Future<DocumentReference> saveOrUpdateProduct(
+      String? productId,
+      String title,
+      double price,
+      String description,
+      String imageUrl,
+      double quantity, // Modificat pentru a accepta valori decimale
+      DateTime expiryDate,
+      String unit,
+      BuildContext context) async {
     if (productId == null) {
-      
       DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
         'title': title,
         'price': price,
         'description': description,
         'imageUrl': imageUrl,
         'quantity': quantity,
+        'unit': unit, // Salvează unitatea
         'expiryDate': expiryDate,
       });
       return newProductRef;
     } else {
-     
       DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
 
       DocumentSnapshot productSnapshot = await productRef.get();
-      int currentQuantity = productSnapshot['quantity'];
+      double currentQuantity = productSnapshot['quantity']; // Modificat pentru a accepta valori decimale
 
-      int newQuantity = currentQuantity + quantity;
+      double newQuantity = unit == 'grame' ? currentQuantity + quantity / 1000 : currentQuantity + quantity;
 
       await productRef.update({
         'title': title,
@@ -165,12 +177,12 @@ class _EditProductPageState extends State<EditProductPage> {
         'description': description,
         'imageUrl': imageUrl,
         'quantity': newQuantity,
+        'unit': unit, // Actualizează unitatea
         'expiryDate': expiryDate,
       });
       return productRef;
     }
   }
-
 
   Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
     for (String supplierId in selectedSuppliers.keys) {
@@ -178,14 +190,14 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
- void _saveProduct() async {
+  void _saveProduct() async {
     if (_formKey.currentState!.validate() && _selectedSuppliers.isNotEmpty) {
       setState(() {
         _isLoading = true;
       });
 
       String imageUrl = await uploadImage(widget.productId ?? '', _imageData, widget.currentImageUrl);
-      int newQuantity = int.parse(_quantityController.text);
+      double newQuantity = double.parse(_quantityController.text); // Modificat pentru a accepta valori decimale
       DateTime expiryDate = _selectedExpiryDate!;
 
       DocumentReference productRef = await saveOrUpdateProduct(
@@ -196,6 +208,7 @@ class _EditProductPageState extends State<EditProductPage> {
         imageUrl,
         newQuantity,
         expiryDate,
+        _selectedUnit,
         context,
       );
 
@@ -261,6 +274,24 @@ class _EditProductPageState extends State<EditProductPage> {
                       onImagePicked: _pickImage,
                     ),
                     SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _units.contains(_selectedUnit) ? _selectedUnit : null,
+                      items: _units.map((String unit) {
+                        return DropdownMenuItem<String>(
+                          value: unit,
+                          child: Text(unit),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedUnit = newValue!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Unitate',
+                      ),
+                    ),
+                    SizedBox(height: 16),
                     SupplierList(
                       supplierControllers: _supplierControllers,
                       selectedSuppliers: _selectedSuppliers,
@@ -269,7 +300,8 @@ class _EditProductPageState extends State<EditProductPage> {
                     ElevatedButton(
                       onPressed: _saveProduct,
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
                       child: Text('Salveaza'),
