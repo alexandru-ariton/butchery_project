@@ -14,7 +14,8 @@ class AuthProvider with ChangeNotifier {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': email,
-        'isLoggedIn': false, 
+        'isLoggedIn': false,
+        'parola':password, 
       });
       notifyListeners();
     } on FirebaseAuthException catch (e) {

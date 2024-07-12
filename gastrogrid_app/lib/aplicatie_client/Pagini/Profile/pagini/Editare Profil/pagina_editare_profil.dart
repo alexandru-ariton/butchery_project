@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/componente%20profil/image_picker_widget.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/componente%20profil/profile_actions.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/componente%20profil/profile_form.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/componente%20profil/image_picker_widget.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/componente%20profil/profile_actions.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/componente%20profil/profile_form.dart';
 import 'package:image_picker/image_picker.dart';
 import '../Adrese/pagina_adrese.dart';
-
 
 class EditProfilePage extends StatefulWidget {
   final String userId;
@@ -22,7 +21,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
-  late TextEditingController _addressController;
+
   late TextEditingController _dobController;
   late TextEditingController _passwordController;
   String? _gender;
@@ -36,7 +35,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.initState();
     _nameController = TextEditingController();
     _phoneController = TextEditingController();
-    _addressController = TextEditingController();
+    
     _dobController = TextEditingController();
     _passwordController = TextEditingController();
     _loadUserProfile();
@@ -46,7 +45,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     _dobController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -57,12 +55,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(widget.userId).get();
       if (userDoc.exists) {
         setState(() {
-          _nameController.text = userDoc['username'] ?? '';
-          _phoneController.text = userDoc['phoneNumber'] ?? '';
-          _addressController.text = userDoc['address'] ?? '';
-          _dobController.text = userDoc['dateOfBirth'] ?? '';
-          _gender = userDoc['gender'];
-          _photoUrl = userDoc['photoUrl'];
+          _nameController.text = (userDoc.data() as Map<String, dynamic>)['username'] ?? 'Nume utilizator';
+          _phoneController.text = (userDoc.data() as Map<String, dynamic>)['phoneNumber'] ?? '';
+         
+          _dobController.text = (userDoc.data() as Map<String, dynamic>)['dateOfBirth'] ?? '';
+          _passwordController.text = (userDoc.data() as Map<String, dynamic>)['password'] ?? '';
+          _gender = (userDoc.data() as Map<String, dynamic>)['gender'];
+          _photoUrl = (userDoc.data() as Map<String, dynamic>)['photoUrl'];
 
           // Extract prefix and phone number
           if (_phoneController.text.isNotEmpty) {
@@ -85,7 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editeaza Profil'),
+        title: Text('Editează Profil'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -107,7 +106,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ProfileForm(
                 nameController: _nameController,
                 phoneController: _phoneController,
-                addressController: _addressController,
+           
                 dobController: _dobController,
                 passwordController: _passwordController,
                 gender: _gender,
@@ -122,7 +121,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     _selectedPrefix = newPrefix!;
                   });
                 },
-                onSelectAddress: () => _selectAddress(context),
+               
                 onSelectDate: () => _selectDate(context),
               ),
               SizedBox(height: 24),
@@ -133,7 +132,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   widget.userId,
                   _nameController,
                   _phoneController,
-                  _addressController,
+            
                   _dobController,
                   _passwordController,
                   _gender,
@@ -145,7 +144,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   backgroundColor: Colors.green,
                   minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text('Salveaza'),
+                child: Text('Salvează'),
               ),
             ],
           ),
@@ -159,24 +158,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
-      lastDate: DateTime(2101),
+      lastDate: DateTime.now(),
     );
-    if (picked != null && picked != DateTime.now()) {
+    if (picked != null) {
       setState(() {
         _dobController.text = "${picked.toLocal()}".split(' ')[0];
       });
     }
   }
 
-  Future<void> _selectAddress(BuildContext context) async {
-    final selectedAddress = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SavedAddressesPage(source: 'Profile')),
-    );
-    if (selectedAddress != null) {
-      setState(() {
-        _addressController.text = selectedAddress;
-      });
-    }
-  }
+ 
 }

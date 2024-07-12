@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_editare_adrese.dart';
-import 'package:gastrogrid_app/providers/provider_livrare.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
 
 class SavedAddressesPage extends StatefulWidget {
   final String source;
@@ -40,6 +40,40 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     }
   }
 
+  void loadSavedAddresses() async {
+    if (userId != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('addresses')
+          .orderBy('timestamp', descending: true)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        setState(() {
+          savedAddresses = querySnapshot.docs.map((doc) {
+            Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+            return {
+              'addressId': doc.id,
+              'address': data?['address'] ?? '',
+              'city': data?['city'] ?? '',
+              'country': data?['country'] ?? '',
+              'zipCode': data?['zipCode'] ?? '',
+              'timestamp': data?['timestamp'],
+            };
+          }).toList();
+        });
+      }).catchError((error) {
+        print("Failed to load addresses: $error");
+      });
+    }
+  }
+
+  void _handleAddressTapForCart(String address) async {
+    LatLng? location = await _getLocationFromAddress(address);
+    Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address, location);
+    Navigator.pop(context, address);
+  }
+
   Future<LatLng?> _getLocationFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
@@ -52,73 +86,32 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     return null;
   }
 
-  void _handleAddressTapForCart(String address) async {
-    LatLng? location = await _getLocationFromAddress(address);
-    Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address, location);
-    Navigator.pop(context, address); 
-  }
-
-  void _handleAddressTapForProfile(String addressId, String address) async {
-    List<String> parts = address.split(',');
-    String street = parts.isNotEmpty ? parts[0].trim() : '';
-    String city = parts.length > 1 ? parts[1].trim() : '';
-    String stateZip = parts.length > 2 ? parts[2].trim() : '';
-    String state = '';
-    String zipCode = '';
-    if (stateZip.isNotEmpty) {
-      List<String> stateZipParts = stateZip.split(' ');
-      if (stateZipParts.isNotEmpty) state = stateZipParts[0].trim();
-      if (stateZipParts.length > 1) zipCode = stateZipParts[1].trim();
-    }
-
+  void _handleAddressTapForProfile(Map<String, dynamic> addressData) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditAddressPage(
-          addressId: addressId,
-          street: street,
-          city: city,
-          state: state,
-          zipCode: zipCode,
+          addressId: addressData['addressId'],
+          street: addressData['address'],
+          city: addressData['city'],
+          country: addressData['country'],
+          zipCode: addressData['zipCode'],
         ),
       ),
     );
   }
 
-  void _handleAddressTap(String addressId, String address) {
+  void _handleAddressTap(Map<String, dynamic> addressData) {
     if (widget.source == 'Cart') {
-      _handleAddressTapForCart(address);
+      _handleAddressTapForCart('${addressData['address']}, ${addressData['city']}, ${addressData['country']}, ${addressData['zipCode']}');
     } else {
-      _handleAddressTapForProfile(addressId, address);
-    }
-  }
-
-  void loadSavedAddresses() async {
-    if (userId != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('addresses')
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        setState(() {
-          savedAddresses = querySnapshot.docs.map((doc) {
-            String address = doc['address'] as String;
-            return {
-              'addressId': doc.id,
-              'address': address,
-            };
-          }).toList();
-        });
-      }).catchError((error) {
-        print("Failed to load addresses: $error");
-      });
+      _handleAddressTapForProfile(addressData);
     }
   }
 
   Widget _buildAddressCard(Map<String, dynamic> addressData) {
     return GestureDetector(
-      onTap: () => _handleAddressTap(addressData['addressId'], addressData['address']!),
+      onTap: () => _handleAddressTap(addressData),
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
@@ -128,12 +121,12 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           title: Text(
-            addressData['address'],
+            '${addressData['address']}, ${addressData['city']}, ${addressData['country']}, ${addressData['zipCode']}',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           trailing: IconButton(
             icon: Icon(Icons.edit, color: Theme.of(context).primaryColor),
-            onPressed: () => _handleAddressTap(addressData['addressId'], addressData['address']),
+            onPressed: () => _handleAddressTap(addressData),
           ),
         ),
       ),
@@ -148,19 +141,18 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
         centerTitle: true,
         elevation: 0,
         automaticallyImplyLeading: true,
-       
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: Theme.of(context).secondaryHeaderColor),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.secondary),
         toolbarTextStyle: TextTheme(
           titleLarge: TextStyle(
-            color: Theme.of(context).secondaryHeaderColor,
+            color: Theme.of(context).colorScheme.secondary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ).bodyMedium,
         titleTextStyle: TextTheme(
           titleLarge: TextStyle(
-            color: Theme.of(context).secondaryHeaderColor,
+            color: Theme.of(context).colorScheme.secondary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),

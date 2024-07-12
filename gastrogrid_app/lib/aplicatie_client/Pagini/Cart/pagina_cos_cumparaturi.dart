@@ -1,8 +1,3 @@
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/cart_item.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/delivery_info_section.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/expandable_section.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/order_summary.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/payment_method_section.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +9,11 @@ import 'package:gastrogrid_app/providers/provider_adresa_plata_cart.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:gastrogrid_app/providers/provider_themes.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/cart_item.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/delivery_info_section.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/expandable_section.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/order_summary.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Cart/componente/payment_method_section.dart';
 
 class ShoppingCartPage extends StatefulWidget {
   const ShoppingCartPage({super.key});
@@ -28,7 +28,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   void _selectDeliveryAddress(BuildContext context) async {
     final selectedAddress = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SavedAddressesPage(source: 'Cart',),
+        builder: (context) => SavedAddressesPage(source: 'Cart'),
       ),
     );
 
@@ -61,81 +61,93 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void finalizeOrder(BuildContext context) async {
-    final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
+  final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
 
-    if (optionsProvider.selectedAddress == null || optionsProvider.selectedPaymentMethod == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Selecteaza ori o adresa ori o modalitate de plata")),
-      );
-      return;
-    }
+  // Debugging print statements
+  print("Selected Address: ${optionsProvider.selectedAddress}");
+  print("Selected Payment Method: ${optionsProvider.selectedPaymentMethod}");
 
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String userId = user.uid;
-      CollectionReference orders = FirebaseFirestore.instance.collection('orders');
-
-      final cart = Provider.of<CartProvider>(context, listen: false);
-      final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
-
-      List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
-      Map<String, dynamic> orderData = {
-        'userId': userId,
-        'items': items,
-        'status': 'Pending',
-        'address': optionsProvider.selectedAddress ?? 'No address selected',
-        'paymentMethod': optionsProvider.selectedPaymentMethod ?? 'No payment method selected',
-        'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
-        'timestamp': FieldValue.serverTimestamp(),
-      };
-
-      try {
-        DocumentReference orderRef = await orders.add(orderData);
-
-        if (optionsProvider.selectedPaymentMethod == 'Card' && optionsProvider.selectedCardDetails != null) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => PaymentPage(
-                cardDetails: optionsProvider.selectedCardDetails!,
-                amount: orderData['total'],
-                orderId: orderRef.id,
-              ),
-            ),
-          ).then((paymentSuccess) async {
-            if (paymentSuccess == true) {
-              await orderRef.update({'status': 'Paid'});
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Plata a fost efectuata cu succes")),
-              );
-              cart.clear();
-              optionsProvider.clear();
-              setState(() {
-                _orderFinalized = true;
-              });
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Plata a esuat")),
-              );
-            }
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Comanda Finalizata")),
-          );
-          cart.clear();
-          optionsProvider.clear();
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Eroare la finalizarea comenzii: $e")),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("-")),
-      );
-    }
+  if (optionsProvider.selectedAddress == null || optionsProvider.selectedPaymentMethod == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Selecteaza ori o adresa ori o modalitate de plata")),
+    );
+    return;
   }
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    String userId = user.uid;
+    CollectionReference orders = FirebaseFirestore.instance.collection('orders');
+
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
+
+    List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
+    Map<String, dynamic> orderData = {
+      'userId': userId,
+      'items': items,
+      'status': 'Pending',
+      'address': optionsProvider.selectedAddress ?? 'No address selected',
+      'paymentMethod': optionsProvider.selectedPaymentMethod ?? 'No payment method selected',
+      'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    print("Order Data: $orderData");
+
+    try {
+      DocumentReference orderRef = await orders.add(orderData);
+      print("Order Reference: ${orderRef.id}");
+
+      if (optionsProvider.selectedPaymentMethod == 'Card' && optionsProvider.selectedCardDetails != null) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PaymentPage(
+              cardDetails: optionsProvider.selectedCardDetails!,
+              amount: orderData['total'],
+              orderId: orderRef.id,
+            ),
+          ),
+        ).then((paymentSuccess) async {
+          if (paymentSuccess == true) {
+            await orderRef.update({'status': 'Paid'});
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Plata a fost efectuata cu succes")),
+            );
+            cart.clear();
+            optionsProvider.clear();
+            setState(() {
+              _orderFinalized = true;
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Plata a esuat")),
+            );
+          }
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Comanda Finalizata")),
+        );
+        cart.clear();
+        optionsProvider.clear();
+        setState(() {
+          _orderFinalized = true;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Eroare la finalizarea comenzii: $e")),
+      );
+      print("Error: $e");
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Utilizator neautentificat.")),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -194,4 +206,3 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     );
   }
 }
-

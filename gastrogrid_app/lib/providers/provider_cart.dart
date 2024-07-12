@@ -12,10 +12,11 @@ class CartProvider with ChangeNotifier {
 
   List<CartItem> get items => _items;
 
+  List<CartItem> get cartItems => _items;
+
   Future<void> addProductToCart(CartItem cartItem, BuildContext context) async {
     DocumentSnapshot productSnapshot = await FirebaseFirestore.instance.collection('products').doc(cartItem.product.id).get();
-     if (!productSnapshot.exists) {
-     
+    if (!productSnapshot.exists) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Product does not exist in the database.')),
       );
@@ -23,25 +24,31 @@ class CartProvider with ChangeNotifier {
     }
     int currentStock = (productSnapshot['quantity'] as num).toInt();
 
-    if (currentStock < cartItem.quantity) {
+    double cartItemQuantityKg = cartItem.unit == 'Grams' ? cartItem.quantity / 1000 : cartItem.quantity;
+
+    if (currentStock < cartItemQuantityKg) {
       notifyOutOfStock(context, cartItem.product);
       return;
     }
 
     final existingCartItem = _items.firstWhere(
       (item) => item.product.id == cartItem.product.id,
-      orElse: () => CartItem(product: cartItem.product, quantity: 0),
+      orElse: () => CartItem(product: cartItem.product, quantity: 0.0, unit: 'Kilograms'),
     );
 
     if (existingCartItem.quantity > 0) {
-      existingCartItem.quantity += cartItem.quantity;
+      existingCartItem.quantity += cartItemQuantityKg;
     } else {
-      _items.add(cartItem);
+      _items.add(CartItem(
+        product: cartItem.product,
+        quantity: cartItemQuantityKg,
+        unit: 'Kilograms',
+      ));
     }
 
-    await _updateProductStock(cartItem.product.id, -cartItem.quantity);
+    await _updateProductStock(cartItem.product.id, -(cartItemQuantityKg));
 
-    if (currentStock - cartItem.quantity < 3) {
+    if (currentStock - cartItemQuantityKg < 3) {
       notificationProviderStoc.addNotification(
         'Stoc redus pentru ${cartItem.product.title}',
         cartItem.product.id,
@@ -53,8 +60,8 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateProductQuantity(CartItem cartItem, int newQuantity) async {
-    int difference = newQuantity - cartItem.quantity;
+  Future<void> updateProductQuantity(CartItem cartItem, double newQuantity) async {
+    double difference = newQuantity - cartItem.quantity;
     cartItem.quantity = newQuantity;
 
     if (cartItem.quantity <= 0) {
@@ -79,7 +86,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  int get totalItemsQuantity {
+  double get totalItemsQuantity {
     return _items.fold(0, (sum, item) => sum + item.quantity);
   }
 
@@ -87,12 +94,12 @@ class CartProvider with ChangeNotifier {
     return _items.fold(0, (sum, item) => sum + item.product.price * item.quantity);
   }
 
-  Future<void> _updateProductStock(String productId, int quantityChange) async {
+  Future<void> _updateProductStock(String productId, double quantityChange) async {
     DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       DocumentSnapshot snapshot = await transaction.get(productRef);
       if (snapshot.exists) {
-        int newStock = (snapshot['quantity'] + quantityChange).clamp(0, double.infinity).toInt();
+        double newStock = (snapshot['quantity'] + quantityChange).clamp(0, double.infinity);
         transaction.update(productRef, {'quantity': newStock});
       }
     });

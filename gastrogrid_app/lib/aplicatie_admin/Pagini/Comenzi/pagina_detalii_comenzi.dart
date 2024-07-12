@@ -34,7 +34,6 @@ class OrderDetailsPage extends StatelessWidget {
             child: ListView(
               children: [
                 _buildOrderDetailRow('ID Comanda:', orderId),
-                _buildOrderDetailRow('Status:', orderData['status'] ?? 'Unknown'),
                 _buildOrderDetailRow('Total:', '${orderData['total'] ?? 'Unknown'} lei'),
                 SizedBox(height: 16),
                 Text('Produse:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

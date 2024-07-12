@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'pagina_editare_produs.dart'; // Asigură-te că acest fișier este importat corect
+import 'pagina_editare_produs.dart';
 
 class ProductManagement extends StatelessWidget {
   const ProductManagement({super.key});
@@ -25,11 +25,9 @@ class ProductManagement extends StatelessWidget {
           .ref('product_images/imaginea1.jpeg')
           .getDownloadURL();
 
-      // Use the imageUrl in an Image widget or however you need
       print('Download URL: $imageUrl');
     } catch (e) {
       print('Error occurred while loading the image: $e');
-      // Handle errors or set a state to show an error image
     }
   }
 
@@ -123,7 +121,7 @@ class ProductManagement extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              'Cantitate: ${quantity.toStringAsFixed(3)} kilograme', // Afișează mereu în kilograme
+                              'Cantitate: ${quantity.toStringAsFixed(3)} kilograme',
                               style: TextStyle(fontSize: fontSize * 0.8),
                             ),
                           ),
@@ -142,7 +140,7 @@ class ProductManagement extends StatelessWidget {
                                         currentDescription: productData['description'],
                                         currentImageUrl: imageUrl,
                                         currentQuantity: quantity.toStringAsFixed(3),
-                                        currentUnit: 'kilograme', // Setează unitatea în kilograme
+                                        currentUnit: 'kilograme',
                                         currentExpiryDate: productData['expiryDate'],
                                       ),
                                     ),

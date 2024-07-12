@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:path/path.dart' as path; 
+
+
 
 Future<void> saveProfile(
   BuildContext context,
@@ -11,7 +14,6 @@ Future<void> saveProfile(
   String userId,
   TextEditingController nameController,
   TextEditingController phoneController,
-  TextEditingController addressController,
   TextEditingController dobController,
   TextEditingController passwordController,
   String? gender,
@@ -19,57 +21,50 @@ Future<void> saveProfile(
   File? image,
   String? photoUrl,
 ) async {
-  if (formKey.currentState!.validate()) {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw FirebaseAuthException(code: 'ERROR_NO_SIGNED_IN_USER', message: 'No user is signed in.');
-      }
+  if (!formKey.currentState!.validate()) {
+    return;
+  }
 
-      String? newPhotoUrl = await uploadImage(context, user.uid, image, photoUrl);
-      if (newPhotoUrl != null) {
-        await user.updatePhotoURL(newPhotoUrl);
-        photoUrl = newPhotoUrl;
-      }
+  try {
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    final existingData = userDoc.data() as Map<String, dynamic>?;
 
-      String newPhoneNumber = '$selectedPrefix ${phoneController.text}';
+    String? currentPassword = existingData != null ? existingData['password'] : null;
+    String? currentAddress = existingData != null ? existingData['address'] : null;
 
+    String newPassword = passwordController.text.isNotEmpty ? passwordController.text : currentPassword ?? '';
+  
+    Map<String, dynamic> updatedData = {
+      'username': nameController.text,
+      'phoneNumber': '$selectedPrefix ${phoneController.text}',
+      'dateOfBirth': dobController.text,
+      'gender': gender,
+      'password': newPassword,
+    };
 
-      // Update password
-      if (passwordController.text.isNotEmpty) {
-        await user.updatePassword(passwordController.text);
-      }
-
-      await FirebaseFirestore.instance.collection('users').doc(userId).set({
-        'username': nameController.text,
-        'phoneNumber': newPhoneNumber,
-        'address': addressController.text,
-        'dateOfBirth': dobController.text,
-        'gender': gender,
-        'photoUrl': photoUrl,
-      }, SetOptions(merge: true));
-
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
-      });
-
-      Navigator.pop(context, true);
-    } catch (e) {
-      String errorMessage;
-      if (e is FirebaseAuthException && e.code == 'too-many-requests') {
-        errorMessage = 'Too many requests. Please try again later.';
-      } else if (e is FirebaseAuthException && e.code == 'operation-not-allowed') {
-        errorMessage = 'Operation not allowed. Check your Firebase console settings.';
-      } else {
-        errorMessage = 'Error: $e';
-      }
-
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
-      });
+    // Logică pentru a încărca imaginea și a actualiza photoUrl
+    if (image != null) {
+      String fileName = path.basename(image.path);
+      Reference storageRef = FirebaseStorage.instance.ref().child('profile_images/$userId/$fileName');
+      UploadTask uploadTask = storageRef.putFile(image);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => {});
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      updatedData['photoUrl'] = downloadUrl;
+    } else if (photoUrl != null) {
+      updatedData['photoUrl'] = photoUrl;
     }
+
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update(updatedData);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profilul a fost actualizat cu succes')));
+    Navigator.of(context).pop(true);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Eroare la actualizarea profilului: $e')));
   }
 }
+
+
 
 
 

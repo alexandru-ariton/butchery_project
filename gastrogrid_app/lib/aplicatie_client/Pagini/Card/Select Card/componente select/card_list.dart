@@ -3,51 +3,53 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
 class CardList extends StatelessWidget {
-  final List<DocumentSnapshot> cards;
+  final List<Map<String, dynamic>> cards;
   final encrypt.Key encryptionKey;
   final String? selectedCardId;
   final Function(String?) onSelectCard;
+  final Function(Map<String, dynamic>) onEditCard;
 
-  const CardList({super.key, 
+  const CardList({
+    Key? key,
     required this.cards,
     required this.encryptionKey,
     required this.selectedCardId,
     required this.onSelectCard,
-  });
+    required this.onEditCard,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return cards.isEmpty
-        ? Center(child: Text('Nu ai carduri adaugate.'))
+        ? Center(child: Text('Nu ai carduri adăugate.'))
         : ListView.builder(
             itemCount: cards.length,
             itemBuilder: (context, index) {
-              DocumentSnapshot card = cards[index];
-              String last4 = 'XXXX';
-              final Map<String, dynamic> cardData = card.data() as Map<String, dynamic>;
-              if (cardData.containsKey('iv')) {
-                try {
-                  final encrypter = encrypt.Encrypter(encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc));
-                  final iv = encrypt.IV.fromBase64(cardData['iv']);
-                  final decryptedCardNumber = encrypter.decrypt64(cardData['cardNumber'], iv: iv);
-                  last4 = decryptedCardNumber.substring(decryptedCardNumber.length - 4);
-                } catch (e) {
-                  // Handle decryption error, but continue
-                }
-              }
+              final card = cards[index];
+              String last4 = card['last4'] ?? 'XXXX';
+
               return Card(
                 elevation: 2,
                 margin: EdgeInsets.symmetric(vertical: 8),
                 child: ListTile(
                   title: Text('Card ${index + 1}'),
                   subtitle: Text('Ultimele 4 cifre: $last4'),
-                  trailing: Radio<String>(
-                    value: card.id,
-                    groupValue: selectedCardId,
-                    onChanged: onSelectCard,
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () => onEditCard(card),
+                      ),
+                      Radio<String>(
+                        value: card['id'],
+                        groupValue: selectedCardId,
+                        onChanged: onSelectCard,
+                      ),
+                    ],
                   ),
                   onTap: () {
-                    onSelectCard(card.id);
+                    onSelectCard(card['id']);
                   },
                 ),
               );

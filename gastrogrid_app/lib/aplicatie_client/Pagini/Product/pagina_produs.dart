@@ -19,8 +19,25 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  int quantity = 1;
+  int quantity = 100; // Initial quantity set to 100 grams
   bool isAddingToCart = false;
+  String selectedUnit = 'Kilograms';
+
+  double get price {
+    if (selectedUnit == 'Grams') {
+      return widget.product.price / 1000 * quantity;
+    } else {
+      return widget.product.price * quantity;
+    }
+  }
+
+  double get quantityInStockUnits {
+    if (selectedUnit == 'Grams') {
+      return quantity / 1000.0; // Convert grams to kilograms for stock comparison
+    } else {
+      return quantity.toDouble();
+    }
+  }
 
   Future<void> addToCart() async {
     if (isAddingToCart) return;
@@ -30,7 +47,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
     try {
       final deliveryProvider = Provider.of<DeliveryProvider>(context, listen: false);
-      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime.toString()=='Locația este în afara ariei de livrare') {
+
+      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime > 60) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Livrarea nu poate fi efectuată pentru această adresă.')),
         );
@@ -63,21 +81,34 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           return;
         }
 
-        if (quantity > currentStock) {
+        if (quantityInStockUnits > currentStock) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Cantitate indisponibila')),
           );
           return;
         }
 
-        var cartItem = CartItem(
-          product: widget.product,
-          quantity: quantity,
+        var cartProvider = Provider.of<CartProvider>(context, listen: false);
+        var existingCartItem = cartProvider.cartItems.firstWhere(
+          (item) => item.product.id == widget.product.id,
+          orElse: () => CartItem(product: widget.product, quantity: 0.0, unit: 'Kilograms'),
         );
 
-        await Provider.of<CartProvider>(context, listen: false).addProductToCart(cartItem, context);
+        double quantityToAdd = selectedUnit == 'Grams' ? quantity / 1000.0 : quantity.toDouble();
 
-        if (currentStock - quantity < 3) {
+        if (existingCartItem.quantity > 0) {
+          existingCartItem.quantity += quantityToAdd;
+          cartProvider.updateProductQuantity(existingCartItem, existingCartItem.quantity);
+        } else {
+          var cartItem = CartItem(
+            product: widget.product,
+            quantity: quantityToAdd,
+            unit: 'Kilograms',
+          );
+          await cartProvider.addProductToCart(cartItem, context);
+        }
+
+        if (currentStock - quantityInStockUnits < 3) {
           await notifyLowStock(context, widget.product);
         } else {
           await Provider.of<NotificationProviderStoc>(context, listen: false)
@@ -89,7 +120,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         );
 
         setState(() {
-          quantity = 1;
+          quantity = selectedUnit == 'Grams' ? 100 : 1; // Reset quantity based on unit
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +198,27 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                 ),
               ),
-            SizedBox(height: 80),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: DropdownButton<String>(
+                value: selectedUnit,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedUnit = newValue!;
+                    quantity = selectedUnit == 'Grams' ? 100 : 1; // Reset quantity based on unit
+                  });
+                },
+                items: <String>['Kilograms', 'Grams']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 23.0),
               child: Row(
@@ -179,14 +230,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         icon: Icons.remove,
                         onPressed: () {
                           setState(() {
-                            if (quantity > 1) quantity--;
+                            if (selectedUnit == 'Grams' && quantity > 100) {
+                              quantity -= 100;
+                            } else if (selectedUnit == 'Kilograms' && quantity > 1) {
+                              quantity -= 1;
+                            }
                           });
                         },
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          quantity.toString(),
+                          (selectedUnit == 'Grams' ? (quantity / 1000.0).toStringAsFixed(3) : quantity.toStringAsFixed(2)),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
@@ -194,14 +249,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         icon: Icons.add,
                         onPressed: () {
                           setState(() {
-                            quantity++;
+                            if (selectedUnit == 'Grams') {
+                              quantity += 100;
+                            } else {
+                              quantity += 1;
+                            }
                           });
                         },
                       ),
                     ],
                   ),
                   Text(
-                    '${widget.product.price.toStringAsFixed(2)} lei',
+                    '${price.toStringAsFixed(2)} lei',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                         ),

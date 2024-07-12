@@ -1,8 +1,7 @@
-// ignore_for_file: unnecessary_null_comparison
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/Select%20Card/pagina_select_card.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_adrese.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20Profil/pagina_editare_profil.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/pagina_setari.dart';
@@ -33,17 +32,16 @@ class _ProfilePageState extends State<ProfilePage> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _userId = user.uid;
-      _photoUrl = user.photoURL;
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(_userId).get();
       setState(() {
-        if(userDoc['username'].toString() != null)
-        {
-          _username = userDoc['username'];
-        }else {
-
-          _username = '-';
-
+        if (userDoc.exists && userDoc.data() != null) {
+          final data = userDoc.data() as Map<String, dynamic>;
+          _username = data['username'] ?? 'Nume utilizator';
+          _photoUrl = data['photoUrl']; // Actualizăm _photoUrl din Firestore
+        } else {
+          _username = 'Nume utilizator';
+          _photoUrl = user.photoURL; // Dacă nu există în Firestore, încercăm din Firebase Auth
         }
       });
     }
@@ -68,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             SizedBox(height: 10),
             Text(
-              _username ?? '-',
+              _username ?? 'Nume utilizator',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -126,6 +124,18 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                   ),
                   ProfileOption(
+                    icon: Icons.payment_rounded,
+                    text: 'Carduri',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SelectCardPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  ProfileOption(
                     icon: Icons.logout,
                     text: 'Logout',
                     onTap: () {
@@ -140,6 +150,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  
 }

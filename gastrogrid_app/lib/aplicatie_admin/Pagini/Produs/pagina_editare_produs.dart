@@ -92,28 +92,36 @@ class _EditProductPageState extends State<EditProductPage> {
   }
 
   Future<void> _loadAllSuppliers() async {
-    var suppliersSnapshot = await FirebaseFirestore.instance.collection('suppliers').get();
-    for (var doc in suppliersSnapshot.docs) {
-      _selectedSuppliers[doc.id] = {'name': doc.data()['name'], 'selected': false};
-      _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller']);
+    try {
+      var suppliersSnapshot = await FirebaseFirestore.instance.collection('suppliers').get();
+      for (var doc in suppliersSnapshot.docs) {
+        _selectedSuppliers[doc.id] = {'name': doc.data()['name'], 'selected': false};
+        _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller']);
+      }
+      setState(() {});
+    } catch (e) {
+      print('Error loading suppliers: $e');
     }
-    setState(() {});
   }
 
   Future<void> _loadSelectedSuppliers() async {
-    if (widget.productId != null) {
-      var suppliersSnapshot = await FirebaseFirestore.instance
-          .collection('products')
-          .doc(widget.productId)
-          .collection('suppliers')
-          .get();
+    try {
+      if (widget.productId != null) {
+        var suppliersSnapshot = await FirebaseFirestore.instance
+            .collection('products')
+            .doc(widget.productId)
+            .collection('suppliers')
+            .get();
 
-      for (var doc in suppliersSnapshot.docs) {
-        if (_selectedSuppliers.containsKey(doc.id)) {
-          _selectedSuppliers[doc.id]!['selected'] = true;
+        for (var doc in suppliersSnapshot.docs) {
+          if (_selectedSuppliers.containsKey(doc.id)) {
+            _selectedSuppliers[doc.id]!['selected'] = true;
+          }
         }
+        setState(() {});
       }
-      setState(() {});
+    } catch (e) {
+      print('Error loading selected suppliers: $e');
     }
   }
 
@@ -153,12 +161,16 @@ class _EditProductPageState extends State<EditProductPage> {
   }
 
   Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
-    for (String supplierId in selectedSuppliers.keys) {
-      if (selectedSuppliers[supplierId]!['selected'] == true) {
-        await productRef.collection('suppliers').doc(supplierId).set({'controller': supplierId});
-      } else {
-        await productRef.collection('suppliers').doc(supplierId).delete();
+    try {
+      for (String supplierId in selectedSuppliers.keys) {
+        if (selectedSuppliers[supplierId]!['selected'] == true) {
+          await productRef.collection('suppliers').doc(supplierId).set({'controller': supplierId});
+        } else {
+          await productRef.collection('suppliers').doc(supplierId).delete();
+        }
       }
+    } catch (e) {
+      print('Error saving suppliers: $e');
     }
   }
 
@@ -172,33 +184,38 @@ class _EditProductPageState extends State<EditProductPage> {
       DateTime expiryDate,
       String unit,
       BuildContext context) async {
-    if (productId == null) {
-      DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
-        'title': title,
-        'price': price,
-        'description': description,
-        'imageUrl': imageUrl,
-        'quantity': newQuantity,
-        'unit': unit,
-        'expiryDate': expiryDate,
-      });
-      return newProductRef;
-    } else {
-      DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
-      DocumentSnapshot productSnapshot = await productRef.get();
-      double currentQuantity = productSnapshot['quantity'];
-      double updatedQuantity = currentQuantity + (unit == 'grame' ? newQuantity / 1000 : newQuantity);
+    try {
+      if (productId == null) {
+        DocumentReference newProductRef = await FirebaseFirestore.instance.collection('products').add({
+          'title': title,
+          'price': price,
+          'description': description,
+          'imageUrl': imageUrl,
+          'quantity': newQuantity,
+          'unit': unit,
+          'expiryDate': expiryDate,
+        });
+        return newProductRef;
+      } else {
+        DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
+        DocumentSnapshot productSnapshot = await productRef.get();
+        double currentQuantity = productSnapshot['quantity'];
+        double updatedQuantity = currentQuantity + (unit == 'grame' ? newQuantity / 1000 : newQuantity);
 
-      await productRef.update({
-        'title': title,
-        'price': price,
-        'description': description,
-        'imageUrl': imageUrl,
-        'quantity': updatedQuantity,
-        'unit': unit,
-        'expiryDate': expiryDate,
-      });
-      return productRef;
+        await productRef.update({
+          'title': title,
+          'price': price,
+          'description': description,
+          'imageUrl': imageUrl,
+          'quantity': updatedQuantity,
+          'unit': unit,
+          'expiryDate': expiryDate,
+        });
+        return productRef;
+      }
+    } catch (e) {
+      print('Error saving/updating product: $e');
+      throw e;  // Rethrow the error to be handled later if needed
     }
   }
 
@@ -208,29 +225,36 @@ class _EditProductPageState extends State<EditProductPage> {
         _isLoading = true;
       });
 
-      String imageUrl = await uploadImage(widget.productId ?? '', _imageData, widget.currentImageUrl);
-      double newQuantity = double.parse(_quantityController.text);
-      DateTime expiryDate = _selectedExpiryDate!;
+      try {
+        String imageUrl = await uploadImage(widget.productId ?? '', _imageData, widget.currentImageUrl);
+        double newQuantity = double.parse(_quantityController.text);
+        DateTime expiryDate = _selectedExpiryDate!;
 
-      DocumentReference productRef = await saveOrUpdateProduct(
-        widget.productId,
-        _titleController.text,
-        double.parse(_priceController.text),
-        _descriptionController.text,
-        imageUrl,
-        newQuantity,
-        expiryDate,
-        _selectedUnit,
-        context,
-      );
+        DocumentReference productRef = await saveOrUpdateProduct(
+          widget.productId,
+          _titleController.text,
+          double.parse(_priceController.text),
+          _descriptionController.text,
+          imageUrl,
+          newQuantity,
+          expiryDate,
+          _selectedUnit,
+          context,
+        );
 
-      await _saveSuppliers(productRef, _selectedSuppliers);
+        await _saveSuppliers(productRef, _selectedSuppliers);
 
-      setState(() {
-        _isLoading = false;
-      });
+        setState(() {
+          _isLoading = false;
+        });
 
-      Navigator.pop(context);
+        Navigator.pop(context);
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Eroare la salvarea produsului: $e')));
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Selecteaza cel putin un furnizor')));
     }

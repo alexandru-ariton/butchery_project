@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_null_comparison
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/clase/clasa_cart.dart';
@@ -59,7 +57,7 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Pret: ${item.product.price.toStringAsFixed(2)} lei',
+                    'Pret: ${(item.product.price * item.quantity).toStringAsFixed(2)} lei',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -67,7 +65,7 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Cantitate: ${item.quantity}',
+                    'Cantitate: ${(item.quantity).toStringAsFixed(2)} Kilograms',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -92,15 +90,15 @@ class CartItemWidget extends StatelessWidget {
           icon: Icon(Icons.remove),
           color: themeProvider.themeData.colorScheme.primary,
           onPressed: () {
-            if (item.quantity > 1) {
-              Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity - 1);
+            if (item.quantity > 0.1) {
+              Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity - 0.1);
             } else {
               Provider.of<CartProvider>(context, listen: false).removeProduct(item);
             }
           },
         ),
         Text(
-          item.quantity.toString(),
+          (item.quantity).toStringAsFixed(2),
           style: TextStyle(
             fontSize: 16,
             color: themeProvider.themeData.colorScheme.onSurface,
@@ -110,7 +108,7 @@ class CartItemWidget extends StatelessWidget {
           icon: Icon(Icons.add),
           color: themeProvider.themeData.colorScheme.primary,
           onPressed: () {
-            Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity + 1);
+            Provider.of<CartProvider>(context, listen: false).updateProductQuantity(item, item.quantity + 0.1);
           },
         ),
       ],

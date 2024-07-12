@@ -20,16 +20,13 @@ class DeliveryProvider with ChangeNotifier {
   String? get selectedAddress => _selectedAddress;
   LatLng? get selectedLocation => _selectedLocation;
   int get deliveryTime => _isDelivery ? _deliveryTime : pickupTime;
- 
-  
 
   String get formattedDeliveryTime {
     int time = _isDelivery ? _deliveryTime : pickupTime;
     if (time > 60) {
       return 'Locația este în afara ariei de livrare';
     } 
-      return _formatTime(time);
-    
+    return _formatTime(time);
   }
 
   DeliveryProvider() {
@@ -57,7 +54,7 @@ class DeliveryProvider with ChangeNotifier {
       double distance = await _calculateDistance(_defaultLocation, _selectedLocation!);
       _deliveryFee = double.parse((5.0 + distance * 0.5).toStringAsFixed(2));
       _deliveryTime = (distance / 10 * 60).round();
-      pickupTime = (distance / 20 * 20).round(); // Adjusted logic for pickup time
+      pickupTime = (distance / 20 * 20).round();
     }
     notifyListeners();
   }
@@ -80,8 +77,10 @@ class DeliveryProvider with ChangeNotifier {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
         _defaultAddress = '${place.street}, ${place.locality}, ${place.country}';
+        print('Adresa default obținută: $_defaultAddress');
       } else {
         _defaultAddress = 'Adresa necunoscută';
+        print('Nu s-a putut obține adresa default.');
       }
     } catch (e) {
       _defaultAddress = 'Eroare la obținerea adresei';
@@ -106,15 +105,14 @@ class DeliveryProvider with ChangeNotifier {
   }
 
   Future<LatLng?> getLocationFromAddress(String address) async {
-  try {
-    List<Location> locations = await locationFromAddress(address);
-    if (locations.isNotEmpty) {
-      return LatLng(locations.first.latitude, locations.first.longitude);
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        return LatLng(locations.first.latitude, locations.first.longitude);
+      }
+    } catch (e) {
+      print("Error getting location from address: $e");
     }
-  } catch (e) {
-    print("Error getting location from address: $e");
+    return null;
   }
-  return null;
-}
-
 }

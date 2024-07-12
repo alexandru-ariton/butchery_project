@@ -6,14 +6,15 @@ class EditAddressPage extends StatefulWidget {
   final String addressId;
   final String street;
   final String city;
-  final String state;
+  final String country;
   final String zipCode;
 
-  const EditAddressPage({super.key, 
+  const EditAddressPage({
+    super.key,
     required this.addressId,
     required this.street,
     required this.city,
-    required this.state,
+    required this.country,
     required this.zipCode,
   });
 
@@ -24,7 +25,7 @@ class EditAddressPage extends StatefulWidget {
 class _EditAddressPageState extends State<EditAddressPage> {
   late TextEditingController _streetController;
   late TextEditingController _cityController;
-  late TextEditingController _stateController;
+  late TextEditingController _countryController;
   late TextEditingController _zipCodeController;
   String? userId;
 
@@ -33,7 +34,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
     super.initState();
     _streetController = TextEditingController(text: widget.street);
     _cityController = TextEditingController(text: widget.city);
-    _stateController = TextEditingController(text: widget.state);
+    _countryController = TextEditingController(text: widget.country);
     _zipCodeController = TextEditingController(text: widget.zipCode);
     _initializeUser();
   }
@@ -59,10 +60,10 @@ class _EditAddressPageState extends State<EditAddressPage> {
             .doc(userId)
             .collection('addresses')
             .doc(widget.addressId);
-        await docRef.set({
-          'street': _streetController.text,
+        await docRef.update({
+          'address': _streetController.text,
           'city': _cityController.text,
-          'state': _stateController.text,
+          'country': _countryController.text,
           'zipCode': _zipCodeController.text,
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -110,7 +111,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
   void dispose() {
     _streetController.dispose();
     _cityController.dispose();
-    _stateController.dispose();
+    _countryController.dispose();
     _zipCodeController.dispose();
     super.dispose();
   }
@@ -119,7 +120,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editeaza Adresa'),
+        title: Text('Editează Adresa'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -132,12 +133,12 @@ class _EditAddressPageState extends State<EditAddressPage> {
             SizedBox(height: 10),
             TextField(
               controller: _cityController,
-              decoration: InputDecoration(labelText: 'Oras'),
+              decoration: InputDecoration(labelText: 'Oraș'),
             ),
             SizedBox(height: 10),
             TextField(
-              controller: _stateController,
-              decoration: InputDecoration(labelText: 'Judet'),
+              controller: _countryController,
+              decoration: InputDecoration(labelText: 'Țara'),
             ),
             SizedBox(height: 10),
             TextField(
@@ -150,12 +151,12 @@ class _EditAddressPageState extends State<EditAddressPage> {
               children: [
                 ElevatedButton(
                   onPressed: _saveAddress,
-                  child: Text('Salveaza'),
+                  child: Text('Salvează'),
                 ),
                 ElevatedButton(
                   onPressed: _removeAddress,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: Text('Sterge'),
+                  child: Text('Șterge'),
                 ),
               ],
             ),

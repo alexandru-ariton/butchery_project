@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import '../pagina_card.dart'; // Asigurați-vă că ați creat această pagină pentru introducerea datelor cardului
+import 'package:gastrogrid_app/aplicatie_client/Pagini/Card/pagina_card.dart';
 
 class SelectCardPage extends StatefulWidget {
-  const SelectCardPage({super.key});
+  const SelectCardPage({Key? key}) : super(key: key);
 
   @override
   _SelectCardPageState createState() => _SelectCardPageState();
 }
 
 class _SelectCardPageState extends State<SelectCardPage> {
-  List<DocumentSnapshot> _cards = [];
+  List<Map<String, dynamic>> _cards = [];
   String? _selectedCardId;
   final _encryptionKey = encrypt.Key.fromUtf8('my32lengthsupersecretnooneknows1');
 
@@ -33,7 +33,24 @@ class _SelectCardPageState extends State<SelectCardPage> {
           .where('userId', isEqualTo: userId)
           .get();
       setState(() {
-        _cards = querySnapshot.docs;
+        _cards = querySnapshot.docs.map((doc) {
+          Map<String, dynamic> cardData = doc.data() as Map<String, dynamic>;
+          if (cardData.containsKey('iv')) {
+            try {
+              final encrypter = encrypt.Encrypter(encrypt.AES(_encryptionKey, mode: encrypt.AESMode.cbc));
+              final iv = encrypt.IV.fromBase64(cardData['iv']);
+              final decryptedCardNumber = encrypter.decrypt64(cardData['cardNumber'], iv: iv);
+              cardData['last4'] = decryptedCardNumber.substring(decryptedCardNumber.length - 4);
+              print('Decrypted card number: $decryptedCardNumber');
+            } catch (e) {
+              // Handle decryption error, but continue
+              print('Error decrypting card number: $e');
+              cardData['last4'] = 'XXXX';
+            }
+          }
+          cardData['id'] = doc.id;
+          return cardData;
+        }).toList();
       });
     }
   }
@@ -59,13 +76,29 @@ class _SelectCardPageState extends State<SelectCardPage> {
     }
   }
 
+  void _editCard(Map<String, dynamic> card) async {
+    final cardDetails = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CardDetailsPage(
+          cardData: card,
+          cardId: card['id'],
+        ),
+      ),
+    );
+
+    if (cardDetails != null && cardDetails['cardId'] != null) {
+      setState(() {
+        _loadCards();
+      });
+    }
+  }
+
   void _confirmSelection() {
     if (_selectedCardId != null) {
-      DocumentSnapshot selectedCard = _cards.firstWhere((card) => card.id == _selectedCardId);
-      final Map<String, dynamic> cardData = selectedCard.data() as Map<String, dynamic>;
+      Map<String, dynamic> selectedCard = _cards.firstWhere((card) => card['id'] == _selectedCardId);
       decryptCardDetails(
         context,
-        cardData,
+        selectedCard,
         _encryptionKey,
         _selectedCardId,
       );
@@ -78,7 +111,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selecteaza un card'),
+        title: Text('Selectează un card'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,6 +123,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
                 encryptionKey: _encryptionKey,
                 selectedCardId: _selectedCardId,
                 onSelectCard: _selectCard,
+                onEditCard: _editCard,
               ),
             ),
             SizedBox(height: 16),
@@ -106,7 +140,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
                 children: const [
                   Icon(Icons.add),
                   SizedBox(width: 10),
-                  Text('Adauga un card nou'),
+                  Text('Adaugă un card nou'),
                 ],
               ),
             ),
@@ -124,7 +158,7 @@ class _SelectCardPageState extends State<SelectCardPage> {
                 children: const [
                   Icon(Icons.check),
                   SizedBox(width: 10),
-                  Text('Confirma selectia'),
+                  Text('Confirmă selecția'),
                 ],
               ),
             ),

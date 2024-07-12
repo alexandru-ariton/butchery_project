@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 class ProfileForm extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController phoneController;
-  final TextEditingController addressController;
   final TextEditingController dobController;
   final TextEditingController passwordController;
   final String? gender;
   final Function(String?) onGenderChanged;
-  final VoidCallback onSelectAddress;
   final VoidCallback onSelectDate;
   final String selectedPrefix;
   final Function(String?) onPrefixChanged;
@@ -17,12 +15,10 @@ class ProfileForm extends StatelessWidget {
     super.key,
     required this.nameController,
     required this.phoneController,
-    required this.addressController,
     required this.dobController,
     required this.passwordController,
     required this.gender,
     required this.onGenderChanged,
-    required this.onSelectAddress,
     required this.onSelectDate,
     required this.selectedPrefix,
     required this.onPrefixChanged,
@@ -62,19 +58,25 @@ class ProfileForm extends StatelessWidget {
         ),
         SizedBox(height: 16),
         TextFormField(
-          controller: addressController,
-          decoration: InputDecoration(labelText: 'Adresa', prefixIcon: Icon(Icons.home)),
-          readOnly: true,
-          onTap: onSelectAddress,
-          validator: (value) => value!.isEmpty ? 'Selecteaza o adresa' : null,
-        ),
-        SizedBox(height: 16),
-        TextFormField(
           controller: dobController,
           decoration: InputDecoration(labelText: 'Data nasterii', prefixIcon: Icon(Icons.calendar_today)),
           readOnly: true,
           onTap: onSelectDate,
-          validator: (value) => value!.isEmpty ? 'Selecteaza data' : null,
+          validator: (value) {
+            if (value!.isEmpty) {
+              return 'Selecteaza data';
+            }
+            final selectedDate = DateTime.parse(value);
+            final currentDate = DateTime.now();
+            final minDate = DateTime(1900);
+            if (selectedDate.isAfter(currentDate)) {
+              return 'Data nu poate fi in viitor';
+            }
+            if (selectedDate.isBefore(minDate)) {
+              return 'Data nu poate fi prea in trecut';
+            }
+            return null;
+          },
         ),
         SizedBox(height: 16),
         DropdownButtonFormField<String>(
@@ -94,7 +96,6 @@ class ProfileForm extends StatelessWidget {
           controller: passwordController,
           decoration: InputDecoration(labelText: 'Parola', prefixIcon: Icon(Icons.lock)),
           obscureText: true,
-          validator: (value) => value!.isEmpty ? 'Introdu parola' : null,
         ),
       ],
     );

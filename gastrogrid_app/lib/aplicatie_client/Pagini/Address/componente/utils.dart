@@ -30,23 +30,32 @@ Future<void> fetchAddressFromCoordinates(
   }
 }
 
+
 Future<void> saveAddress(String address, BuildContext context) async {
-  User? user = FirebaseAuth.instance.currentUser;
+  final user = FirebaseAuth.instance.currentUser;
   if (user != null) {
-    String userId = user.uid;
-    DocumentReference docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('addresses')
-        .doc();
-    await docRef.set({'address': address});
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Adresa salvata")),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("User-ul nu a fost gasit")),
-    );
+    final userId = user.uid;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('addresses')
+          .add({
+        'address': address,
+        'timestamp': FieldValue.serverTimestamp(), 
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Adresa a fost salvată cu succes')),
+      );
+
+      Navigator.of(context).pop(); 
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Eroare la salvarea adresei: $e')),
+      );
+    }
   }
-  Navigator.pop(context, true);
 }
+
