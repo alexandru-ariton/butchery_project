@@ -23,17 +23,18 @@ class Product {
   });
 
   factory Product.fromMap(Map<String, dynamic> data, String id) {
-    return Product(
-      id: id,
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      price: (data['price'] as num).toDouble(),
-      imageUrl: data['imageUrl'] ?? '',
-      quantity: data['quantity'] ?? 0,
-      supplierId: data['supplierId'] ?? '', 
-       expiryDate: data['expiryDate'] != null ? (data['expiryDate'] as Timestamp).toDate() : null,
-    );
-  }
+  return Product(
+    id: id,
+    title: data['title'] ?? '',
+    description: data['description'] ?? '',
+    price: (data['price'] as num).toDouble(),
+    imageUrl: data['imageUrl'] ?? '',
+    quantity: (data['quantity'] ?? 0).toInt(), // Ensure quantity is an int
+    supplierId: data['supplierId'] ?? '',
+    expiryDate: data['expiryDate'] != null ? (data['expiryDate'] as Timestamp).toDate() : null,
+  );
+}
+
 
   Map<String, dynamic> toMap() {
     return {

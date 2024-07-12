@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 
 class OrderHeader extends StatelessWidget {
   final String orderId;
-  final String status;
+  final String preparationStatus;
+  final String paymentStatus;
   final double total;
 
-  const OrderHeader({super.key, required this.orderId, required this.status, required this.total});
+  const OrderHeader({
+    super.key, 
+    required this.orderId, 
+    required this.preparationStatus, 
+    required this.paymentStatus, 
+    required this.total
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +32,21 @@ class OrderHeader extends StatelessWidget {
             Icon(Icons.info, color: Colors.blue),
             SizedBox(width: 8),
             Text(
-              'Status: $status',
+              'Status preparare: $preparationStatus',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(Icons.payment, color: Colors.orange),
+            SizedBox(width: 8),
+            Text(
+              'Status plată: $paymentStatus',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[700],

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_admin/Pagini/Comenzi/pagina_detalii_comenzi.dart';
@@ -10,7 +9,17 @@ class OrderManagement extends StatelessWidget {
     await FirebaseFirestore.instance.collection('orders').doc(id).delete();
   }
 
-  
+  void _updateOrderStatus(String orderId, String newStatus) async {
+    await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'status': newStatus});
+  }
+
+  void _updatePreparationStatus(String orderId, String newStatus) async {
+    await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'preparationStatus': newStatus});
+  }
+
+  void _updatePaymentStatus(String orderId, String newStatus) async {
+    await FirebaseFirestore.instance.collection('orders').doc(orderId).update({'paymentStatus': newStatus});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +42,11 @@ class OrderManagement extends StatelessWidget {
                 var orderId = order.id;
                 var orderData = order.data() as Map<String, dynamic>;
 
-                String currentOrderStatus = orderData['status'] ?? 'In asteptare';
+                String currentPreparationStatus = orderData['preparationStatus'] ?? 'Receptionata';
                 String currentPaymentStatus = orderData['paymentStatus'] ?? 'Neplatit';
 
-                if (!['In asteptare', 'In curs de procesare', 'Finalizata'].contains(currentOrderStatus)) {
-                  currentOrderStatus = 'In asteptare';
+                if (!['Receptionata', 'In curs de procesare', 'In curs de livrare', 'Finalizata'].contains(currentPreparationStatus)) {
+                  currentPreparationStatus = 'Receptionata';
                 }
 
                 if (!['Platit', 'Neplatit'].contains(currentPaymentStatus)) {
@@ -71,11 +80,11 @@ class OrderManagement extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Status: $currentOrderStatus',
+                            'Status preparare: $currentPreparationStatus',
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
-                            'Status plata: $currentPaymentStatus',
+                            'Status plată: $currentPaymentStatus',
                             style: TextStyle(fontSize: 16),
                           ),
                           SizedBox(height: 16),
@@ -84,22 +93,26 @@ class OrderManagement extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: DropdownButtonFormField<String>(
-                                  value: currentOrderStatus,
+                                  value: currentPreparationStatus,
                                   decoration: InputDecoration(
-                                    labelText: 'Status',
+                                    labelText: 'Status preparare',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     filled: true,
                                     fillColor: Colors.white,
                                   ),
-                                  items: ['In asteptare', 'In curs de procesare', 'Finalizata']
+                                  items: ['Receptionata', 'In curs de procesare', 'In curs de livrare', 'Finalizata']
                                       .map((status) => DropdownMenuItem(
                                             value: status,
                                             child: Text(status, style: TextStyle(fontSize: 16)),
                                           ))
-                                      .toList(), onChanged: (String? value) {  },
-
+                                      .toList(),
+                                  onChanged: (String? value) {
+                                    if (value != null) {
+                                      _updatePreparationStatus(orderId, value);
+                                    }
+                                  },
                                 ),
                               ),
                               SizedBox(width: 8),
@@ -107,22 +120,37 @@ class OrderManagement extends StatelessWidget {
                                 child: DropdownButtonFormField<String>(
                                   value: currentPaymentStatus,
                                   decoration: InputDecoration(
-                                    labelText: 'Status plata',
+                                    labelText: 'Status plată',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     filled: true,
                                     fillColor: Colors.white,
                                   ),
-                                  items: ['Platit', 'Neplatit']
-                                      .map((status) => DropdownMenuItem(
-                                            value: status,
-                                            child: Text(status, style: TextStyle(fontSize: 16)),
-                                          ))
-                                      .toList(),
-                                  onChanged: (value) {
-                                   
-                                  },
+                                  items: currentPaymentStatus == 'Platit'
+                                      ? [
+                                          DropdownMenuItem(
+                                            value: 'Platit',
+                                            child: Text('Platit', style: TextStyle(fontSize: 16)),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 'Neplatit',
+                                            child: Text('Neplatit', style: TextStyle(fontSize: 16)),
+                                          ),
+                                        ]
+                                      : ['Platit', 'Neplatit']
+                                          .map((status) => DropdownMenuItem(
+                                                value: status,
+                                                child: Text(status, style: TextStyle(fontSize: 16)),
+                                              ))
+                                          .toList(),
+                                  onChanged: currentPaymentStatus == 'Platit'
+                                      ? null
+                                      : (String? value) {
+                                          if (value != null) {
+                                            _updatePaymentStatus(orderId, value);
+                                          }
+                                        },
                                 ),
                               ),
                               IconButton(

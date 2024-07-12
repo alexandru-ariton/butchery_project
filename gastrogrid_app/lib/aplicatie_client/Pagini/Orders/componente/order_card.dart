@@ -12,6 +12,9 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var orderData = order.data() as Map<String, dynamic>;
+    String preparationStatus = orderData['preparationStatus'] ?? 'Receptionata';
+    String paymentStatus = orderData['paymentStatus'] ?? 'Neplatit';
+    
     return Card(
       margin: EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
@@ -23,7 +26,12 @@ class OrderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OrderHeader(orderId: order.id, status: orderData['status'], total: orderData['total']),
+            OrderHeader(
+              orderId: order.id, 
+              preparationStatus: preparationStatus, 
+              paymentStatus: paymentStatus, 
+              total: orderData['total']
+            ),
             Divider(),
             OrderItems(items: orderData['items']),
             SizedBox(height: 16),

@@ -108,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SavedAddressesPage(),
+                          builder: (context) => SavedAddressesPage(source: 'Profile'),
                         ),
                       );
                     },

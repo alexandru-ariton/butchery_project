@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/pagina_editare_produs.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'pagina_editare_produs.dart'; // Asigură-te că acest fișier este importat corect
 
 class ProductManagement extends StatelessWidget {
   const ProductManagement({super.key});
@@ -10,7 +10,7 @@ class ProductManagement extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProductPage(),
+        builder: (context) => const EditProductPage(),
       ),
     );
   }
@@ -76,7 +76,6 @@ class ProductManagement extends StatelessWidget {
                     var product = snapshot.data!.docs[index - 1];
                     Map<String, dynamic> productData = product.data() as Map<String, dynamic>;
                     String imageUrl = productData['imageUrl'];
-                    String unit = productData.containsKey('unit') ? productData['unit'] : 'unitate'; // Verifică dacă unitatea există
                     double quantity = productData['quantity'].toDouble();
 
                     return Card(
@@ -124,7 +123,7 @@ class ProductManagement extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              'Cantitate: ${quantity.toStringAsFixed(3)} $unit',
+                              'Cantitate: ${quantity.toStringAsFixed(3)} kilograme', // Afișează mereu în kilograme
                               style: TextStyle(fontSize: fontSize * 0.8),
                             ),
                           ),
@@ -143,7 +142,7 @@ class ProductManagement extends StatelessWidget {
                                         currentDescription: productData['description'],
                                         currentImageUrl: imageUrl,
                                         currentQuantity: quantity.toStringAsFixed(3),
-                                        currentUnit: unit,
+                                        currentUnit: 'kilograme', // Setează unitatea în kilograme
                                         currentExpiryDate: productData['expiryDate'],
                                       ),
                                     ),

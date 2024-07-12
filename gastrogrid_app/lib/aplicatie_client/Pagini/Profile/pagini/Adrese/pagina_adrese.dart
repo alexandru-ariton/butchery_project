@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 import 'package:geocoding/geocoding.dart';
 
 class SavedAddressesPage extends StatefulWidget {
-  const SavedAddressesPage({super.key});
+  final String source;
+
+  const SavedAddressesPage({super.key, required this.source});
 
   @override
   _SavedAddressesPageState createState() => _SavedAddressesPageState();
@@ -50,36 +52,13 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     return null;
   }
 
-  void _handleAddressTap1(String address) async {
+  void _handleAddressTapForCart(String address) async {
     LatLng? location = await _getLocationFromAddress(address);
     Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address, location);
     Navigator.pop(context, address); 
   }
 
-  void loadSavedAddresses() async {
-    if (userId != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('addresses')
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        setState(() {
-          savedAddresses = querySnapshot.docs.map((doc) {
-            String address = doc['address'] as String;
-            return {
-              'addressId': doc.id,
-              'address': address,
-            };
-          }).toList();
-        });
-      }).catchError((error) {
-        print("Failed to load addresses: $error");
-      });
-    }
-  }
-
-  void _handleAddressTap(String addressId, String address) async {
+  void _handleAddressTapForProfile(String addressId, String address) async {
     List<String> parts = address.split(',');
     String street = parts.isNotEmpty ? parts[0].trim() : '';
     String city = parts.length > 1 ? parts[1].trim() : '';
@@ -106,9 +85,40 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     );
   }
 
+  void _handleAddressTap(String addressId, String address) {
+    if (widget.source == 'Cart') {
+      _handleAddressTapForCart(address);
+    } else {
+      _handleAddressTapForProfile(addressId, address);
+    }
+  }
+
+  void loadSavedAddresses() async {
+    if (userId != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('addresses')
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        setState(() {
+          savedAddresses = querySnapshot.docs.map((doc) {
+            String address = doc['address'] as String;
+            return {
+              'addressId': doc.id,
+              'address': address,
+            };
+          }).toList();
+        });
+      }).catchError((error) {
+        print("Failed to load addresses: $error");
+      });
+    }
+  }
+
   Widget _buildAddressCard(Map<String, dynamic> addressData) {
     return GestureDetector(
-      onTap: () => _handleAddressTap1(addressData['address']!),
+      onTap: () => _handleAddressTap(addressData['addressId'], addressData['address']!),
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
@@ -137,16 +147,20 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
         title: Text('Adresele mele'),
         centerTitle: true,
         elevation: 0,
+        automaticallyImplyLeading: true,
+       
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: Theme.of(context).primaryColor), toolbarTextStyle: TextTheme(
+        iconTheme: IconThemeData(color: Theme.of(context).secondaryHeaderColor),
+        toolbarTextStyle: TextTheme(
           titleLarge: TextStyle(
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).secondaryHeaderColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
-        ).bodyMedium, titleTextStyle: TextTheme(
+        ).bodyMedium,
+        titleTextStyle: TextTheme(
           titleLarge: TextStyle(
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).secondaryHeaderColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),

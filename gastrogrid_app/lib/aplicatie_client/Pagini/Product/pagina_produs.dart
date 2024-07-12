@@ -5,6 +5,7 @@ import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/stock_
 import 'package:provider/provider.dart';
 import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
+import 'package:gastrogrid_app/providers/provider_livrare.dart';
 import 'package:gastrogrid_app/clase/clasa_cart.dart';
 import 'package:gastrogrid_app/clase/clasa_produs.dart';
 import 'package:intl/intl.dart';
@@ -28,14 +29,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
 
     try {
+      final deliveryProvider = Provider.of<DeliveryProvider>(context, listen: false);
+      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime.toString()=='Locația este în afara ariei de livrare') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Livrarea nu poate fi efectuată pentru această adresă.')),
+        );
+        return;
+      }
+
       DocumentSnapshot productSnapshot = await FirebaseFirestore.instance
           .collection('products')
           .doc(widget.product.id)
           .get();
 
       if (productSnapshot.exists) {
-        int currentStock = productSnapshot['quantity'];
-        Timestamp? expiryTimestamp = productSnapshot['expiryDate'];
+        int currentStock = (productSnapshot['quantity'] as num).toInt();
+        Timestamp? expiryTimestamp = productSnapshot['expiryDate'] as Timestamp?;
         DateTime? expiryDate = expiryTimestamp?.toDate();
 
         if (currentStock == 0) {

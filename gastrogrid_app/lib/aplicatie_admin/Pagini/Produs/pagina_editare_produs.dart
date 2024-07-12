@@ -3,11 +3,7 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/lista_furnizori.dart';
-import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
-import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/product_form.dart';
 import 'package:intl/intl.dart';
 
 class EditProductPage extends StatefulWidget {
@@ -19,9 +15,10 @@ class EditProductPage extends StatefulWidget {
   final String? currentQuantity;
   final String? currentUnit;
   final Timestamp? currentExpiryDate;
+  final String? notificationId;
 
   const EditProductPage({
-    super.key,
+    Key? key,
     this.productId,
     this.currentTitle,
     this.currentPrice,
@@ -30,7 +27,8 @@ class EditProductPage extends StatefulWidget {
     this.currentQuantity,
     this.currentUnit,
     this.currentExpiryDate,
-  });
+    this.notificationId,
+  }) : super(key: key);
 
   @override
   _EditProductPageState createState() => _EditProductPageState();
@@ -49,7 +47,7 @@ class _EditProductPageState extends State<EditProductPage> {
   bool _isLoading = false;
   final Map<String, Map<String, dynamic>> _selectedSuppliers = {};
   final Map<String, TextEditingController> _supplierControllers = {};
-  String _selectedUnit = 'kilograme'; // Adăugat pentru a selecta unitatea
+  String _selectedUnit = 'kilograme';
   final List<String> _units = ['grame', 'kilograme'];
 
   @override
@@ -74,6 +72,7 @@ class _EditProductPageState extends State<EditProductPage> {
     if (widget.currentUnit != null) {
       _selectedUnit = widget.currentUnit!;
     }
+    _loadAllSuppliers();
     _loadSelectedSuppliers();
   }
 
@@ -92,6 +91,15 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
+  Future<void> _loadAllSuppliers() async {
+    var suppliersSnapshot = await FirebaseFirestore.instance.collection('suppliers').get();
+    for (var doc in suppliersSnapshot.docs) {
+      _selectedSuppliers[doc.id] = {'name': doc.data()['name'], 'selected': false};
+      _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller']);
+    }
+    setState(() {});
+  }
+
   Future<void> _loadSelectedSuppliers() async {
     if (widget.productId != null) {
       var suppliersSnapshot = await FirebaseFirestore.instance
@@ -101,9 +109,11 @@ class _EditProductPageState extends State<EditProductPage> {
           .get();
 
       for (var doc in suppliersSnapshot.docs) {
-        _selectedSuppliers[doc.id] = doc.data();
-        _supplierControllers[doc.id] = TextEditingController(text: doc.data()['controller']);
+        if (_selectedSuppliers.containsKey(doc.id)) {
+          _selectedSuppliers[doc.id]!['selected'] = true;
+        }
       }
+      setState(() {});
     }
   }
 
@@ -142,13 +152,23 @@ class _EditProductPageState extends State<EditProductPage> {
     return downloadUrl;
   }
 
+  Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
+    for (String supplierId in selectedSuppliers.keys) {
+      if (selectedSuppliers[supplierId]!['selected'] == true) {
+        await productRef.collection('suppliers').doc(supplierId).set({'controller': supplierId});
+      } else {
+        await productRef.collection('suppliers').doc(supplierId).delete();
+      }
+    }
+  }
+
   Future<DocumentReference> saveOrUpdateProduct(
       String? productId,
       String title,
       double price,
       String description,
       String imageUrl,
-      double quantity, // Modificat pentru a accepta valori decimale
+      double newQuantity,
       DateTime expiryDate,
       String unit,
       BuildContext context) async {
@@ -158,46 +178,38 @@ class _EditProductPageState extends State<EditProductPage> {
         'price': price,
         'description': description,
         'imageUrl': imageUrl,
-        'quantity': quantity,
-        'unit': unit, // Salvează unitatea
+        'quantity': newQuantity,
+        'unit': unit,
         'expiryDate': expiryDate,
       });
       return newProductRef;
     } else {
       DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
-
       DocumentSnapshot productSnapshot = await productRef.get();
-      double currentQuantity = productSnapshot['quantity']; // Modificat pentru a accepta valori decimale
-
-      double newQuantity = unit == 'grame' ? currentQuantity + quantity / 1000 : currentQuantity + quantity;
+      double currentQuantity = productSnapshot['quantity'];
+      double updatedQuantity = currentQuantity + (unit == 'grame' ? newQuantity / 1000 : newQuantity);
 
       await productRef.update({
         'title': title,
         'price': price,
         'description': description,
         'imageUrl': imageUrl,
-        'quantity': newQuantity,
-        'unit': unit, // Actualizează unitatea
+        'quantity': updatedQuantity,
+        'unit': unit,
         'expiryDate': expiryDate,
       });
       return productRef;
     }
   }
 
-  Future<void> _saveSuppliers(DocumentReference productRef, Map<String, Map<String, dynamic>> selectedSuppliers) async {
-    for (String supplierId in selectedSuppliers.keys) {
-      await productRef.collection('suppliers').doc(supplierId).set(selectedSuppliers[supplierId]!);
-    }
-  }
-
   void _saveProduct() async {
-    if (_formKey.currentState!.validate() && _selectedSuppliers.isNotEmpty) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
       String imageUrl = await uploadImage(widget.productId ?? '', _imageData, widget.currentImageUrl);
-      double newQuantity = double.parse(_quantityController.text); // Modificat pentru a accepta valori decimale
+      double newQuantity = double.parse(_quantityController.text);
       DateTime expiryDate = _selectedExpiryDate!;
 
       DocumentReference productRef = await saveOrUpdateProduct(
@@ -244,12 +256,60 @@ class _EditProductPageState extends State<EditProductPage> {
                 key: _formKey,
                 child: ListView(
                   children: [
-                    ProductForm(
-                      titleController: _titleController,
-                      priceController: _priceController,
-                      descriptionController: _descriptionController,
-                      quantityController: _quantityController,
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        labelText: 'Titlu',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți titlul';
+                        }
+                        return null;
+                      },
                     ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      controller: _priceController,
+                      decoration: InputDecoration(
+                        labelText: 'Preț',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți prețul';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: 'Descriere',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți descrierea';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      controller: _quantityController,
+                      decoration: InputDecoration(
+                        labelText: 'Cantitate',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Introduceți cantitatea';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16),
                     TextFormField(
                       controller: _expiryDateController,
                       decoration: InputDecoration(
@@ -261,21 +321,26 @@ class _EditProductPageState extends State<EditProductPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the expiry date';
+                          return 'Introduceți data de expirare';
                         }
                         return null;
                       },
                       readOnly: true,
                     ),
                     SizedBox(height: 16),
-                    ImagePickerWidget(
-                      imageData: _imageData,
-                      imageUrl: widget.currentImageUrl,
-                      onImagePicked: _pickImage,
+                    _imageData != null
+                        ? Image.memory(_imageData!)
+                        : widget.currentImageUrl != null
+                            ? Image.network(widget.currentImageUrl!)
+                            : Container(),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: Text('Selectează imaginea'),
                     ),
                     SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _units.contains(_selectedUnit) ? _selectedUnit : null,
+                      value: _selectedUnit,
                       items: _units.map((String unit) {
                         return DropdownMenuItem<String>(
                           value: unit,
@@ -292,9 +357,19 @@ class _EditProductPageState extends State<EditProductPage> {
                       ),
                     ),
                     SizedBox(height: 16),
-                    SupplierList(
-                      supplierControllers: _supplierControllers,
-                      selectedSuppliers: _selectedSuppliers,
+                    Text('Furnizori:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Column(
+                      children: _selectedSuppliers.keys.map((supplierId) {
+                        return CheckboxListTile(
+                          title: Text(_selectedSuppliers[supplierId]!['name'] ?? 'No name'),
+                          value: _selectedSuppliers[supplierId]!['selected'] ?? false,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _selectedSuppliers[supplierId]!['selected'] = value ?? false;
+                            });
+                          },
+                        );
+                      }).toList(),
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
@@ -304,7 +379,7 @@ class _EditProductPageState extends State<EditProductPage> {
                         backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
-                      child: Text('Salveaza'),
+                      child: Text('Salvează'),
                     ),
                   ],
                 ),

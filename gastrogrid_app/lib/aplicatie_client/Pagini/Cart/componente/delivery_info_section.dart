@@ -9,7 +9,8 @@ class DeliveryInfoSection extends StatelessWidget {
   final SelectedOptionsProvider optionsProvider;
   final VoidCallback onSelectDeliveryAddress;
 
-  const DeliveryInfoSection({super.key, 
+  const DeliveryInfoSection({
+    super.key,
     required this.deliveryInfo,
     required this.optionsProvider,
     required this.onSelectDeliveryAddress,
@@ -26,14 +27,21 @@ class DeliveryInfoSection extends StatelessWidget {
       ),
       child: deliveryInfo.isDelivery
           ? ListTile(
-              title: Text('Adresa selectata'),
-              subtitle: Text(optionsProvider.selectedAddress ?? 'Nu a fost selectata nicio adresa'),
+              title: Text('Adresa selectată'),
+              subtitle: Text(optionsProvider.selectedAddress ?? 'Nu a fost selectată nicio adresă'),
               trailing: Icon(Icons.keyboard_arrow_right),
               onTap: onSelectDeliveryAddress,
             )
           : ListTile(
-              title: Text('Ridicare personală activata'),
-              subtitle: Text('Produsele vor fi ridicate de la magazin'),
+              title: Text('Ridicare personală activată'),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Adresa magazinului: ${deliveryInfo.defaultAddress}'),
+                  SizedBox(height: 4),
+                  Text('Timp estimat: ${deliveryInfo.formattedDeliveryTime}'),
+                ],
+              ),
             ),
     );
   }

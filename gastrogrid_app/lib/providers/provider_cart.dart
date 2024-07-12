@@ -21,7 +21,7 @@ class CartProvider with ChangeNotifier {
       );
       return;
     }
-    int currentStock = productSnapshot['quantity'];
+    int currentStock = (productSnapshot['quantity'] as num).toInt();
 
     if (currentStock < cartItem.quantity) {
       notifyOutOfStock(context, cartItem.product);

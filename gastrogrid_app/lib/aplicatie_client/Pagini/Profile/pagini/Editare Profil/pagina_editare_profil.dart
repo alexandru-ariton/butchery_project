@@ -171,7 +171,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _selectAddress(BuildContext context) async {
     final selectedAddress = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SavedAddressesPage()),
+      MaterialPageRoute(builder: (context) => SavedAddressesPage(source: 'Profile')),
     );
     if (selectedAddress != null) {
       setState(() {
