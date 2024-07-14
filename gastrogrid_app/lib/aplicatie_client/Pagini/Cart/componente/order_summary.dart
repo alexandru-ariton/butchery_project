@@ -1,5 +1,5 @@
 // Importă pachetele necesare.
-import 'package:gastrogrid_app/clase/clasa_cart.dart';
+
 import 'package:gastrogrid_app/providers/provider_cart.dart'; // Importă providerul pentru gestionarea coșului de cumpărături.
 import 'package:flutter/material.dart'; // Importă pachetul Flutter Material pentru UI.
 import 'package:provider/provider.dart'; // Importă pachetul Provider pentru gestionarea stării.

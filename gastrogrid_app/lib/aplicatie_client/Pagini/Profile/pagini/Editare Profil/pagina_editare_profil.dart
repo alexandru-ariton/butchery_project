@@ -18,8 +18,6 @@ import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Editare%20
 // Importă biblioteca ImagePicker pentru a selecta imagini.
 import 'package:image_picker/image_picker.dart';
 
-// Importă pagina de adrese salvate.
-import '../Adrese/pagina_adrese.dart';
 
 // Declarația unei clase Flutter pentru widget-ul EditProfilePage, care controlează afișarea paginii de editare a profilului.
 class EditProfilePage extends StatefulWidget {

@@ -39,7 +39,7 @@ class DeliveryProvider with ChangeNotifier {
   // Getter pentru locația selectată.
   LatLng? get selectedLocation => _selectedLocation;
   // Getter pentru timpul de livrare estimat.
-   int get deliveryTime => _isDelivery ? (_deliveryTime ?? 0) : pickupTime;
+   int get deliveryTime => _isDelivery ? (_deliveryTime) : pickupTime;
 
     void resetSelectedAddress() {
     _selectedAddress = null;

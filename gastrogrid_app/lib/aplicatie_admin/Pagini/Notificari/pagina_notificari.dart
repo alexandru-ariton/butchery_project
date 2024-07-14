@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
-import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
+
 
 class LowStockNotificationPage extends StatelessWidget {
   const LowStockNotificationPage({Key? key}) : super(key: key);
@@ -129,9 +129,6 @@ class LowStockNotificationPage extends StatelessWidget {
 
                 String? storeName = 'GastroGrid';
                 String? storeAddress = deliveryInfo.defaultAddress;
-                if (storeAddress == null) {
-                  print('Error: Store address is null');
-                }
                 print('Adresa default: $storeAddress');
 
                 return FutureBuilder<List<String>>(
@@ -167,7 +164,7 @@ class LowStockNotificationPage extends StatelessWidget {
                               onPressed: () async {
                                 if (emailList.isNotEmpty) {
                                   String subject = 'Notificare pentru $productName';
-                                  String body = _buildEmailBody(productName, timestamp, storeName ?? 'Unknown Store', storeAddress ?? 'Unknown Address');
+                                  String body = _buildEmailBody(productName, timestamp, storeName, storeAddress);
                                   _openEmailClient(emailList, subject, body, doc.id);
                                 } else {
                                   print('No email addresses available.');

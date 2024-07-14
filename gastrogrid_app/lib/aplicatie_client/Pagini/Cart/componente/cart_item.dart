@@ -25,26 +25,16 @@ class CartItemWidget extends StatelessWidget {
         padding: EdgeInsets.all(16), // Definirea padding-ului interior al cardului.
         child: Row(
           children: <Widget>[
-            if (item.product.imageUrl != null) // Verifică dacă URL-ul imaginii nu este null.
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10), // Definirea formelor colțurilor imaginii.
-                child: Image.network(
-                  item.product.imageUrl, // URL-ul imaginii.
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover, // Imaginea se ajustează pentru a acoperi containerul.
-                ),
-              )
-            else // Dacă URL-ul imaginii este null.
-              Container(
+            
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Definirea formelor colțurilor imaginii.
+              child: Image.network(
+                item.product.imageUrl, // URL-ul imaginii.
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200], // Culoarea de fundal a containerului.
-                  borderRadius: BorderRadius.circular(10), // Definirea formelor colțurilor containerului.
-                ),
-                child: Icon(Icons.image, size: 50, color: Colors.grey[400]), // Afișează o pictogramă default pentru imagine.
+                fit: BoxFit.cover, // Imaginea se ajustează pentru a acoperi containerul.
               ),
+            ),
             SizedBox(width: 16), // Un spațiu de 16px între imagine și detaliile produsului.
             Expanded(
               child: Column(

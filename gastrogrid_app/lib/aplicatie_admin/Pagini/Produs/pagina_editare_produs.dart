@@ -44,7 +44,6 @@ class _EditProductPageState extends State<EditProductPage> {
   final TextEditingController _expiryDateController = TextEditingController();
   DateTime? _selectedExpiryDate;
   Uint8List? _imageData;
-  String? _imageName;
   bool _isLoading = false;
   final Map<String, Map<String, dynamic>> _selectedSuppliers = {};
   final Map<String, TextEditingController> _supplierControllers = {};
@@ -139,7 +138,6 @@ class _EditProductPageState extends State<EditProductPage> {
             final result = reader.result as String;
             print('Image Data (Base64): ${result.substring(0, 100)}'); // Debug print
             _imageData = base64.decode(result.split(',').last);
-            _imageName = file.name;
           });
         }
       });

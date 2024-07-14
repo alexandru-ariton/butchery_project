@@ -130,7 +130,6 @@ class _ProductsAndSuppliersChartState extends State<ProductsAndSuppliersChart> {
     for (var productDoc in productsSnapshot.docs) {
       var productData = productDoc.data() as Map<String, dynamic>?;
       if (productData != null) {
-        String productName = productData['title'];
         QuerySnapshot suppliersSnapshot = await productDoc.reference.collection('suppliers').get();
 
         for (var supplierDoc in suppliersSnapshot.docs) {

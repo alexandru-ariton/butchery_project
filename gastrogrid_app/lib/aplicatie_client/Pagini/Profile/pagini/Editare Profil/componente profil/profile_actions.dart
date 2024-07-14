@@ -4,8 +4,7 @@ import 'dart:io';
 // Importă pachetul principal pentru construirea interfeței de utilizator în Flutter.
 import 'package:flutter/material.dart';
 
-// Importă pachetul Firebase Auth pentru autentificarea utilizatorilor.
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 // Importă pachetul Firebase Storage pentru gestionarea fișierelor stocate în Firebase.
 import 'package:firebase_storage/firebase_storage.dart';
@@ -45,7 +44,6 @@ Future<void> saveProfile(
 
     // Obține parola și adresa curentă din datele existente.
     String? currentPassword = existingData != null ? existingData['password'] : null;
-    String? currentAddress = existingData != null ? existingData['address'] : null;
 
     // Setează noua parolă sau păstrează parola curentă.
     String newPassword = passwordController.text.isNotEmpty ? passwordController.text : currentPassword ?? '';

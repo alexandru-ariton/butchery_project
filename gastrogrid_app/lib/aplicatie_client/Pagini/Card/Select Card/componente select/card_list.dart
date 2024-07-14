@@ -1,6 +1,5 @@
 // Importă pachetele necesare.
 import 'package:flutter/material.dart'; // Importă pachetul Flutter Material pentru UI.
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importă pachetul Cloud Firestore pentru baze de date.
 import 'package:encrypt/encrypt.dart' as encrypt; // Importă pachetul Encrypt pentru criptare/decriptare.
 
 // Definirea unui widget stateless pentru afișarea listei de carduri.
