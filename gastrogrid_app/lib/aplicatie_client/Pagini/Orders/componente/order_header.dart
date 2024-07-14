@@ -1,11 +1,15 @@
+// Importă biblioteca principală Flutter pentru a crea interfețe de utilizator.
 import 'package:flutter/material.dart';
 
+// Declarația unei clase stateless pentru afișarea antetului comenzii.
 class OrderHeader extends StatelessWidget {
+  // Declarația câmpurilor pentru detaliile comenzii.
   final String orderId;
   final String preparationStatus;
   final String paymentStatus;
   final double total;
 
+  // Constructorul clasei OrderHeader.
   const OrderHeader({
     super.key, 
     required this.orderId, 
@@ -14,11 +18,13 @@ class OrderHeader extends StatelessWidget {
     required this.total
   });
 
+  // Metodă care construiește interfața de utilizator a widgetului.
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Afișează ID-ul comenzii.
         Text(
           'Comanda #$orderId',
           style: TextStyle(
@@ -27,6 +33,7 @@ class OrderHeader extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8),
+        // Afișează statusul preparării.
         Row(
           children: [
             Icon(Icons.info, color: Colors.blue),
@@ -41,12 +48,13 @@ class OrderHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: 8),
+        // Afișează statusul plății.
         Row(
           children: [
             Icon(Icons.payment, color: Colors.orange),
             SizedBox(width: 8),
             Text(
-              'Status plată: $paymentStatus',
+              'Status plata: $paymentStatus',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[700],
@@ -55,6 +63,7 @@ class OrderHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: 8),
+        // Afișează totalul comenzii.
         Row(
           children: [
             Icon(Icons.attach_money, color: Colors.green),

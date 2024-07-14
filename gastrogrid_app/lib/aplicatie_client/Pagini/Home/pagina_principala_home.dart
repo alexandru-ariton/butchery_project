@@ -1,3 +1,4 @@
+// Importă componentele necesare pentru pagina principală (HomePage).
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/product_list.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Home/componente/sliver_app_bar_delegate.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:gastrogrid_app/aplicatie_client/Pagini/Address/pagina_selectare_
 import 'package:gastrogrid_app/providers/provider_themes.dart';
 import 'package:provider/provider.dart';
 
+// Declarația unei clase stateful pentru pagina principală.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -13,10 +15,13 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+// Declarația stării pentru clasa HomePage.
 class _HomePageState extends State<HomePage> {
+  // Controller pentru câmpul de căutare.
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // Metodă pentru selectarea adresei.
   void _selectAddress(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -25,16 +30,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Metodă care construiește interfața de utilizator a widgetului.
   @override
   Widget build(BuildContext context) {
+    // Obține tema curentă folosind providerul.
     final themeProvider = Provider.of<ThemeProvider>(context);
+    // Obține dimensiunea ecranului.
     final screenSize = MediaQuery.of(context).size;
+    // Verifică dacă ecranul este mic.
     final isSmallScreen = screenSize.width < 600;
 
     return Scaffold(
+      // Setează culoarea de fundal a paginii.
       backgroundColor: themeProvider.themeData.colorScheme.surface,
+      // Construiește corpul paginii folosind un CustomScrollView.
       body: CustomScrollView(
         slivers: <Widget>[
+          // Adaugă un container cu stilizare personalizată.
           SliverToBoxAdapter(
             child: Container(
               color: Theme.of(context).primaryColor,
@@ -69,11 +81,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: 20),
+                  // Adaugă butoane pentru opțiunile de livrare.
                   DeliveryToggleButtons(),
                 ],
               ),
             ),
           ),
+          // Adaugă un header persistent cu un câmp de căutare.
           SliverPersistentHeader(
             delegate: SliverAppBarDelegate(
               minHeight: 80.0,
@@ -88,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
-                      hintText: 'Caută produse',
+                      hintText: 'Cauta produse',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
                         borderSide: BorderSide.none,
@@ -108,6 +122,7 @@ class _HomePageState extends State<HomePage> {
             ),
             pinned: false,
           ),
+          // Adaugă lista de produse, filtrată după interogarea de căutare.
           ProductList(searchQuery: _searchQuery),
         ],
       ),

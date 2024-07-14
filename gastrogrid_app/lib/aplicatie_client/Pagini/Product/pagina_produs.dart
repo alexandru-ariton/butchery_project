@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/quantity_button.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/stock_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gastrogrid_app/clase/clasa_produs.dart';
+import 'package:gastrogrid_app/clase/clasa_cart.dart';
 import 'package:gastrogrid_app/providers/provider_cart.dart';
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
-import 'package:gastrogrid_app/clase/clasa_cart.dart';
-import 'package:gastrogrid_app/clase/clasa_produs.dart';
+import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 import 'package:intl/intl.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
+
   const ProductDetailPage({super.key, required this.product});
 
   @override
@@ -19,24 +19,11 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  int quantity = 100; // Initial quantity set to 100 grams
   bool isAddingToCart = false;
-  String selectedUnit = 'Kilograms';
+  String selectedUnit = 'gr';
 
   double get price {
-    if (selectedUnit == 'Grams') {
-      return widget.product.price / 1000 * quantity;
-    } else {
-      return widget.product.price * quantity;
-    }
-  }
-
-  double get quantityInStockUnits {
-    if (selectedUnit == 'Grams') {
-      return quantity / 1000.0; // Convert grams to kilograms for stock comparison
-    } else {
-      return quantity.toDouble();
-    }
+    return widget.product.price;
   }
 
   Future<void> addToCart() async {
@@ -48,9 +35,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     try {
       final deliveryProvider = Provider.of<DeliveryProvider>(context, listen: false);
 
-      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime > 60) {
+      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime == 0  || deliveryProvider.pickupTime == 0 || deliveryProvider.deliveryTime > 60 ) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Livrarea nu poate fi efectuată pentru această adresă.')),
+          SnackBar(content: Text('Livrarea nu poate fi efectuata pentru aceasta adresa.')),
         );
         return;
       }
@@ -61,14 +48,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           .get();
 
       if (productSnapshot.exists) {
-        int currentStock = (productSnapshot['quantity'] as num).toInt();
+        double currentStockKg = (productSnapshot['quantity'] as num).toDouble();
         Timestamp? expiryTimestamp = productSnapshot['expiryDate'] as Timestamp?;
         DateTime? expiryDate = expiryTimestamp?.toDate();
 
-        if (currentStock == 0) {
+        if (currentStockKg == 0) {
           await notifyOutOfStock(context, widget.product);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Produsul este epuizat')),
+            SnackBar(content: Text('Stoc epuizat')),
           );
           return;
         }
@@ -76,39 +63,34 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         if (expiryDate != null && DateTime.now().isAfter(expiryDate)) {
           await notifyExpired(context, widget.product);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Produsul a expirat')),
-          );
-          return;
-        }
-
-        if (quantityInStockUnits > currentStock) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Cantitate indisponibila')),
+            SnackBar(content: Text('Produs expirat')),
           );
           return;
         }
 
         var cartProvider = Provider.of<CartProvider>(context, listen: false);
-        var existingCartItem = cartProvider.cartItems.firstWhere(
-          (item) => item.product.id == widget.product.id,
-          orElse: () => CartItem(product: widget.product, quantity: 0.0, unit: 'Kilograms'),
+        var existingCartItemKg = cartProvider.cartItems.firstWhere(
+          (item) => item.product.id == widget.product.id && item.unit == 'gr',
+          orElse: () => CartItem(product: widget.product, quantity: 0.0, unit: 'gr'),
         );
 
-        double quantityToAdd = selectedUnit == 'Grams' ? quantity / 1000.0 : quantity.toDouble();
+        double quantityToAdd = 0.1; // 0.1 kilogram
 
-        if (existingCartItem.quantity > 0) {
-          existingCartItem.quantity += quantityToAdd;
-          cartProvider.updateProductQuantity(existingCartItem, existingCartItem.quantity);
+        double quantityToAddInKg = quantityToAdd;
+
+        if (existingCartItemKg.quantity > 0) {
+          existingCartItemKg.quantity += quantityToAdd;
+          cartProvider.updateProductQuantity(existingCartItemKg, existingCartItemKg.quantity);
         } else {
           var cartItem = CartItem(
             product: widget.product,
             quantity: quantityToAdd,
-            unit: 'Kilograms',
+            unit: selectedUnit,
           );
           await cartProvider.addProductToCart(cartItem, context);
         }
 
-        if (currentStock - quantityInStockUnits < 3) {
+        if (currentStockKg - quantityToAddInKg < 3) {
           await notifyLowStock(context, widget.product);
         } else {
           await Provider.of<NotificationProviderStoc>(context, listen: false)
@@ -119,9 +101,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           SnackBar(content: Text('Produsul ${widget.product.title} a fost adaugat in cos')),
         );
 
-        setState(() {
-          quantity = selectedUnit == 'Grams' ? 100 : 1; // Reset quantity based on unit
-        });
+        Navigator.of(context).pop(); // Navigate back to the home page
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Produsul nu exista')),
@@ -201,69 +181,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: DropdownButton<String>(
-                value: selectedUnit,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedUnit = newValue!;
-                    quantity = selectedUnit == 'Grams' ? 100 : 1; // Reset quantity based on unit
-                  });
-                },
-                items: <String>['Kilograms', 'Grams']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 23.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      QuantityButton(
-                        icon: Icons.remove,
-                        onPressed: () {
-                          setState(() {
-                            if (selectedUnit == 'Grams' && quantity > 100) {
-                              quantity -= 100;
-                            } else if (selectedUnit == 'Kilograms' && quantity > 1) {
-                              quantity -= 1;
-                            }
-                          });
-                        },
+                children: [
+                 
+                  Padding(
+                    padding: const EdgeInsets.only(left:100.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 8.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          (selectedUnit == 'Grams' ? (quantity / 1000.0).toStringAsFixed(3) : quantity.toStringAsFixed(2)),
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
+                      child: Text(
+                        '${(price/10).toStringAsFixed(2)} lei/$selectedUnit',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
-                      QuantityButton(
-                        icon: Icons.add,
-                        onPressed: () {
-                          setState(() {
-                            if (selectedUnit == 'Grams') {
-                              quantity += 100;
-                            } else {
-                              quantity += 1;
-                            }
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Text(
-                    '${price.toStringAsFixed(2)} lei',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                    ),
                   ),
                 ],
               ),
@@ -274,7 +211,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: SizedBox(
                 child: ElevatedButton(
                   onPressed: addToCart,
-                  child: Text('Adauga in Cos', style: TextStyle(fontSize: 16)),
+                  child: Text('Adauga in cos', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ),

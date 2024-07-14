@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gastrogrid_app/aplicatie_admin/Pagini/Produs/componente%20edit/image_picker_widget.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:intl/intl.dart';
 
@@ -47,8 +48,8 @@ class _EditProductPageState extends State<EditProductPage> {
   bool _isLoading = false;
   final Map<String, Map<String, dynamic>> _selectedSuppliers = {};
   final Map<String, TextEditingController> _supplierControllers = {};
-  String _selectedUnit = 'kilograme';
-  final List<String> _units = ['grame', 'kilograme'];
+  String _selectedUnit = 'kg';
+  final List<String> _units = ['gr', 'kg'];
 
   @override
   void initState() {
@@ -133,19 +134,16 @@ class _EditProductPageState extends State<EditProductPage> {
       final reader = html.FileReader();
       reader.readAsDataUrl(file);
       reader.onLoadEnd.listen((event) {
-        if (reader.result is String) {
+        if (reader.readyState == html.FileReader.DONE) {
           setState(() {
             final result = reader.result as String;
-            _imageData = base64StringToUint8List(result.split(',').last);
+            print('Image Data (Base64): ${result.substring(0, 100)}'); // Debug print
+            _imageData = base64.decode(result.split(',').last);
             _imageName = file.name;
           });
         }
       });
     });
-  }
-
-  Uint8List base64StringToUint8List(String base64String) {
-    return Uint8List.fromList(base64.decode(base64String));
   }
 
   Future<String> uploadImage(String productId, Uint8List? imageData, String? currentImageUrl) async {
@@ -200,7 +198,7 @@ class _EditProductPageState extends State<EditProductPage> {
         DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
         DocumentSnapshot productSnapshot = await productRef.get();
         double currentQuantity = productSnapshot['quantity'];
-        double updatedQuantity = currentQuantity + (unit == 'grame' ? newQuantity / 1000 : newQuantity);
+        double updatedQuantity = currentQuantity + (unit == 'gr' ? newQuantity / 1000 : newQuantity);
 
         await productRef.update({
           'title': title,
@@ -215,7 +213,7 @@ class _EditProductPageState extends State<EditProductPage> {
       }
     } catch (e) {
       print('Error saving/updating product: $e');
-      throw e;  // Rethrow the error to be handled later if needed
+      throw e;
     }
   }
 
@@ -287,7 +285,7 @@ class _EditProductPageState extends State<EditProductPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Introduceți titlul';
+                          return 'Introduceti titlul';
                         }
                         return null;
                       },
@@ -296,12 +294,12 @@ class _EditProductPageState extends State<EditProductPage> {
                     TextFormField(
                       controller: _priceController,
                       decoration: InputDecoration(
-                        labelText: 'Preț',
+                        labelText: 'Pret',
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Introduceți prețul';
+                          return 'Introduceți pretul';
                         }
                         return null;
                       },
@@ -328,7 +326,7 @@ class _EditProductPageState extends State<EditProductPage> {
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Introduceți cantitatea';
+                          return 'Introduceti cantitatea';
                         }
                         return null;
                       },
@@ -345,22 +343,17 @@ class _EditProductPageState extends State<EditProductPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Introduceți data de expirare';
+                          return 'Introduceti data de expirare';
                         }
                         return null;
                       },
                       readOnly: true,
                     ),
                     SizedBox(height: 16),
-                    _imageData != null
-                        ? Image.memory(_imageData!)
-                        : widget.currentImageUrl != null
-                            ? Image.network(widget.currentImageUrl!)
-                            : Container(),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _pickImage,
-                      child: Text('Selectează imaginea'),
+                    ImagePickerWidget(
+                      imageData: _imageData,
+                      imageUrl: widget.currentImageUrl,
+                      onImagePicked: _pickImage,
                     ),
                     SizedBox(height: 16),
                     DropdownButtonFormField<String>(
@@ -403,7 +396,7 @@ class _EditProductPageState extends State<EditProductPage> {
                         backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
-                      child: Text('Salvează'),
+                      child: Text('Salveaza'),
                     ),
                   ],
                 ),

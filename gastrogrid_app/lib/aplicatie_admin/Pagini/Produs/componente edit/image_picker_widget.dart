@@ -13,14 +13,17 @@ class ImagePickerWidget extends StatelessWidget {
     return Column(
       children: [
         imageData != null
-            ? Image.memory(imageData!, height: 150)
+            ? Image.memory(imageData!, height: 400, width: 400, fit: BoxFit.cover)
             : imageUrl != null
                 ? Image.network(
                     imageUrl!,
-                    height: 150,
+                    height: 600,
+                    width: 600,
+                    fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        height: 150,
+                        height: 600,
+                        width: 600,
                         color: Colors.grey[200],
                         child: Center(child: Text('-')),
                       );
@@ -37,7 +40,8 @@ class ImagePickerWidget extends StatelessWidget {
                     },
                   )
                 : Container(
-                    height: 150,
+                    height: 600,
+                    width: 600,
                     color: Colors.grey[200],
                     child: Center(child: Text('-')),
                   ),
@@ -45,7 +49,7 @@ class ImagePickerWidget extends StatelessWidget {
         TextButton.icon(
           onPressed: onImagePicked,
           icon: Icon(Icons.image),
-          label: Text('Schimba Imaginea'),
+          label: Text('Schimba imaginea'),
           style: TextButton.styleFrom(
             foregroundColor: Colors.blueGrey[900],
           ),

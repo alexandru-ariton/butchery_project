@@ -40,6 +40,14 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     }
   }
 
+   void _resetDeliveryAddress(BuildContext context) {
+    Provider.of<SelectedOptionsProvider>(context, listen: false).setSelectedAddress('');
+    Provider.of<DeliveryProvider>(context, listen: false).resetSelectedAddress();
+    setState(() {
+      _orderFinalized = false;
+    });
+  }
+
   void _selectPaymentMethod(BuildContext context, String? method) async {
     final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
     optionsProvider.setSelectedPaymentMethod(method!);
@@ -61,93 +69,84 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void finalizeOrder(BuildContext context) async {
-  final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
+    final optionsProvider = Provider.of<SelectedOptionsProvider>(context, listen: false);
 
-  // Debugging print statements
-  print("Selected Address: ${optionsProvider.selectedAddress}");
-  print("Selected Payment Method: ${optionsProvider.selectedPaymentMethod}");
-
-  if (optionsProvider.selectedAddress == null || optionsProvider.selectedPaymentMethod == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Selecteaza ori o adresa ori o modalitate de plata")),
-    );
-    return;
-  }
-
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    String userId = user.uid;
-    CollectionReference orders = FirebaseFirestore.instance.collection('orders');
-
-    final cart = Provider.of<CartProvider>(context, listen: false);
-    final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
-
-    List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
-    Map<String, dynamic> orderData = {
-      'userId': userId,
-      'items': items,
-      'status': 'Pending',
-      'address': optionsProvider.selectedAddress ?? 'No address selected',
-      'paymentMethod': optionsProvider.selectedPaymentMethod ?? 'No payment method selected',
-      'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
-      'timestamp': FieldValue.serverTimestamp(),
-    };
-
-    print("Order Data: $orderData");
-
-    try {
-      DocumentReference orderRef = await orders.add(orderData);
-      print("Order Reference: ${orderRef.id}");
-
-      if (optionsProvider.selectedPaymentMethod == 'Card' && optionsProvider.selectedCardDetails != null) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => PaymentPage(
-              cardDetails: optionsProvider.selectedCardDetails!,
-              amount: orderData['total'],
-              orderId: orderRef.id,
-            ),
-          ),
-        ).then((paymentSuccess) async {
-          if (paymentSuccess == true) {
-            await orderRef.update({'status': 'Paid'});
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Plata a fost efectuata cu succes")),
-            );
-            cart.clear();
-            optionsProvider.clear();
-            setState(() {
-              _orderFinalized = true;
-            });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Plata a esuat")),
-            );
-          }
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Comanda Finalizata")),
-        );
-        cart.clear();
-        optionsProvider.clear();
-        setState(() {
-          _orderFinalized = true;
-        });
-      }
-    } catch (e) {
+    if (optionsProvider.selectedAddress == null || optionsProvider.selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Eroare la finalizarea comenzii: $e")),
+        SnackBar(content: Text("Selecteaza ori o adresa ori o modalitate de plata")),
       );
-      print("Error: $e");
+      return;
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Utilizator neautentificat.")),
-    );
-  }
-}
 
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      CollectionReference orders = FirebaseFirestore.instance.collection('orders');
+
+      final cart = Provider.of<CartProvider>(context, listen: false);
+      final deliveryInfo = Provider.of<DeliveryProvider>(context, listen: false);
+
+      List<Map<String, dynamic>> items = cart.items.map((item) => item.toMap()).toList();
+      Map<String, dynamic> orderData = {
+        'userId': userId,
+        'items': items,
+        'status': 'Pending',
+        'address': optionsProvider.selectedAddress ?? 'No address selected',
+        'paymentMethod': optionsProvider.selectedPaymentMethod ?? 'No payment method selected',
+        'total': cart.total + (deliveryInfo.isDelivery ? deliveryInfo.deliveryFee : 0),
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      try {
+        DocumentReference orderRef = await orders.add(orderData);
+
+        if (optionsProvider.selectedPaymentMethod == 'Card' && optionsProvider.selectedCardDetails != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => PaymentPage(
+                cardDetails: optionsProvider.selectedCardDetails!,
+                amount: orderData['total'],
+                orderId: orderRef.id,
+              ),
+            ),
+          ).then((paymentSuccess) async {
+            if (paymentSuccess == true) {
+              await orderRef.update({'status': 'Paid'});
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Plata a fost efectuata cu succes")),
+              );
+              cart.clear();
+              optionsProvider.clear();
+              setState(() {
+                _orderFinalized = true;
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Plata a esuat")),
+              );
+            }
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Comanda finalizata")),
+          );
+          cart.clear();
+          optionsProvider.clear();
+          setState(() {
+            _orderFinalized = true;
+          });
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Eroare la finalizarea comenzii: $e")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Utilizator neautentificat.")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +160,14 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     return Scaffold(
       backgroundColor: themeProvider.themeData.colorScheme.surface,
       appBar: AppBar(
-        title: Center(child: Text('Cart')),
+        title: Padding(
+          padding: const EdgeInsets.only(left:130.0),
+          child:  Text('Cart'),
+        ),
+       leading:IconButton(
+              icon: Icon(Icons.restore),
+              onPressed: () => _resetDeliveryAddress(context),
+            ),
       ),
       body: Column(
         children: [
@@ -178,7 +184,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               optionsProvider: optionsProvider,
               onSelectDeliveryAddress: () => _selectDeliveryAddress(context),
             ),
-          ),
+          
+          ),  
           ExpandableSection(
             title: 'Selecteaza metoda de plata',
             content: PaymentMethodSection(
@@ -196,7 +203,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                   finalizeOrder(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Selecteeaza o adresa si o modalitate de plata")),
+                    SnackBar(content: Text("Selecteaza o adresa sau o modalitate de plata")),
                   );
                 }
               },

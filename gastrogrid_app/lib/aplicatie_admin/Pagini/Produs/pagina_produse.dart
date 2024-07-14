@@ -1,11 +1,14 @@
+// Importă pachetele necesare pentru utilizarea Flutter, Firestore, Firebase Storage și navigare.
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'pagina_editare_produs.dart';
 
+// Definirea clasei ProductManagement ca widget stateless.
 class ProductManagement extends StatelessWidget {
   const ProductManagement({super.key});
 
+  // Metodă pentru a naviga la pagina de adăugare a unui nou produs.
   void _addProduct(BuildContext context) {
     Navigator.push(
       context,
@@ -15,10 +18,12 @@ class ProductManagement extends StatelessWidget {
     );
   }
 
+  // Metodă asincronă pentru a șterge un produs din Firestore.
   void _deleteProduct(String id) async {
     await FirebaseFirestore.instance.collection('products').doc(id).delete();
   }
 
+  // Metodă asincronă pentru a încărca o imagine din Firebase Storage.
   Future<void> loadImage(BuildContext context) async {
     try {
       String imageUrl = await firebase_storage.FirebaseStorage.instance
@@ -31,6 +36,7 @@ class ProductManagement extends StatelessWidget {
     }
   }
 
+  // Metodă build pentru a construi interfața utilizatorului.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,8 +49,8 @@ class ProductManagement extends StatelessWidget {
             if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
             return LayoutBuilder(
               builder: (context, constraints) {
-                int crossAxisCount = (constraints.maxWidth ~/ 250).clamp(2, 6);
-                double fontSize = constraints.maxWidth / 60;
+                int crossAxisCount = (constraints.maxWidth ~/ 250).clamp(2, 6); // Calcularea numărului de coloane.
+                double fontSize = constraints.maxWidth / 60; // Calcularea dimensiunii fontului.
 
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -121,7 +127,7 @@ class ProductManagement extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              'Cantitate: ${quantity.toStringAsFixed(3)} kilograme',
+                              'Cantitate: ${quantity.toStringAsFixed(3)} kg',
                               style: TextStyle(fontSize: fontSize * 0.8),
                             ),
                           ),
@@ -140,7 +146,7 @@ class ProductManagement extends StatelessWidget {
                                         currentDescription: productData['description'],
                                         currentImageUrl: imageUrl,
                                         currentQuantity: quantity.toStringAsFixed(3),
-                                        currentUnit: 'kilograme',
+                                        currentUnit: 'kg',
                                         currentExpiryDate: productData['expiryDate'],
                                       ),
                                     ),

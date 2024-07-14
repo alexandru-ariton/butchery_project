@@ -1,31 +1,55 @@
+// Importă biblioteca principală Flutter pentru a crea interfețe de utilizator.
 import 'package:flutter/material.dart';
+
+// Importă pachetul Firebase Auth pentru autentificarea utilizatorilor.
 import 'package:firebase_auth/firebase_auth.dart';
+
+// Importă pachetul Firestore pentru interacțiunea cu baza de date Firebase.
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+// Importă pagina pentru editarea adreselor.
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Profile/pagini/Adrese/pagina_editare_adrese.dart';
+
+// Importă pachetul geocoding pentru a obține locația dintr-o adresă.
 import 'package:geocoding/geocoding.dart';
+
+// Importă pachetul Google Maps pentru a gestiona locațiile.
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+// Importă pachetul provider pentru gestionarea stării.
 import 'package:provider/provider.dart';
+
+// Importă providerul pentru livrare.
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
 
+// Declarația unei clase StatefulWidget pentru pagina de adrese salvate.
 class SavedAddressesPage extends StatefulWidget {
+  // Declarația unui câmp pentru sursa paginii.
   final String source;
 
+  // Constructorul clasei SavedAddressesPage.
   const SavedAddressesPage({super.key, required this.source});
 
   @override
   _SavedAddressesPageState createState() => _SavedAddressesPageState();
 }
 
+// Declarația unei clase de stare pentru widget-ul SavedAddressesPage.
 class _SavedAddressesPageState extends State<SavedAddressesPage> {
+  // Declarația unei liste pentru adresele salvate.
   List<Map<String, dynamic>> savedAddresses = [];
+
+  // Declarația unei variabile pentru ID-ul utilizatorului.
   String? userId;
 
+  // Metodă care inițializează starea widgetului. Se apelează când widgetul este creat.
   @override
   void initState() {
     super.initState();
     _initializeUser();
   }
 
+  // Metodă asincronă pentru inițializarea utilizatorului.
   void _initializeUser() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -40,6 +64,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     }
   }
 
+  // Metodă pentru încărcarea adreselor salvate din Firestore.
   void loadSavedAddresses() async {
     if (userId != null) {
       FirebaseFirestore.instance
@@ -68,12 +93,14 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     }
   }
 
+  // Metodă pentru gestionarea selectării unei adrese pentru coșul de cumpărături.
   void _handleAddressTapForCart(String address) async {
     LatLng? location = await _getLocationFromAddress(address);
     Provider.of<DeliveryProvider>(context, listen: false).setSelectedAddress(address, location);
     Navigator.pop(context, address);
   }
 
+  // Metodă pentru obținerea locației dintr-o adresă folosind geocoding.
   Future<LatLng?> _getLocationFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
@@ -86,6 +113,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     return null;
   }
 
+  // Metodă pentru gestionarea selectării unei adrese pentru profil.
   void _handleAddressTapForProfile(Map<String, dynamic> addressData) async {
     Navigator.push(
       context,
@@ -101,6 +129,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     );
   }
 
+  // Metodă pentru gestionarea selectării unei adrese.
   void _handleAddressTap(Map<String, dynamic> addressData) {
     if (widget.source == 'Cart') {
       _handleAddressTapForCart('${addressData['address']}, ${addressData['city']}, ${addressData['country']}, ${addressData['zipCode']}');
@@ -109,6 +138,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     }
   }
 
+  // Metodă pentru construirea unui card de adresă.
   Widget _buildAddressCard(Map<String, dynamic> addressData) {
     return GestureDetector(
       onTap: () => _handleAddressTap(addressData),
@@ -133,6 +163,7 @@ class _SavedAddressesPageState extends State<SavedAddressesPage> {
     );
   }
 
+  // Metodă care construiește interfața de utilizator a widgetului.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

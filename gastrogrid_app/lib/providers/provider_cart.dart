@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastrogrid_app/aplicatie_client/Pagini/Product/componente/stock_notifications.dart';
 import 'package:gastrogrid_app/clase/clasa_cart.dart';
+import 'package:gastrogrid_app/clase/clasa_produs.dart';
 import 'package:gastrogrid_app/providers/provider_notificareStoc.dart';
 
 class CartProvider with ChangeNotifier {
@@ -11,8 +12,23 @@ class CartProvider with ChangeNotifier {
   CartProvider(this.notificationProviderStoc);
 
   List<CartItem> get items => _items;
-
   List<CartItem> get cartItems => _items;
+
+  double _convertToKg(double quantity, String unit) {
+    if (unit == 'gr') {
+      return quantity % 100;
+    } else {
+      return quantity;
+    }
+  }
+
+  double _convertFromKg(double quantityKg, String unit) {
+    if (unit == 'gr') {
+      return quantityKg * 1000;
+    } else {
+      return quantityKg;
+    }
+  }
 
   Future<void> addProductToCart(CartItem cartItem, BuildContext context) async {
     DocumentSnapshot productSnapshot = await FirebaseFirestore.instance.collection('products').doc(cartItem.product.id).get();
@@ -22,33 +38,32 @@ class CartProvider with ChangeNotifier {
       );
       return;
     }
-    int currentStock = (productSnapshot['quantity'] as num).toInt();
+    double currentStockKg = (productSnapshot['quantity'] as num).toDouble();
+    double cartItemQuantityKg = _convertToKg(cartItem.quantity, cartItem.unit);
 
-    double cartItemQuantityKg = cartItem.unit == 'Grams' ? cartItem.quantity / 1000 : cartItem.quantity;
-
-    if (currentStock < cartItemQuantityKg) {
+    if (currentStockKg < cartItemQuantityKg) {
       notifyOutOfStock(context, cartItem.product);
       return;
     }
 
     final existingCartItem = _items.firstWhere(
-      (item) => item.product.id == cartItem.product.id,
-      orElse: () => CartItem(product: cartItem.product, quantity: 0.0, unit: 'Kilograms'),
+      (item) => item.product.id == cartItem.product.id && item.unit == cartItem.unit,
+      orElse: () => CartItem(product: cartItem.product, quantity: 0.0, unit: cartItem.unit),
     );
 
     if (existingCartItem.quantity > 0) {
-      existingCartItem.quantity += cartItemQuantityKg;
+      existingCartItem.quantity += cartItem.quantity;
     } else {
       _items.add(CartItem(
         product: cartItem.product,
-        quantity: cartItemQuantityKg,
-        unit: 'Kilograms',
+        quantity: cartItem.quantity,
+        unit: cartItem.unit,
       ));
     }
 
-    await _updateProductStock(cartItem.product.id, -(cartItemQuantityKg));
+    await _updateProductStock(cartItem.product.id, -cartItemQuantityKg);
 
-    if (currentStock - cartItemQuantityKg < 3) {
+    if (currentStockKg - cartItemQuantityKg < 3) {
       notificationProviderStoc.addNotification(
         'Stoc redus pentru ${cartItem.product.title}',
         cartItem.product.id,
@@ -61,22 +76,30 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> updateProductQuantity(CartItem cartItem, double newQuantity) async {
-    double difference = newQuantity - cartItem.quantity;
-    cartItem.quantity = newQuantity;
+    double oldQuantityKg = _convertToKg(cartItem.quantity, cartItem.unit);
+    double newQuantityKg = _convertToKg(newQuantity, cartItem.unit);
+    double differenceKg = newQuantityKg - oldQuantityKg;
 
-    if (cartItem.quantity <= 0) {
-      _items.remove(cartItem);
+    if (differenceKg <= 0 || await isStockAvailable(cartItem.product.id, differenceKg)) {
+      cartItem.quantity = newQuantity;
+
+      if (cartItem.quantity <= 0) {
+        _items.remove(cartItem);
+      }
+
+      await _updateProductStock(cartItem.product.id, -differenceKg);
+
+      notifyListeners();
+    } else {
+      print('Stoc insuficient pentru acest produs.');
     }
-
-    await _updateProductStock(cartItem.product.id, -difference);
-
-    notifyListeners();
   }
 
   Future<void> removeProduct(CartItem cartItem) async {
+    double cartItemQuantityKg = _convertToKg(cartItem.quantity, cartItem.unit);
     _items.remove(cartItem);
 
-    await _updateProductStock(cartItem.product.id, cartItem.quantity);
+    await _updateProductStock(cartItem.product.id, cartItemQuantityKg);
 
     notifyListeners();
   }
@@ -87,21 +110,30 @@ class CartProvider with ChangeNotifier {
   }
 
   double get totalItemsQuantity {
-    return _items.fold(0, (sum, item) => sum + item.quantity);
+    return _items.fold(0, (sum, item) => sum + _convertToKg(item.quantity, item.unit));
   }
 
   double get total {
-    return _items.fold(0, (sum, item) => sum + item.product.price * item.quantity);
+    return _items.fold(0, (sum, item) => sum + item.product.price * _convertToKg(item.quantity, item.unit));
   }
 
-  Future<void> _updateProductStock(String productId, double quantityChange) async {
+  Future<void> _updateProductStock(String productId, double quantityChangeKg) async {
     DocumentReference productRef = FirebaseFirestore.instance.collection('products').doc(productId);
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       DocumentSnapshot snapshot = await transaction.get(productRef);
       if (snapshot.exists) {
-        double newStock = (snapshot['quantity'] + quantityChange).clamp(0, double.infinity);
+        double newStock = ((snapshot['quantity'] as num).toDouble() + quantityChangeKg).clamp(0, double.infinity);
         transaction.update(productRef, {'quantity': newStock});
       }
     });
+  }
+
+  Future<bool> isStockAvailable(String productId, double requestedQuantityKg) async {
+    DocumentSnapshot productSnapshot = await FirebaseFirestore.instance.collection('products').doc(productId).get();
+    if (!productSnapshot.exists) {
+      return false;
+    }
+    double currentStock = (productSnapshot['quantity'] as num).toDouble();
+    return currentStock >= requestedQuantityKg;
   }
 }

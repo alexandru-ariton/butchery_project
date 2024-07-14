@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+// Widget-ul stateless ProductForm primește patru TextEditingController prin constructor.
 class ProductForm extends StatelessWidget {
   final TextEditingController titleController;
   final TextEditingController priceController;
   final TextEditingController descriptionController;
   final TextEditingController quantityController;
 
-  const ProductForm({super.key, 
+  // Constructorul const al widget-ului primește controller-ele ca parametri necesari.
+  const ProductForm({
+    super.key,
     required this.titleController,
     required this.priceController,
     required this.descriptionController,
@@ -17,76 +20,83 @@ class ProductForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Câmpul de text pentru denumirea produsului.
         TextFormField(
           controller: titleController,
           decoration: InputDecoration(
-            labelText: 'Denumire Produs',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.grey[200],
+            labelText: 'Denumire produs',  // Eticheta câmpului
+            border: OutlineInputBorder(),  // Bordura câmpului
+            filled: true,  // Indică faptul că câmpul este umplut
+            fillColor: Colors.grey[200],  // Culoarea de umplere a câmpului
           ),
-          validator: (value) {
+          validator: (value) {  // Funcția de validare
             if (value == null || value.isEmpty) {
-              return 'Introdu denumirea produsului';
+              return 'Introdu denumirea produsului';  // Mesaj de eroare dacă câmpul este gol
             }
-            return null;
+            return null;  // Nicio eroare dacă câmpul nu este gol
           },
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 16),  // Spațiu vertical între câmpuri
+
+        // Câmpul de text pentru prețul produsului.
         TextFormField(
           controller: priceController,
           decoration: InputDecoration(
-            labelText: 'Pret',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.grey[200],
+            labelText: 'Pret',  // Eticheta câmpului
+            border: OutlineInputBorder(),  // Bordura câmpului
+            filled: true,  // Indică faptul că câmpul este umplut
+            fillColor: Colors.grey[200],  // Culoarea de umplere a câmpului
           ),
-          keyboardType: TextInputType.number,
-          validator: (value) {
+          keyboardType: TextInputType.number,  // Setează tastatura numerică pentru introducerea prețului
+          validator: (value) {  // Funcția de validare
             if (value == null || value.isEmpty) {
-              return 'Introdu pretul';
+              return 'Introdu pretul';  // Mesaj de eroare dacă câmpul este gol
             }
             if (double.tryParse(value) == null) {
-              return 'Valoare invalida';
+              return 'Valoare invalida';  // Mesaj de eroare dacă valoarea introdusă nu este un număr
             }
-            return null;
+            return null;  // Nicio eroare dacă câmpul nu este gol și valoarea este validă
           },
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 16),  // Spațiu vertical între câmpuri
+
+        // Câmpul de text pentru descrierea produsului.
         TextFormField(
           controller: descriptionController,
           decoration: InputDecoration(
-            labelText: 'Descriere',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.grey[200],
+            labelText: 'Descriere',  // Eticheta câmpului
+            border: OutlineInputBorder(),  // Bordura câmpului
+            filled: true,  // Indică faptul că câmpul este umplut
+            fillColor: Colors.grey[200],  // Culoarea de umplere a câmpului
           ),
-          maxLines: 4,
-          validator: (value) {
+          maxLines: 4,  // Permite introducerea a până la patru linii de text
+          validator: (value) {  // Funcția de validare
             if (value == null || value.isEmpty) {
-              return 'Introdu o descriere';
+              return 'Introdu o descriere';  // Mesaj de eroare dacă câmpul este gol
             }
-            return null;
+            return null;  // Nicio eroare dacă câmpul nu este gol
           },
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 16),  // Spațiu vertical între câmpuri
+
+        // Câmpul de text pentru cantitatea produsului.
         TextFormField(
           controller: quantityController,
           decoration: InputDecoration(
-            labelText: 'Cantitate',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.grey[200],
+            labelText: 'Cantitate',  // Eticheta câmpului
+            border: OutlineInputBorder(),  // Bordura câmpului
+            filled: true,  // Indică faptul că câmpul este umplut
+            fillColor: Colors.grey[200],  // Culoarea de umplere a câmpului
           ),
-          keyboardType: TextInputType.number,
-          validator: (value) {
+          keyboardType: TextInputType.number,  // Setează tastatura numerică pentru introducerea cantității
+          validator: (value) {  // Funcția de validare
             if (value == null || value.isEmpty) {
-              return 'Introdu cantitatea';
+              return 'Introdu cantitatea';  // Mesaj de eroare dacă câmpul este gol
             }
             if (int.tryParse(value) == null) {
-              return 'Valoare invalida';
+              return 'Valoare invalida';  // Mesaj de eroare dacă valoarea introdusă nu este un număr
             }
-            return null;
+            return null;  // Nicio eroare dacă câmpul nu este gol și valoarea este validă
           },
         ),
       ],

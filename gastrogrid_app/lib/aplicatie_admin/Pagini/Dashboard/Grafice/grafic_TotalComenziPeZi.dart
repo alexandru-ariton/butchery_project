@@ -1,42 +1,42 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart'; // Importă biblioteca principală Flutter pentru utilizarea widget-urilor.
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importă biblioteca Cloud Firestore pentru accesul la baza de date Firestore.
+import 'package:fl_chart/fl_chart.dart'; // Importă biblioteca fl_chart pentru utilizarea graficelor.
 
 class OrderLineChart extends StatelessWidget {
-  const OrderLineChart({super.key});
+  const OrderLineChart({super.key}); // Constructorul clasei, care folosește o cheie opțională.
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+      stream: FirebaseFirestore.instance.collection('orders').snapshots(), // Creează un stream de instantanee din colecția 'orders'.
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator()); // Afișează un indicator de încărcare dacă nu sunt date disponibile.
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text('Eroare'));
+          return Center(child: Text('Eroare')); // Afișează un mesaj de eroare dacă există o eroare.
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text('-'));
+          return Center(child: Text('-')); // Afișează un mesaj dacă nu există date.
         }
 
-        Map<String, int> orderCounts = {};
+        Map<String, int> orderCounts = {}; // Creează un map pentru a stoca numărul de comenzi pe zi.
         for (var doc in snapshot.data!.docs) {
           var timestamp = (doc['timestamp'] as Timestamp).toDate();
           var dateStr = "${timestamp.year}-${timestamp.month}-${timestamp.day}";
-          orderCounts[dateStr] = (orderCounts[dateStr] ?? 0) + 1;
+          orderCounts[dateStr] = (orderCounts[dateStr] ?? 0) + 1; // Incrementează numărul de comenzi pentru ziua respectivă.
         }
 
         return Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0), // Adaugă padding de 8 pixeli la toate marginile.
           child: AspectRatio(
             aspectRatio: 1.5,
             child: OrderLineChartWidget(
               data: orderCounts,
-              startDate: DateTime.now().subtract(Duration(days: 7)),
-              endDate: DateTime.now(),
+              startDate: DateTime.now().subtract(Duration(days: 7)), // Setează data de început cu 7 zile în urmă.
+              endDate: DateTime.now(), // Setează data de sfârșit la data curentă.
             ),
           ),
         );
@@ -59,11 +59,11 @@ class OrderLineChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<FlSpot> spots = [];
+    List<FlSpot> spots = []; // Creează o listă de puncte pentru grafic.
     DateTime currentDate = startDate;
     while (currentDate.isBefore(endDate) || currentDate.isAtSameMomentAs(endDate)) {
       var dateStr = "${currentDate.year}-${currentDate.month}-${currentDate.day}";
-      spots.add(FlSpot(currentDate.difference(startDate).inDays.toDouble(), data[dateStr]?.toDouble() ?? 0));
+      spots.add(FlSpot(currentDate.difference(startDate).inDays.toDouble(), data[dateStr]?.toDouble() ?? 0)); // Adaugă un punct pentru fiecare zi.
       currentDate = currentDate.add(Duration(days: 1));
     }
 

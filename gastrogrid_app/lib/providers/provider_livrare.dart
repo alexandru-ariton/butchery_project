@@ -1,76 +1,115 @@
+// Importă pachetul principal pentru construirea UI-ului în Flutter.
 import 'package:flutter/material.dart';
+// Importă pachetul pentru utilizarea Google Maps în Flutter.
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+// Importă pachetul pentru obținerea locației curente și calcularea distanțelor.
 import 'package:geolocator/geolocator.dart';
+// Importă pachetul pentru geocodificare (convertirea coordonatelor în adrese).
 import 'package:geocoding/geocoding.dart';
 
+// Clasă care gestionează informațiile de livrare și notifică ascultătorii când există schimbări.
 class DeliveryProvider with ChangeNotifier {
+  // Variabilă privată care indică dacă este activată livrarea.
   bool _isDelivery = true;
-  double _deliveryFee = 5.0;
+  // Variabilă privată pentru taxa de livrare.
+  double _deliveryFee = 0.0;
+  // Locația implicită (LatLng) setată la o locație specifică.
   final LatLng _defaultLocation = LatLng(44.416686, 26.101286);
+  // Adresa implicită.
   String? _defaultAddress;
+  // Adresa selectată de utilizator.
   String? _selectedAddress;
+  // Locația selectată de utilizator.
   LatLng? _selectedLocation;
-  int _deliveryTime = 60;
-  int pickupTime = 20;
+  // Timpul de livrare estimat în minute.
+  int _deliveryTime = 0;
+  // Timpul estimat pentru preluare în minute.
+  int pickupTime = 0;
 
+  // Getter pentru a verifica dacă este activată livrarea.
   bool get isDelivery => _isDelivery;
+  // Getter pentru taxa de livrare, calculată pe baza timpului de livrare.
   double get deliveryFee => (_isDelivery && _deliveryTime <= 60) ? _deliveryFee : 0.0;
-  String get defaultAddress => _defaultAddress ?? 'Adresa necunoscută';
+  // Getter pentru adresa implicită.
+  String get defaultAddress => _defaultAddress ?? 'Adresa necunoscuta';
+  // Getter pentru locația implicită.
   LatLng get defaultLocation => _defaultLocation;
+  // Getter pentru adresa selectată.
   String? get selectedAddress => _selectedAddress;
+  // Getter pentru locația selectată.
   LatLng? get selectedLocation => _selectedLocation;
-  int get deliveryTime => _isDelivery ? _deliveryTime : pickupTime;
+  // Getter pentru timpul de livrare estimat.
+   int get deliveryTime => _isDelivery ? (_deliveryTime ?? 0) : pickupTime;
 
-  String get formattedDeliveryTime {
+    void resetSelectedAddress() {
+    _selectedAddress = null;
+    _selectedLocation = null;
+    _deliveryFee = 0.0;
+    _deliveryTime = 0;
+    pickupTime = 0;
+    notifyListeners();
+  }
+
+  // Getter pentru timpul de livrare formatat ca text.
+  Object get formattedDeliveryTime {
     int time = _isDelivery ? _deliveryTime : pickupTime;
-    if (time > 60) {
-      return 'Locația este în afara ariei de livrare';
-    } 
+    String mesaj= "In afara ariei de livrare";
+    if(time>60)
+    {
+      return mesaj;
+    }
     return _formatTime(time);
   }
 
+  // Constructor care convertește locația implicită într-o adresă.
   DeliveryProvider() {
     _convertDefaultLocationToAddress();
   }
 
+  // Metodă pentru comutarea între livrare și preluare.
   void toggleDelivery(bool isDelivery) {
     _isDelivery = isDelivery;
-    notifyListeners();
+    notifyListeners(); // Notifică ascultătorii despre schimbare.
   }
 
+  // Metodă pentru setarea adresei și locației selectate.
   void setSelectedAddress(String? address, LatLng? location) {
     _selectedAddress = address;
     _selectedLocation = location;
-    calculateDeliveryDetails();
-    notifyListeners();
+    calculateDeliveryDetails(); // Calculează detaliile livrării pe baza noii adrese.
+    notifyListeners(); // Notifică ascultătorii despre schimbare.
   }
 
+  // Metodă pentru calcularea detaliilor livrării (taxa și timpul).
   Future<void> calculateDeliveryDetails() async {
     if (_selectedAddress == null || _selectedLocation == null) {
-      _deliveryFee = 5.0;
-      _deliveryTime = 60;
-      pickupTime = 20;
+      _deliveryFee = 0.0;
+      _deliveryTime = 0;
+      pickupTime = 0;
     } else {
       double distance = await _calculateDistance(_defaultLocation, _selectedLocation!);
       _deliveryFee = double.parse((5.0 + distance * 0.5).toStringAsFixed(2));
       _deliveryTime = (distance / 10 * 60).round();
       pickupTime = (distance / 20 * 20).round();
     }
-    notifyListeners();
+    notifyListeners(); // Notifică ascultătorii despre schimbare.
   }
 
+  // Metodă privată pentru calcularea distanței dintre două locații.
   Future<double> _calculateDistance(LatLng start, LatLng end) async {
     double distance = Geolocator.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude) / 1000;
-    return distance;
+    return distance; // Returnează distanța în kilometri.
   }
 
+  // Metodă pentru resetarea informațiilor de livrare la valorile implicite.
   void resetDeliveryInfo() {
-    _deliveryFee = 5.0;
-    _deliveryTime = 60;
-    pickupTime = 20;
-    notifyListeners();
+    _deliveryFee = 0.0;
+    _deliveryTime = 0;
+    pickupTime = 0;
+    notifyListeners(); // Notifică ascultătorii despre schimbare.
   }
 
+  // Metodă privată pentru convertirea locației implicite într-o adresă.
   Future<void> _convertDefaultLocationToAddress() async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(_defaultLocation.latitude, _defaultLocation.longitude);
@@ -86,9 +125,10 @@ class DeliveryProvider with ChangeNotifier {
       _defaultAddress = 'Eroare la obținerea adresei';
       print('Eroare la obținerea adresei: $e'); // Log de eroare pentru debugging
     }
-    notifyListeners();
+    notifyListeners(); // Notifică ascultătorii despre schimbare.
   }
 
+  // Metodă privată pentru formatarea timpului în minute, ore și zile.
   String _formatTime(int minutes) {
     if (minutes < 60) {
       return '$minutes min';
@@ -104,6 +144,7 @@ class DeliveryProvider with ChangeNotifier {
     }
   }
 
+  // Metodă pentru obținerea locației (LatLng) pe baza unei adrese.
   Future<LatLng?> getLocationFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
@@ -113,6 +154,8 @@ class DeliveryProvider with ChangeNotifier {
     } catch (e) {
       print("Error getting location from address: $e");
     }
-    return null;
+    return null; // Returnează null dacă locația nu poate fi obținută.
   }
+
+   
 }

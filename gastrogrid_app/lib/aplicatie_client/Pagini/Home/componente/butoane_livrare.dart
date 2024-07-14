@@ -1,7 +1,13 @@
+// Importă biblioteca principală Flutter pentru a crea interfețe de utilizator.
 import 'package:flutter/material.dart';
+
+// Importă providerul pentru gestionarea livrărilor.
 import 'package:gastrogrid_app/providers/provider_livrare.dart';
+
+// Importă pachetul provider pentru gestionarea stării.
 import 'package:provider/provider.dart';
 
+// Declarația unei clase stateful pentru butoanele de toggle pentru livrare.
 class DeliveryToggleButtons extends StatefulWidget {
   const DeliveryToggleButtons({super.key});
 
@@ -9,26 +15,32 @@ class DeliveryToggleButtons extends StatefulWidget {
   _DeliveryToggleButtonsState createState() => _DeliveryToggleButtonsState();
 }
 
+// Declarația stării pentru clasa DeliveryToggleButtons.
 class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
   @override
   Widget build(BuildContext context) {
+    // Obține informațiile de livrare folosind providerul.
     final deliveryInfo = Provider.of<DeliveryProvider>(context);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // Padding pentru a adăuga spațiu în jurul butoanelor.
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              // Buton pentru opțiunea de livrare.
               _buildDeliveryButton(deliveryInfo.isDelivery),
               SizedBox(width: 10),
+              // Buton pentru opțiunea de ridicare.
               _buildPickupButton(!deliveryInfo.isDelivery),
             ],
           ),
         ),
         SizedBox(height: 16),
+        // Afișează informațiile de livrare sau ridicare, în funcție de selecție.
         Center(
           child: deliveryInfo.isDelivery 
             ? _buildDeliveryInfo(deliveryInfo) 
@@ -38,6 +50,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
     );
   }
 
+  // Metodă pentru construirea butonului de livrare.
   Widget _buildDeliveryButton(bool isDeliverySelected) {
     return _buildToggleButton(
       'Livrare', 
@@ -49,6 +62,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
     );
   }
 
+  // Metodă pentru construirea butonului de ridicare.
   Widget _buildPickupButton(bool isPickupSelected) {
     return _buildToggleButton(
       'Ridicare', 
@@ -60,6 +74,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
     );
   }
 
+  // Metodă pentru construirea unui buton de toggle.
   Widget _buildToggleButton(String text, bool isSelected, IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
@@ -93,6 +108,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
     );
   }
 
+  // Metodă pentru afișarea informațiilor de livrare.
   Widget _buildDeliveryInfo(DeliveryProvider deliveryInfo) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -108,6 +124,7 @@ class _DeliveryToggleButtonsState extends State<DeliveryToggleButtons> {
     );
   }
 
+  // Metodă pentru afișarea informațiilor de ridicare.
   Widget _buildPickupInfo(DeliveryProvider deliveryInfo) {
     return Row(
       mainAxisSize: MainAxisSize.min,

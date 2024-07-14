@@ -1,15 +1,19 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'dart:math';
 
-class ProductsAndSuppliersChart extends StatelessWidget {
+class ProductsAndSuppliersChart extends StatefulWidget {
   const ProductsAndSuppliersChart({super.key});
 
   @override
+  _ProductsAndSuppliersChartState createState() => _ProductsAndSuppliersChartState();
+}
+
+class _ProductsAndSuppliersChartState extends State<ProductsAndSuppliersChart> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: Column(
         children: [
           Expanded(
@@ -29,24 +33,25 @@ class ProductsAndSuppliersChart extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-        Map<String, int> productsData = {};
+        Map<String, Map<String, dynamic>> productsData = {};
         for (var doc in snapshot.data!.docs) {
           var data = doc.data() as Map<String, dynamic>?;
           String? productName = data != null ? data['title'] as String? : null;
           var quantity = data != null ? data['quantity'] : null;
+          String? unit = data != null ? data['unit'] as String? : null;
 
-          if (productName != null && quantity != null) {
-            productsData[productName] = (quantity is int) ? quantity : (quantity as double).toInt();
+          if (productName != null && quantity != null && unit != null) {
+            productsData[productName] = {'quantity': quantity, 'unit': unit};
           }
         }
 
         var series = [
-          charts.Series<MapEntry<String, int>, String>(
+          charts.Series<MapEntry<String, Map<String, dynamic>>, String>(
             id: 'Products',
-            domainFn: (MapEntry<String, int> entry, _) => entry.key,
-            measureFn: (MapEntry<String, int> entry, _) => entry.value,
+            domainFn: (MapEntry<String, Map<String, dynamic>> entry, _) => entry.key,
+            measureFn: (MapEntry<String, Map<String, dynamic>> entry, _) => entry.value['quantity'],
             data: productsData.entries.toList(),
-            labelAccessorFn: (MapEntry<String, int> entry, _) => '${entry.key}: ${entry.value}',
+            labelAccessorFn: (MapEntry<String, Map<String, dynamic>> entry, _) => '${entry.key}: ${(entry.value['quantity'] as num).toStringAsFixed(2)} ${entry.value['unit']}',
             colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
           )
         ];
@@ -117,24 +122,34 @@ class ProductsAndSuppliersChart extends StatelessWidget {
     );
   }
 
-  Future<Map<String, List<String>>> _getSuppliersData() async {
-    Map<String, List<String>> suppliersData = {};
+  Future<Map<String, Map<String, dynamic>>> _getSuppliersData() async {
+    Map<String, Map<String, dynamic>> suppliersData = {};
 
     QuerySnapshot productsSnapshot = await FirebaseFirestore.instance.collection('products').get();
 
     for (var productDoc in productsSnapshot.docs) {
       var productData = productDoc.data() as Map<String, dynamic>?;
-      String? productName = productData != null ? productData['title'] as String? : null;
-
-      if (productName != null) {
+      if (productData != null) {
+        String productName = productData['title'];
         QuerySnapshot suppliersSnapshot = await productDoc.reference.collection('suppliers').get();
 
         for (var supplierDoc in suppliersSnapshot.docs) {
           var supplierData = supplierDoc.data() as Map<String, dynamic>?;
-          String? supplierName = supplierData != null ? supplierData['name'] as String? : null;
+          String? supplierId = supplierData != null ? supplierData['controller'] as String? : null;
 
-          if (supplierName != null) {
-            suppliersData[supplierName] = (suppliersData[supplierName] ?? [])..add(productName);
+          if (supplierId != null) {
+            DocumentSnapshot supplierSnapshot = await FirebaseFirestore.instance.collection('suppliers').doc(supplierId).get();
+            String? supplierName = supplierSnapshot.data() != null ? supplierSnapshot['name'] as String? : null;
+
+            if (supplierName != null) {
+              if (suppliersData.containsKey(supplierName)) {
+                suppliersData[supplierName]?['count'] = (suppliersData[supplierName]?['count'] ?? 0) + 1;
+              } else {
+                suppliersData[supplierName] = {
+                  'count': 1,
+                };
+              }
+            }
           }
         }
       }
@@ -144,19 +159,19 @@ class ProductsAndSuppliersChart extends StatelessWidget {
   }
 
   Widget _buildSuppliersChart() {
-    return FutureBuilder<Map<String, List<String>>>(
+    return FutureBuilder<Map<String, Map<String, dynamic>>>(
       future: _getSuppliersData(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
         var suppliersData = snapshot.data!;
         var series = [
-          charts.Series<MapEntry<String, List<String>>, String>(
+          charts.Series<MapEntry<String, Map<String, dynamic>>, String>(
             id: 'Suppliers',
-            domainFn: (MapEntry<String, List<String>> entry, _) => entry.key,
-            measureFn: (MapEntry<String, List<String>> entry, _) => entry.value.length,
+            domainFn: (MapEntry<String, Map<String, dynamic>> entry, _) => entry.key,
+            measureFn: (MapEntry<String, Map<String, dynamic>> entry, _) => entry.value['count'],
             data: suppliersData.entries.toList(),
-            labelAccessorFn: (MapEntry<String, List<String>> entry, _) => '${entry.key}: ${entry.value.length}',
+            labelAccessorFn: (MapEntry<String, Map<String, dynamic>> entry, _) => '${entry.key}: ${entry.value['count']} produse',
             colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
           )
         ];
@@ -233,9 +248,9 @@ class ProductsAndSuppliersChart extends StatelessWidget {
                             if (model.hasDatumSelection) {
                               final selectedDatum = model.selectedDatum[0];
                               final supplierName = selectedDatum.datum.key;
-                              final products = suppliersData[supplierName]!;
-                              
-                              print('Furnizorul selectat: $supplierName, Produsele: $products');
+                              final count = suppliersData[supplierName]!['count'];
+
+                              print('Furnizorul selectat: $supplierName, Produse: $count');
                             }
                           },
                         ),
@@ -253,7 +268,7 @@ class ProductsAndSuppliersChart extends StatelessWidget {
 }
 
 class CustomCircleSymbolRenderer extends charts.CircleSymbolRenderer {
-  final Map<String, List<String>> suppliersData;
+  final Map<String, Map<String, dynamic>> suppliersData;
 
   CustomCircleSymbolRenderer({required this.suppliersData});
 
@@ -277,32 +292,32 @@ class CustomCircleSymbolRenderer extends charts.CircleSymbolRenderer {
       strokeWidthPx: strokeWidthPx,
     );
 
-   final textStyle = charts.TextStyleSpec(color: charts.MaterialPalette.black, fontSize: 12);
+    final textStyle = charts.TextStyleSpec(color: charts.MaterialPalette.white, fontSize: 12);
     final selectedSupplier = suppliersData.keys.elementAt(bounds.left.toInt() % suppliersData.length);
-    final products = suppliersData[selectedSupplier]!.join(', ');
+    final count = suppliersData[selectedSupplier]!['count'];
 
     final textElementSupplier = canvas.graphicsFactory.createTextElement(selectedSupplier)
       ..textStyle = textStyle as charts.TextStyle?;
-    final textElementProducts = canvas.graphicsFactory.createTextElement(products)
+    final textElementCount = canvas.graphicsFactory.createTextElement('$count produse')
       ..textStyle = textStyle as charts.TextStyle?;
 
-    final backgroundBounds = Rectangle(bounds.left - 5, bounds.top - 25, bounds.width + 10, bounds.height + 25);
+    final backgroundBounds = Rectangle(bounds.left, bounds.top, bounds.width, bounds.height);
     canvas.drawRect(
       backgroundBounds,
-      fill: charts.MaterialPalette.white,
-      stroke: charts.MaterialPalette.black,
+      fill: charts.MaterialPalette.blue.shadeDefault,
+      stroke: charts.MaterialPalette.blue.shadeDefault,
     );
 
     canvas.drawText(
       textElementSupplier,
-      (bounds.left).round(),
-      (bounds.top - 20).round(),
+      (bounds.left + 5).round(),
+      (bounds.top + 5).round(),
     );
 
     canvas.drawText(
-      textElementProducts,
-      (bounds.left).round(),
-      (bounds.top - 5).round(),
+      textElementCount,
+      (bounds.left + 5).round(),
+      (bounds.top + 20).round(),
     );
   }
 }
