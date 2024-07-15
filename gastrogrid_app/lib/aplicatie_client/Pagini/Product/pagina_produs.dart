@@ -78,7 +78,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
         double quantityToAddInKg = quantityToAdd;
 
-        if (existingCartItemKg.quantity > 0) {
+        if (existingCartItemKg.quantity > 0) { 
           existingCartItemKg.quantity += quantityToAdd;
           cartProvider.updateProductQuantity(existingCartItemKg, existingCartItemKg.quantity);
         } else {

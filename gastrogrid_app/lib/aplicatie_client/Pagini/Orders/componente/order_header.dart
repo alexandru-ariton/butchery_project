@@ -31,7 +31,7 @@ class OrderHeader extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
-        ),
+        ), 
         SizedBox(height: 8),
         // Afișează statusul preparării.
         Row(

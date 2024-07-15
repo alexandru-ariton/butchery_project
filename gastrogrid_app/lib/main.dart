@@ -33,7 +33,7 @@ Future<void> initializeUserDocuments() async {
       // Actualizează documentul setând 'isLoggedIn' la false.
       await doc.reference.update({'isLoggedIn': false});
     } catch (e) {
-      // Prinde și afișează erorile.
+      // Print și afișează erorile.
       print('Eroare la actualizarea documentului din users: ${doc.id}, eroare: $e');
     }
   }

@@ -16,8 +16,7 @@ class PaymentPage extends StatelessWidget {
     return Scaffold( // Scaffold oferă o structură de bază pentru pagină.
       appBar: AppBar( // Bara de aplicație de sus.
         title: Text('Plata'), // Titlul barei de aplicație.
-        backgroundColor: Colors.teal, // Culoarea de fundal a barei de aplicație.
-        automaticallyImplyLeading: false, // Dezactivează butonul implicit de back.
+        automaticallyImplyLeading: true,
       ),
       body: Padding( // Padding adaugă spațiu în jurul conținutului.
         padding: const EdgeInsets.all(16.0),
