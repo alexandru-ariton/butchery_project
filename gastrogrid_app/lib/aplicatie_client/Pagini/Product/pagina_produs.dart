@@ -33,11 +33,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
 
     try {
-      final deliveryProvider = Provider.of<DeliveryProvider>(context, listen: false);
+      final deliveryProvider =
+          Provider.of<DeliveryProvider>(context, listen: false);
 
-      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime == 0  || deliveryProvider.pickupTime == 0 || deliveryProvider.deliveryTime > 60 ) {
+      if (deliveryProvider.isDelivery && deliveryProvider.deliveryTime == 0 ||
+          deliveryProvider.pickupTime == 0 ||
+          deliveryProvider.deliveryTime > 60) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Livrarea nu poate fi efectuata pentru aceasta adresa.')),
+          SnackBar(
+              content: Text(
+                  'Livrarea nu poate fi efectuata pentru aceasta adresa.')),
         );
         return;
       }
@@ -49,7 +54,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
       if (productSnapshot.exists) {
         double currentStockKg = (productSnapshot['quantity'] as num).toDouble();
-        Timestamp? expiryTimestamp = productSnapshot['expiryDate'] as Timestamp?;
+        Timestamp? expiryTimestamp =
+            productSnapshot['expiryDate'] as Timestamp?;
         DateTime? expiryDate = expiryTimestamp?.toDate();
 
         if (currentStockKg == 0) {
@@ -60,7 +66,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           return;
         }
 
-        if (expiryDate != null && DateTime.now().isAfter(expiryDate)) {
+        if (DateTime.now().isAfter(expiryDate!)) {
           await notifyExpired(context, widget.product);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Produs expirat')),
@@ -71,16 +77,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         var cartProvider = Provider.of<CartProvider>(context, listen: false);
         var existingCartItemKg = cartProvider.cartItems.firstWhere(
           (item) => item.product.id == widget.product.id && item.unit == 'gr',
-          orElse: () => CartItem(product: widget.product, quantity: 0.0, unit: 'gr'),
+          orElse: () =>
+              CartItem(product: widget.product, quantity: 0.0, unit: 'gr'),
         );
 
         double quantityToAdd = 0.1; // 0.1 kilogram
 
         double quantityToAddInKg = quantityToAdd;
 
-        if (existingCartItemKg.quantity > 0) { 
+        if (existingCartItemKg.quantity > 0) {
           existingCartItemKg.quantity += quantityToAdd;
-          cartProvider.updateProductQuantity(existingCartItemKg, existingCartItemKg.quantity);
+          cartProvider.updateProductQuantity(
+              existingCartItemKg, existingCartItemKg.quantity);
         } else {
           var cartItem = CartItem(
             product: widget.product,
@@ -98,7 +106,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Produsul ${widget.product.title} a fost adaugat in cos')),
+          SnackBar(
+              content: Text(
+                  'Produsul ${widget.product.title} a fost adaugat in cos')),
         );
 
         Navigator.of(context).pop(); // Navigate back to the home page
@@ -163,7 +173,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Text(
                 widget.product.description,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.7),
                     ),
               ),
             ),
@@ -184,21 +197,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                 
                   Padding(
-                    padding: const EdgeInsets.only(left:100.0),
+                    padding: const EdgeInsets.only(left: 100.0),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40.0, vertical: 8.0),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        '${(price/10).toStringAsFixed(2)} lei/$selectedUnit',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        '${(price / 10).toStringAsFixed(2)} lei/$selectedUnit',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                     ),
                   ),
