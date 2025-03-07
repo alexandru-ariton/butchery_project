@@ -1,66 +1,127 @@
-🥩 Butcher Shop Management System
+# 🥩 Butchery Management System
 
-A Flutter-based butcher shop management system designed to streamline inventory management, order processing, and customer interactions. The project consists of two applications:
+A **butchery management system** developed as part of an academic project at the **Bucharest University of Economic Studies**. This system includes two distinct applications:
 
-Customer App – Allows customers to browse products, place orders, and manage their addresses and payments.
-Admin App – Enables butchers to manage products, track orders, and communicate with suppliers.
+- **Customer Application** 🛒 - Allows customers to browse products, place orders, and manage their profiles.
+- **Admin Application** 🛠 - Enables butchers to manage inventory, orders, and supplier relationships efficiently.
 
-🚀 Features
+---
 
-🛒 Customer App
+## 📌 Project Overview
 
-- Product Browsing – View and search products with real-time updates.
-- Order Placement – Add items to the cart and place orders.
-- Address Management – Select and save delivery addresses using Google Maps.
-- Payment Integration – Choose between cash and card payments.
-- Order Tracking – Customers receive order status updates.
-- User Authentication – Secure login and signup.
+- **Institution**: Bucharest University of Economic Studies  
+- **Faculty**: Cybernetics, Statistics, and Economic Informatics  
+- **Authors**: Alexandru Ariton, Cristian-Eugen Ciurea  
+- **Year**: 2024  
+- **Technologies Used**: Flutter, Dart, Google Cloud Console, Firebase  
 
-🏪 Admin App
+---
 
-- Inventory Management – Add, edit, and remove products.
-- Supplier Management – Track suppliers and update stock availability.
-- Order Processing – Manage customer orders efficiently.
-- Analytics Dashboard – View real-time reports and sales insights.
-- Notifications – Alerts for low stock and expiring products.
+## 🚀 Features
 
-🛠️ Technologies Used
+### ✅ **Customer App Features**
+- 🔍 **Product Catalog** – Browse products with images, descriptions, and prices.
+- 📦 **Order Placement** – Select items, choose delivery/pickup, and complete orders.
+- 📍 **Address Selection** – Save multiple addresses, integrate with Google Maps.
+- 💳 **Payment Management** – Store and manage payment methods.
+- 🔔 **Notifications** – Receive alerts on order status updates.
 
-- Flutter & Dart – Frontend framework for cross-platform compatibility.
-- Firebase Firestore – NoSQL database for storing product and order data.
-- Firebase Authentication – Secure login and authentication.
-- Firebase Storage – Store and manage product images.
-- Google Maps API – Interactive location selection for deliveries.
-- Cloud Functions – Backend processing for notifications and order tracking.
+### ✅ **Admin App Features**
+- 📦 **Inventory Management** – Add, update, and remove products with expiration alerts.
+- 📊 **Order Processing** – Track and process customer orders efficiently.
+- 📢 **Supplier Management** – Maintain supplier relationships and restock products.
+- 📈 **Reporting** – View sales data, product performance, and analytics.
 
-🏗️ Installation
+---
 
-Prerequisites
+## 🏗️ System Architecture
 
-- Flutter SDK 
-- Firebase Project Setup 
-- Google Maps API Key 
+The system consists of the following components:
 
-Steps
-1.Clone the repository:
-- git clone https://github.com/yourusername/butcher-shop.git
-- cd butcher-shop
+- **Frontend**: Flutter-based mobile applications.
+- **Backend & Database**: Firebase Firestore for real-time data synchronization.
+- **Cloud Services**: Google Cloud Console for authentication, storage, and notifications.
 
-2.Install dependencies:
-- flutter pub get
+### 🛠 **Technologies Used**
 
-3.Configure Firebase:
+| Technology | Purpose |
+|------------|---------|
+| **Flutter** | Cross-platform UI framework for mobile development |
+| **Dart** | Programming language for backend logic |
+| **Firebase Firestore** | NoSQL database for real-time data |
+| **Firebase Authentication** | Secure user login & authentication |
+| **Google Cloud Console** | Cloud resource management |
+| **Google Maps API** | Address selection & location tracking |
 
-- Add google-services.json (Android) and GoogleService-Info.plist (iOS) to the respective android/app and ios/Runner folders.
+---
 
-4.Run the app:
+## 📥 Installation & Setup
 
-- flutter run
+### 🔹 **Prerequisites**
+Ensure you have the following installed:
+- **Flutter SDK**
+- **Dart SDK**
+- **Firebase CLI**
 
-📌 Roadmap
+### 🔹 **Installation Steps**
+1️⃣ Clone the repository:
+```sh
+git clone https://github.com/your-repo/butchery-management.git
+```
+2️⃣ Navigate to the project directory:
+```sh
+cd butchery-management
+```
+3️⃣ Install dependencies:
+```sh
+flutter pub get
+```
+4️⃣ Set up Firebase:
+   - Create a Firebase project.
+   - Enable **Firestore**, **Authentication**, and **Storage**.
+   - Download and configure `google-services.json` (Android) / `GoogleService-Info.plist` (iOS).
 
- - Implement a delivery personnel app for tracking deliveries.
- - Integrate real-time order tracking for customers.
- - Add POS integration for in-store purchases.
- - Improve security measures (data encryption, authentication).
- - Implement customer feedback for service improvement.
+5️⃣ Run the app:
+```sh
+flutter run
+```
+
+---
+
+## 📊 Data Flow & Diagrams
+
+### **📌 Database Schema**
+The database is structured as follows:
+
+- **Users**: Stores customer profiles, addresses, and orders.
+- **Products**: Contains inventory details such as names, prices, stock, and expiry dates.
+- **Orders**: Tracks customer purchases, payment status, and order fulfillment.
+- **Suppliers**: Manages supplier information and product restocking.
+
+### **📍 Order Processing Flowchart**
+1. Customer selects products.
+2. Customer chooses delivery or pickup.
+3. Customer completes payment.
+4. System processes the order and notifies the admin.
+5. Admin verifies and ships the order.
+6. Customer receives a notification upon completion.
+
+---
+
+## 🎯 Future Enhancements
+
+🔮 **Next Steps:**
+- Integrate **AI-based recommendations** for customers.
+- Implement **Loyalty & Rewards System**.
+- Add **Multilingual Support**.
+- Develop a **Web Dashboard for Admins**.
+
+---
+
+👥 Contributors:  
+- **Alexandru Ariton**  
+- **Cristian-Eugen Ciurea**  
+
+---
+
+
