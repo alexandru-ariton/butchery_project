@@ -119,8 +119,7 @@ The database is structured as follows:
 ---
 
 👥 Contributors:  
-- **Alexandru Ariton**  
-- **Cristian-Eugen Ciurea**  
+- **Alexandru Ariton**   
 
 ---
 
