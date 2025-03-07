@@ -8,6 +8,7 @@ Admin App – Enables butchers to manage products, track orders, and communicate
 🚀 Features
 
 🛒 Customer App
+
 Product Browsing – View and search products with real-time updates.
 Order Placement – Add items to the cart and place orders.
 Address Management – Select and save delivery addresses using Google Maps.
@@ -16,6 +17,7 @@ Order Tracking – Customers receive order status updates.
 User Authentication – Secure login and signup.
 
 🏪 Admin App
+
 Inventory Management – Add, edit, and remove products.
 Supplier Management – Track suppliers and update stock availability.
 Order Processing – Manage customer orders efficiently.
@@ -23,6 +25,7 @@ Analytics Dashboard – View real-time reports and sales insights.
 Notifications – Alerts for low stock and expiring products.
 
 🛠️ Technologies Used
+
 Flutter & Dart – Frontend framework for cross-platform compatibility.
 Firebase Firestore – NoSQL database for storing product and order data.
 Firebase Authentication – Secure login and authentication.
@@ -31,7 +34,9 @@ Google Maps API – Interactive location selection for deliveries.
 Cloud Functions – Backend processing for notifications and order tracking.
 
 🏗️ Installation
+
 Prerequisites
+
 Flutter SDK 
 Firebase Project Setup 
 Google Maps API Key 
@@ -53,6 +58,7 @@ Steps
 - flutter run
 
 📌 Roadmap
+
  Implement a delivery personnel app for tracking deliveries.
  Integrate real-time order tracking for customers.
  Add POS integration for in-store purchases.
