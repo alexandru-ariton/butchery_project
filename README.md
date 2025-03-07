@@ -1,4 +1,5 @@
 🥩 Butcher Shop Management System
+
 A Flutter-based butcher shop management system designed to streamline inventory management, order processing, and customer interactions. The project consists of two applications:
 
 Customer App – Allows customers to browse products, place orders, and manage their addresses and payments.
